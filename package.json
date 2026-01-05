@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-   "build:uat": "vite build --mode uat",
-   "build:prod": "vite build --mode production",
+    "build:uat": "vite build --mode uat",
+    "build:production": "vite build --mode production",
+    "dev": "vite --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
@@ -20,7 +20,10 @@
     "axios": "^1.11.0",
     "flowbite-react": "^0.12.2",
     "formik": "^2.4.6",
+    "html2canvas": "^1.4.1",
+    "html2pdf.js": "^0.12.1",
     "js-cookie": "^3.0.5",
+    "jspdf": "^3.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.62.0",
@@ -29,7 +32,9 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.5.0",
     "react-spinners": "^0.17.0",
+    "react-to-print": "^3.1.1",
     "tailwindcss": "^4.1.4",
+    "wkhtmltopdf": "^0.4.0",
     "yup": "^1.7.0"
   },
   "devDependencies": {

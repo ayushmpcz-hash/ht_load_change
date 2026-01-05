@@ -34,6 +34,7 @@ export const getNgbToken = async (formData, url) => {
 
 }
 export const getFinalUsingDataToken = async (url,token) => {
+  console.log(token,'token in apiii')
   const response = await fetch(
     `${url}`,
     {

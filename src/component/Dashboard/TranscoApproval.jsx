@@ -14,12 +14,7 @@ import {
 import { responseOption, revertOption } from '../newComponents/commonOption.js';
 import { HT_LOAD_CHANGE_BASE } from '../../api/api.js';
 
-const revertOptionFor29 = [
-  { label: "Officer Requested", value: "Officer Requested" },
-  { label: "Incorrect Details", value: "Incorrect Details" },
-];
-
-const LoadCommissioningPermission = () => {
+const TranscoApproval = () => {
   const officerData = useSelector(state => state.user.officerData);
   const location = useLocation();
   const navigate = useNavigate();
@@ -36,9 +31,8 @@ const LoadCommissioningPermission = () => {
   } = useForm({
     defaultValues: items || {},
   });
-  // console.log(officerData, 'officerData');
-  // console.log(items, 'items');
-   console.log(HT_LOAD_CHANGE_BASE,'HT_LOAD_CHANGE_BASE in Coomisioning permision')
+  console.log(officerData, 'officerData');
+  console.log(items, 'items');
 
   const token = Cookies.get('accessToken');
 
@@ -49,9 +43,6 @@ const LoadCommissioningPermission = () => {
   const [isDisabled, setIsDisabled] = useState(false);
   const [isBtnDisabled, setBtnIsDisabled] = useState(false);
   const commissioning_permission_response = watch('commissioning_permission_response');
-
-  const isStatus29 = items?.application_status === 29;
-
   const handleSendOtp = async formData => {
     setFormDataValue(formData);
     const sentOtp = await sendOtpNew(mobileNo);
@@ -141,7 +132,7 @@ const LoadCommissioningPermission = () => {
           <div class="card mt-2 mb-2 bg-white rounded shadow-md ">
             <div className="card-header px-4 py-2 border-b border-gray-300">
               <h2 className="text-lg font-bold capitalize ">
-                HT Load Change Commissioning Permission
+                HT Load Change EDCRA Permission
               </h2>
             </div>
             <div className="card-body px-4 pb-4">
@@ -152,12 +143,12 @@ const LoadCommissioningPermission = () => {
               </div>
             </div>
           </div>
-          {officerData?.employee_detail.role == 3 && (
+          {officerData?.employee_detail.role == 18 && (
             <>
               <div class="card mt-2 mb-2 bg-white rounded shadow-md ">
                 <div className="card-header px-4 py-2 border-b border-gray-300">
                   <h2 className="text-lg font-bold capitalize ">
-                    Commissioning Permission Details
+                    EDCRA Permission Details
                   </h2>
                 </div>
                 <div className="card-body px-4 pb-4">
@@ -191,7 +182,7 @@ const LoadCommissioningPermission = () => {
                     {/* Reverted Case */}
                     {commissioning_permission_response === 'Reverted' && (
                       <>
-                        {/* <SelectTag
+                        <SelectTag
                           LName="Revert Reason"
                           options={revertOption}
                           {...register('revert_reason', {
@@ -201,26 +192,14 @@ const LoadCommissioningPermission = () => {
                           labelKey="label"
                           valueKey="value"
                           disabled={isDisabled}
-                        /> */}
-                        <SelectTag
-                          LName="Revert Reason"
-                          options={isStatus29 ? revertOptionFor29 : revertOption}
-                          {...register("revert_reason", {
-                            required: "Revert Reason is required",
-                          })}
-                          errorMsg={errors.revert_reason?.message}
-                          labelKey="label"
-                          valueKey="value"
-                          disabled={isDisabled}
                         />
-
                         <InputTag
                           LName="Revert Reason Remark"
                           placeholder="Enter Remark"
-                          {...register('revert_remark', {
+                          {...register('revert_reason_remark', {
                             required: 'Remark is required',
                           })}
-                          errorMsg={errors.revert_remark?.message}
+                          errorMsg={errors.revert_reason_remark?.message}
                           disabled={isDisabled}
                         />
                         <InputTag
@@ -247,10 +226,11 @@ const LoadCommissioningPermission = () => {
                           </button>
                           <button
                             type="submit" // ✅ Yeh important hai, warna handleSendOtp call nahi hota
-                            className={`px-4 py-2 rounded text-white ${isDisabled
+                            className={`px-4 py-2 rounded text-white ${
+                              isDisabled
                                 ? 'bg-gray-400 cursor-not-allowed'
                                 : 'bg-green-500 hover:bg-purple-800'
-                              }`}
+                            }`}
                             disabled={isDisabled}
                           >
                             {commissioning_permission_response === 'Reverted'
@@ -269,10 +249,11 @@ const LoadCommissioningPermission = () => {
                           <button
                             type="button"
                             onClick={handleVerifyOtp}
-                            className={`px-4 py-2 rounded text-white ${isBtnDisabled
+                            className={`px-4 py-2 rounded text-white ${
+                              isBtnDisabled
                                 ? 'bg-gray-400 cursor-not-allowed'
                                 : 'bg-green-600 hover:bg-purple-800'
-                              }`}
+                            }`}
                             disabled={isBtnDisabled}
                           >
                             {isBtnDisabled ? 'Please wait...' : 'Verify OTP'}
@@ -304,4 +285,4 @@ const LoadCommissioningPermission = () => {
     </>
   );
 };
-export default LoadCommissioningPermission;
+export default TranscoApproval;

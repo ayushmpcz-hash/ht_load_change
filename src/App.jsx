@@ -23,18 +23,28 @@ import LoadDemandNote from './component/Dashboard/LoadDemandNote';
 import LoadAgreement from './component/Dashboard/LoadAgreement';
 import LoadChangeInstruction from './component/loadChange/LoadChangeInstruction';
 import SuccessRespones from './component/newComponents/SuccessRespones';
+import UserSuccessResponse from './component/newComponents/UserSuccessResponse';
 
 
 import LoadCommissioningPermission from "./component/Dashboard/LoadCommissioningPermission"
 import LoadCommissioning from "./component/Dashboard/LoadCommissioning"
+import TranscoApproval from "./component/Dashboard/TranscoApproval"
 import LoadDemandNotePayment from './component/Dashboard/UserDashboard/LoadDemandNotePayment';
 
-import {TrackApplicationStatus,LoadRegistrationFeePayment,LoadResubmission,RegistrationPayment,LoadConnectionServed,
-  LoadWorkCompletionAndMeterIssuing
+import {
+  TrackApplicationStatus, LoadRegistrationFeePayment, LoadResubmission, RegistrationPayment, LoadConnectionServed,
+  LoadWorkCompletionAndMeterIssuing, SearchApplicantDetailsPDF, Download,
 } from "./component/importComponents"
+import PendingForForwardToEDCRA from './component/Dashboard/PendingForForwardToEDCRA';
+import PendingForTranscoApproval from './component/Dashboard/PendingForTranscoApproval';
+import Dummy from './component/Dummy';
+import BayRequiredAccept from './component/Dashboard/BayRequiredAccept';
 
 
 function App() {
+//   console.log(import.meta.env.MODE,'App js MODE')
+//   console.log(import.meta.env,'App js ENVVVVVVVVVVVVVVVVVVVVVV')
+//  console.log( import.meta.env.VITE_LOAD_CHANGE_BASE_URL,'MMMMMMMMMMMMMMMMMMMMMMM')
   return (
     <>
       <BrowserRouter>
@@ -43,6 +53,7 @@ function App() {
             <Route index element={<Body />} />
             <Route path="/NewServiceConnection" element={<LoadChangeReg />} />
             <Route path="/ht-load-change/" element={<LoadChangeInstruction />} />
+            <Route path="/dummy/:empId" element={<Dummy />} />
             <Route
               path="/ht-load-change/consumer-registration/:consumerId"
               element={<LoadChangeReg />}
@@ -65,13 +76,13 @@ function App() {
             />
             <Route
               path="/track-application"
-              element={<TrackApplicationStatus/>}
+              element={<TrackApplicationStatus />}
             />
             <Route
               path="ht-load-change/track_application_status"
               element={<TrackApplicationStatus />}
             />
-            <Route path="ht-load-change/payment/:id" element={<RegistrationPayment />}/>
+            <Route path="ht-load-change/payment/:id" element={<RegistrationPayment />} />
           </Route>
           {/* 🆕 Dashboard routes */}
           <Route path="/dashboard" element={<DashboardLayout />}>
@@ -81,24 +92,33 @@ function App() {
             <Route path="/dashboard/pending_for_application_resubmission/:id" element={<LoadResubmission />} />
             <Route path="/dashboard/pending_for_load_sanction/:id" element={<LoadSanction />} />
             <Route path="/dashboard/pending_for_survey/:id" element={<LoadSurvey />} />
-            <Route path="/dashboard/pending_for_agreement_finalization/:id" element={<LoadAgreement />}/>
-            <Route path="/dashboard/pending_for_second_demand_note_generation/:id" element={<LoadDemandNote />}/>
-            <Route path="/dashboard/pending_for_demand_note_payment/:id" element={<LoadDemandNotePayment />}/>
+            <Route path="/dashboard/pending_for_agreement_finalization/:id" element={<LoadAgreement />} />
+            <Route path="/dashboard/pending_for_second_demand_note_generation/:id" element={<LoadDemandNote />} />
+            <Route path="/dashboard/pending_for_demand_note_payment/:id" element={<LoadDemandNotePayment />} />
+            <Route path="/dashboard/pending_for_transco_approval/:id" element={<PendingForTranscoApproval />} />
+            <Route path="/dashboard/pending_for_forwarding_to_EDCRA/:id" element={<PendingForForwardToEDCRA />} />
+            <Route path="/dashboard/pending_for_work_completion_certifying_&_issuing_of_meter/:id" element={<LoadWorkCompletionAndMeterIssuing />} />
+            <Route path="/dashboard/pending_for_bay_required/:id" element={<BayRequiredAccept />} />
+            <Route path="/dashboard/pending_for_commissioning_permission/:id" element={<LoadCommissioningPermission />} />
+            <Route path="/dashboard/pending_for_commissioning/:id" element={<LoadCommissioning />} />
+            <Route path="/dashboard/connection_served/:id" element={<LoadConnectionServed />} />
 
-            <Route path="/dashboard/pending_for_work_completion_certifying_&_issuing_of_meter/:id" element={<LoadWorkCompletionAndMeterIssuing />}/>
-
-            <Route path="/dashboard/pending_for_commissioning_permission/:id" element={<LoadCommissioningPermission />}/>
-            <Route path="/dashboard/pending_for_commissioning/:id" element={<LoadCommissioning />}/>
-            <Route path="/dashboard/connection_served/:id" element={<LoadConnectionServed />}/>
-
-            <Route path="/dashboard/success_respones" element={<SuccessRespones />}/>
-            <Route path="/dashboard/respones/:id" element={<SuccessRespones />}/>
+            <Route path="/dashboard/success_respones" element={<SuccessRespones />} />
+            <Route path="/dashboard/respones/:id" element={<SuccessRespones />} />
+            <Route path="/dashboard/download_pdf" element={<SearchApplicantDetailsPDF />} />
+            <Route path="/dashboard/download" element={< Download />} />
           </Route>
           <Route path="/user-dashboard" element={<DashboardLayout />}>
             <Route index element={<ApplicantStatus />} />
-            <Route path="/user-dashboard/pending_for_registration_fee_payment/:id" element={<LoadRegistrationFeePayment />}/>
-            <Route path="/user-dashboard/pending_for_application_resubmission/:id" element={<LoadResubmission />}/>
-            <Route path="/user-dashboard/pending_for_demand_note_payment/:id" element={<LoadDemandNotePayment />}/>
+         <Route
+    path="success-respones/:id"
+    element={<UserSuccessResponse />}
+  />
+
+            <Route path="/user-dashboard/pending_for_registration_fee_payment/:id" element={<LoadRegistrationFeePayment />} />
+            <Route path="/user-dashboard/pending_for_application_resubmission/:id" element={<LoadResubmission />} />
+            <Route path="/user-dashboard/pending_for_demand_note_payment/:id" element={<LoadDemandNotePayment />} />
+            {/* <Route path="/user-dashboard/pending_for_agreement_finalization/:id" element={<LoadAgreement/>}/> */}
             {/* <Route
               path="/user-dashboard/applicant-padding-application"
               element={<ApplicantPaddingApplication />}
@@ -106,6 +126,7 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
+      
     </>
   );
 }

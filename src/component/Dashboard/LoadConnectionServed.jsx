@@ -11,7 +11,8 @@ const LoadConnectionServed = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { items } = location.state || {};
-  console.log(items,"items")
+  // console.log(items,"items")
+   console.log(HT_LOAD_CHANGE_BASE,'HT_LOAD_CHANGE_BASE in coonection served')
   const token = Cookies.get("accessToken");
   const [isDisabled, setIsDisabled] = useState(false);
   const [isBtnDisabled, setBtnIsDisabled] = useState(false);

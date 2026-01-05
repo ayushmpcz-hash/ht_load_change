@@ -55,7 +55,11 @@ export const verifyOtpNew = async (mobileNo, otp) => {
       }
     );
 
-    if (response.ok) {
+
+const result = await response.json();
+console.log(result.message); // "Invalid OTP"
+console.log(result.code);
+    if (result.message =="Success" && result.code =="200" ) {
       return { success: true };
     } else {
       return { success: false, error: "Invalid OTP ❌" };

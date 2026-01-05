@@ -1,4 +1,5 @@
 export const submitFormData = async (formData, url) => {
+  console.log(formData,'form dataaaaaaaa')
   const requestOptions = {
     method: 'POST',
     body: formData,
@@ -20,7 +21,7 @@ export const updateFormData = async (formData, url) => {
     method: 'PATCH',
     body: formData,
     credentials: 'omit',
-  };
+  }; 
 
   const response = await fetch(`${url}`, requestOptions);
 console.log(response,"response")

@@ -40,6 +40,10 @@
 .read-the-docs {
   color: #888;
 } */
+
+body{
+  background: #e6e6ff !important;
+}
 @import 'tailwindcss';
 .menu {
   list-style: none;

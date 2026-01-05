@@ -2,43 +2,65 @@ import React from 'react';
 
 function Footer() {
   return (
-    <div className="relative isolate overflow-hidden bg-gray-900 ">
-      <div className="grid grid-flow-col gap-4 mx-0 sm:mx-4 md:mx-20 lg:mx-40">
-        <div className="col-span-6 px-5">
-          <h3 className="text-left text-white ">CALL US NOW</h3>
-          <p className="text-left text-white ">+91 755 2551222</p>
-          <p className="text-left text-white">+91 755 2551222</p>
-        </div>
-        <div className="col-span-6 px-5">
-          <h3 className="text-center text-white">CONNECT WITH US</h3>
-          <p className="text-center text-white"> +91 755 2551222</p>
-        </div>
-        <div className="col-span-6 px-5">
-          <span className="text-right text-white">ADDRESS:</span>
-          <span className="text-center text-white">
-            <p>IT CELL, O/O. MANAGING DIRECTOR, MPMKVVCL,</p>
-          </span>
-          <span className="text-center text-white">
-            {' '}
-            <p>NISHTHA PARISAR, GOVINDPURA, BHOPAL - 462023.</p>
-          </span>
+    <div className="relative isolate overflow-hidden bg-[#0E5063] p-1 ">
+      <div class="container mx-auto px-4 h-full">
+        <div className="flex border-b border-white">
+          <div className="w-2/6 pb-2">
+            <div className="col-span-6 px-5">
+              <h3 className="text-left text-white font-medium uppercase text-lg mb-2">
+                CALL US NOW
+              </h3>
+              <p className="text-left text-white ">+91 755 2551222</p>
+              <p className="text-left text-white">+91 755 2551222</p>
+            </div>
+          </div>
+          <div className="w-1/6"> </div>
+
+          <div className="w-2/6 pb-2">
+            <div className="col-span-6 px-5">
+              <h3 className="ttext-left text-white font-medium uppercase text-lg mb-2">
+                CONNECT WITH US
+              </h3>
+              <p className="text-left text-white"> +91 755 2551222</p>
+            </div>
+          </div>
+          <div className="w-1/6"> </div>
+
+          <div className="w-3/6 pb-2">
+            <span className="text-left text-white font-medium uppercase text-lg mb-2">
+              ADDRESS:
+            </span>
+            <span className="text-left text-white">
+              <p>IT CELL, O/O. MANAGING DIRECTOR, MPMKVVCL,</p>
+            </span>
+            <span className="text-left text-white">
+              {' '}
+              <p>NISHTHA PARISAR, GOVINDPURA, BHOPAL - 462023.</p>
+            </span>
+          </div>
         </div>
       </div>
-      <hr className="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700"></hr>
-      <div className="grid grid-flow-col gap-4 mx-0 sm:mx-4 md:mx-20 lg:mx-40">
-        <div className="col-span-6 px-5">
-          <h3 className="text-left text-white "> 2023 , ALL RIGHTS RESERVED BY MPMKVVCL</h3>
-        </div>
-        <div className="col-span-6 px-5">
-          <h3 className="text-center text-white">Version 1.3</h3>
-        </div>
-        <div className="col-span-6 px-5">
-          <p className="text-right text-white">
-            Developed and Managed by : IT CELL, MPMKVVCL BHOPAL
-          </p>
+
+      <div class="container mx-auto px-4 h-full mt-4">
+        <div className="flex">
+          <div className="w-3/6 pb-2">
+            <div className="col-span-6 px-5">
+              <p className="text-left text-white">2023 , ALL RIGHTS RESERVED BY MPMKVVCL</p>
+            </div>
+          </div>  
+ 
+          <div className="w-2/6 pb-2">
+            <p className="text-left text-white">Version 1.3</p>
+          </div>
+ 
+          <div className="w-3/6 pb-2">
+            <p className="text-left text-white">
+              Developed and Managed by : IT CELL, MPMKVVCL BHOPAL
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </div> 
   );
 }
 

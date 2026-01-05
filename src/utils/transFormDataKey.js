@@ -63,6 +63,8 @@ const keyMapping = {
   billId: 'current_bill_id',
   billedUnits: 'current_bill_units',
   netBill: 'current_net_bill_amt',
+  paidAmt:'current_paid_amt',
+  currentMonthBill:'current_month_bill',
   previousBillMonth: 'prev_bill_month',
   previousBillId: 'prev_bill_id',
   previousBilledUnits: 'prev_bill_units',
@@ -72,7 +74,7 @@ const keyMapping = {
   thirdLastBillId: 'third_last_bill_id',
   thirdLastBilledUnits: 'third_last_bill_units',
   thirdLastNetBill: 'third_last_net_bill',
-  paidAmt:"Outstanding_amt", 
   purposeInstId:"connection_purpose_id",
-  lastReducedCdDate:"last_reduction_date"
+  lastReducedCdDate:"last_reduction_date",
+  govtFlag:"govt_flag"
 };

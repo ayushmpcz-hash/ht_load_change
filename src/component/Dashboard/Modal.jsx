@@ -2,9 +2,9 @@ import React from "react";
 import { useSelector } from "react-redux";
 export const Modal = ({ closeModal }) => {
   let  officerData = useSelector(state=>state.user.officerData)
-  let officer_data =officerData.employee_detail
+  let officer_data =officerData?.employee_detail
   return (
-    <div className="fixed z-10 inset-0 overflow-y-auto">
+    <div className="fixed z-10 inset-0 overflow-y-auto"  onClick={closeModal}  >
       <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0 backdrop-filter backdrop-blur-sm">
         <div className="fixed inset-0 transition-opacity" aria-hidden="true">
           <div className="absolute inset-0 opacity-25 bg-white" /></div>
@@ -30,19 +30,19 @@ export const Modal = ({ closeModal }) => {
             <div className="grid gap-4 mb-4 grid-cols-3">
                     <div className="col-span-3 sm:col-span-1">
                         <label for="price" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Employee No</label>
-                        <input type="text"  value={officer_data.employee_login_id ? officer_data.employee_login_id : null} name="employee_login_id"  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"  required=""/>
+                        <input type="text"  value={officer_data?.employee_login_id ? officer_data?.employee_login_id : null} name="employee_login_id"  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"  required=""/>
                     </div>
                     <div className="col-span-3 sm:col-span-1">
                         <label for="price" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Employee Name</label>
-                        <input type="text" name="employee_name" value={officer_data.employee_name } className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"  required=""/>
+                        <input type="text" name="employee_name" value={officer_data?.employee_name } className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"  required=""/>
                     </div>
                     <div className="col-span-3 sm:col-span-1">
                         <label for="price" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Per Mobile No.</label>
-                        <input type="text" name="erp_cug_mobile" value={officer_data.personal_mobile} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"  required=""/>
+                        <input type="text" name="erp_cug_mobile" value={officer_data?.personal_mobile} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"  required=""/>
                     </div>
                     <div className="col-span-3 sm:col-span-1">
                         <label for="price" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Designation</label>
-                        <input type="text" name="erp_department" value={officer_data.erp_department} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"  required=""/>
+                        <input type="text" name="erp_department" value={officer_data?.erp_department} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"  required=""/>
                     </div>
                     <div className="col-span-3 sm:col-span-1">
                         <label for="price" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Current Charge

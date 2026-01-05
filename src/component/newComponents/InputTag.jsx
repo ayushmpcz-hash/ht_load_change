@@ -12,9 +12,9 @@ const InputTag = React.forwardRef(function InputTag({
 }, ref) {
     const id = useId()
     return (
-        <div className="sm:col-span-2">
+        <div className="sm:col-span-2 font-group">
             {LName &&
-                <label htmlFor={id} className="block text-sm font-medium text-gray-900">
+                <label htmlFor={id} className="block text-lg font-medium text-gray-900">
                     {LName}
                 </label>
             }
@@ -23,7 +23,7 @@ const InputTag = React.forwardRef(function InputTag({
                     type={type}
                     placeholder={placeholder}
                     autoComplete="off"
-                    className={`uppercase block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm ${className}`}
+                    className={`border p-2 border-gray-400 rounded capitalize w-full ${className}`}
                     ref={ref}
                     // {...register}
                     {...props}

@@ -14,12 +14,12 @@ export default defineConfig({
         secure: false, // if SSL is self-signed
       },
       '/media': {
-        target: 'https://htsanyojanuat.mpcz.in:8088',
+        target: 'https://htsanyojan.mpcz.in:8089',
         changeOrigin: true,
         secure: false,
       },
       '/ht_load_change': {
-        target: 'https://htsanyojanuat.mpcz.in:8088/',
+        target: 'https://htsanyojan.mpcz.in:8089/',
         changeOrigin: true,
         secure: false,
       },
@@ -48,6 +48,13 @@ export default defineConfig({
       // tkc/get_tkc_category
       // tkc/get_tkc_by_oyt/${contractor_category_id}
       // tkc/get_reg_date/${Contractor_name_id}`
+      
+      //    '/billdesk': {
+      //   target: 'https://uat1.billdesk.com/merchant-uat',
+      //   changeOrigin: true,
+      //   secure: false,
+      //   rewrite: (path) => path.replace(/^\/billdesk/, ''),
+      // },
       
     }
   },

@@ -35,7 +35,7 @@ const BillDeskPayment = () => {
   mercid: "UMPMKHTV2",
   bdorderid: "BDORD456",
   authorization:"HyXyUWc9OjhTFZDPCS2sMiglJ48WrQcR",
-  ru: "https://htsanyojanuat.mpcz.in:8088/ht_load_change/lc_payment_process"
+  ru: "https://htsanyojan.mpcz.in:8089/ht_load_change/lc_payment_process"
 };
 
     const initializePaymentFlow = () => {
@@ -43,7 +43,7 @@ const BillDeskPayment = () => {
         merchantId: "UMPMKHTV2",
         bdOrderId: "TSSGF43214F",
         authToken: "'HyXyUWc9OjhTFZDPCS2sMiglJ48WrQcR'",
-        returnUrl:"https://htsanyojanuat.mpcz.in:8088/ht_load_change/lc_payment_process" ,
+        returnUrl:"https://htsanyojan.mpcz.in:8089/ht_load_change/lc_payment_process" ,
         prefs: {
           payment_categories: ['card', 'nb'],
         },

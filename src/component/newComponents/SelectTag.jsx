@@ -12,15 +12,15 @@ function SelectTag({
     const id = useId()
     
     return (
-        <div className="sm:col-span-2">
+        <div className="sm:col-span-2 form-group mb-2">
             {LName &&
-                <label htmlFor={id} className="block text-sm font-medium text-gray-900">
+                <label htmlFor={id} className="block text-lg font-medium text-gray-900">
                     {LName}
                 </label>
             }
-            <div className="mt-2">
+            <div className="mt-1 form w-ull">
                 <select {...props} id={id} ref={ref} disabled={disabled}
-                 className={`uppercase block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm ${className}`}>
+                 className={`border p-2 border-gray-400 rounded capitalize w-full ${className}`}>
             <option value="">select {LName}</option>
             {options?.map((option)=>(
                 

@@ -38,7 +38,7 @@ const TrackApplicationStatus = React.forwardRef(function TrackApplicationStatus(
 
       if (sentOtp) {
         setShowOtpInput(true);
-        console.log(response.data.data,"response.data.data")
+        // console.log(response.data.data,"response.data.data")
         dispatch(setLoginUser(response.data));
         // setError("otpSuccess", {
         //   type: "manual",

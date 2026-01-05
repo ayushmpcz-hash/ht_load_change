@@ -22,7 +22,9 @@ import RegistrationPayment from './loadChange/RegistrationPayment.jsx'
 // officer Dashboard
 import LoadConnectionServed from './Dashboard/loadConnectionServed.jsx';
 import LoadWorkCompletionAndMeterIssuing from './Dashboard/LoadWorkCompletionAndMeterIssuing.jsx';
-// import ApplicantFillDetails from './ApplicantFillDetails.jsx'
+import SearchApplicantDetailsPDF from './Dashboard/SearchApplicantDetailsPDF.jsx';
+import Download from './Dashboard/download.jsx';
+
 
 
 
@@ -50,4 +52,6 @@ export {
   getNgbToken,
   getFinalUsingDataToken,
   LoadWorkCompletionAndMeterIssuing,
+  SearchApplicantDetailsPDF,
+  Download,
 };

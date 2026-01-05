@@ -2,6 +2,7 @@ const TypeOfValue = {
   typeOfChanges: [
     { label: 'Load Enhancement', value: 'Load_Enhancement' },
     { label: 'Load Reduction', value: 'Load_Reduction' },
+    // { label: 'Only Voltage Upgrade', value: 'Only_Voltage_Upgrade' },
   ],
   supplyVoltage: [
     { label: '11 KV', value: '11 KV' },
@@ -29,6 +30,11 @@ const TypeOfValue = {
 const responseOption = [
     { label: "Accept", value: "Accepted" },
     { label: "Revert", value: "Reverted" }
+  ]
+  
+export const PaymentOption = [
+    { label: "Online", value: "Online" },
+    { label: "Challan", value: "Challan" }
 
   ]
 const revertOption = [

@@ -6,6 +6,8 @@ const initialState = {
   loginUser:null,
   loading: false,
   error: null,
+  applications:[],
+  searchText :"",
 };
 
 const userSlice = createSlice({
@@ -27,8 +29,17 @@ const userSlice = createSlice({
     setError: (state, action) => {
       state.error = action.payload;
     },
+    logout(state) {
+      return initialState; // ✅ hard reset
+    },
+    setApplications: (state, action) => {
+    state.applications = action.payload;
+  },
+  setSearchText: (state, action) => {
+      state.searchText = action.payload;
+    },
   },
 });
 
-export const { setUserData, setOfficerData,setLoginUser, setLoading, setError } = userSlice.actions;
+export const { setUserData, setOfficerData,setLoginUser, setLoading, setError,logout,setApplications ,setSearchText } = userSlice.actions;
 export default userSlice.reducer;

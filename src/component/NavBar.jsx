@@ -1,5 +1,6 @@
 import React, { Children } from 'react';
 import { NavLink } from 'react-router-dom';
+// import { HT_HOME_URL } from '../api/api'
 ('use client');
 
 import { useState } from 'react';
@@ -68,36 +69,32 @@ const callsToAction = [
 
 export default function NavBar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
+// console.log(HT_HOME_URL,"HT_HOME_URLLLLLLLLl")
   return (
-    <header className="bg-gray-300 w-full">
-      <nav aria-label="Global" className="mx-auto flex max-w-7xl  justify-between p-6 lg:px-8">
-        <div className="flex lg:flex-1">
-           <NavLink to="/" className="-m-1.5 p-1.5">
-          Home
-          
-          
-            {/* <span className="sr-only">Your Company</span> */}
+    <header className="relative w-full bg-[#1B4560] p-1">
+      <nav aria-label="Global" className="flex items-start justify-start">
+        <div className="navbar flex items-start justify-start  w-1/5 hidden">
+          <NavLink to="/" className="-m-1.5 p-1.5">
+            Home
             <img
               alt=""
               src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
               className="h-8 w-auto"
             />
-            </NavLink>
-          
-        </div>
-        <div className="flex lg:hidden">
+          </NavLink>
           <button
             type="button"
             onClick={() => setMobileMenuOpen(true)}
             className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
           >
             <span className="sr-only">Open main menu</span>
-            {/* <Bars3Icon aria-hidden="true" className="size-6" /> */}
           </button>
         </div>
-        <PopoverGroup className="hidden lg:flex lg:gap-x-30">
-          <Popover className="relative">
+
+        <PopoverGroup className="hidden lg:flex lg:gap-x-0 flex items-center justify-start">
+          {/* <Popover className="relative">
             <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold text-gray-900">
               Ht NSC Service
               <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />
@@ -142,15 +139,75 @@ export default function NavBar() {
                 ))}
               </div>
             </PopoverPanel>
-          </Popover>
-                 
-          <NavLink to="/ht-load-change" className="text-sm/6 font-semibold text-gray-900">
-           HT Load Change (NSC)
+          </Popover> */}
+          {/* <NavLink
+            to="/"
+            className="text-base font-medium text-white capitalize p-4 hover:bg-[#45c4e9]"
+          >
+            Home
+          </NavLink> */}
+          <a
+            href={"https://htsanyojan.mpcz.in:8089"}
+            className="text-base font-medium text-white capitalize p-4 hover:bg-[#45c4e9]"
+          >
+            Home
+          </a>
+
+
+          {/*  */}
+
+          {/* <div className="relative inline-block text-left">
+      <NavLink
+        onClick={() => setOpen(!open)}
+        className="text-base font-medium text-white capitalize p-4 hover:bg-[#45c4e9] flex item-center"
+      >
+        HT NSC Services
+        <svg
+          className="w-5 h-5 ml-2 -mr-1"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </NavLink>
+
+      {open && (
+        <div className="absolute right-0 mt-2 w-44 origin-top-right bg-white border border-gray-200 rounded-md shadow-lg z-10">
+          <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
+           <NavLink to="https://htsanyojanuat.mpcz.in:8088/applicationInstructions">
+            HT New Service Connection (NSC)
           </NavLink>
-          <NavLink to="department-login" className="text-sm/6 font-semibold text-gray-900">
+          </button>
+          <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
+           <NavLink to="/ht-load-change">
+            HT Load Change (NSC)
+          </NavLink>
+          </button>
+        </div>
+      )}
+    </div> */}
+          <NavLink
+            to="/ht-load-change"
+            className="text-base font-medium text-white capitalize p-4 hover:bg-[#45c4e9]"
+          >
+            HT Load Change
+          </NavLink>
+
+
+
+
+          <NavLink
+            to="department-login"
+            className="text-base font-medium text-white capitalize p-4 hover:bg-[#45c4e9]"
+          >
             Department Login
           </NavLink>
-          <NavLink to="applicant-login" className="text-sm/6 font-semibold text-gray-900">
+          <NavLink
+            to="applicant-login"
+            className="text-base font-medium text-white capitalize p-4 hover:bg-[#45c4e9]"
+          >
             Applicant Login
           </NavLink>
           {/* <NavLink to="track-application" className="text-sm/6 font-semibold text-gray-900">
@@ -159,9 +216,9 @@ export default function NavBar() {
           {/* <a href="#" className="text-sm/6 font-semibold text-gray-900">
             Marketplace
           </a> */}
-          <a href="#" className="text-sm/6 font-semibold text-gray-900">
+          {/* <a href="#" className="text-sm/6 font-semibold text-gray-900">
             Company
-          </a>
+          </a> */}
         </PopoverGroup>
         {/* <div className="hidden lg:flex lg:flex-1 lg:justify-end">
           <a href="#" className="text-sm/6 font-semibold text-gray-900">
