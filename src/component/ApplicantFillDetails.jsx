@@ -137,7 +137,7 @@ export default function ApplicantBasicDetails({ htConsumers ,register ,errors,is
           {htConsumers?.connection_type === 'Permanent' && (
             <InputTag
               LName="Existing Contract Demand"
-              {...register('existing_contract_demand')}
+              {...register('cd')}
              readOnly={true}
               errorMsg={errors.existing_contract_demand?.message}
             />

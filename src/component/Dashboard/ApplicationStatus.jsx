@@ -251,7 +251,7 @@ import { HT_NSC_DASHBOARD_URL,HT_LOAD_CHANGE_BASE } from '../../api/api'
 const ApplicationStatus = () => {
   const [loading, setLoading] = useState(true);
   const officerData = useSelector(state => state.user.officerData);
-console.log(HT_LOAD_CHANGE_BASE,'HT_LOAD_CHANGE_BASE in Application Status')
+console.log(HT_LOAD_CHANGE_BASE,'HT_LOAD_CHANGE_BASE in Application Status component')
 console.log(HT_NSC_DASHBOARD_URL,'HT_NSC_DASHBOARD_URL in ApplicationStatus component')
   useEffect(() => {
     // Simulate loading or wait for officerData
@@ -299,7 +299,7 @@ console.log(HT_NSC_DASHBOARD_URL,'HT_NSC_DASHBOARD_URL in ApplicationStatus comp
       </div>
     );
   }
-  console.log(officerData,'officerData')
+
   return (
     <main className="flex-1 min-h-screen bg-gray-50 p-4 md:p-6">
 

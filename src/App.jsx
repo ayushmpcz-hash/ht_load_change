@@ -42,8 +42,8 @@ import BayRequiredAccept from './component/Dashboard/BayRequiredAccept';
 
 
 function App() {
-//   console.log(import.meta.env.MODE,'App js MODE')
-//   console.log(import.meta.env,'App js ENVVVVVVVVVVVVVVVVVVVVVV')
+  console.log(import.meta.env.MODE,'App js MODE')
+  console.log(import.meta.env,'App js ENVVVVVVVVVVVVVVVVVVVVVV')
 //  console.log( import.meta.env.VITE_LOAD_CHANGE_BASE_URL,'MMMMMMMMMMMMMMMMMMMMMMM')
   return (
     <>

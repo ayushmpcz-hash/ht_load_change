@@ -1361,6 +1361,8 @@ function ApplicantReg() {
   const SupplyVoltage = watch('new_supply_voltage');
   const ContractDemand = watch('new_contact_demand');
 
+  console.log(htConsumers,'htconsumer details')
+
   useEffect(() => {
     if (Object.keys(data).length) {
       // console.log(data, "data")
@@ -1420,9 +1422,11 @@ function ApplicantReg() {
       // clearErrors("new_contact_demand");
       if (SubTypeOfChange === "Only_Voltage_Upgrade") {
         setValue("contract_demand_difference", 0);
-        setValue("new_contact_demand", htConsumers?.existing_contract_demand);
+        // setValue("new_contact_demand", htConsumers?.existing_contract_demand);
+        setValue("new_contact_demand", htConsumers?.cd);
         setIsLocked(true)
-        const contract_demand = contractDemandRange(SupplyVoltage, htConsumers?.existing_contract_demand);
+        // const contract_demand = contractDemandRange(SupplyVoltage, htConsumers?.existing_contract_demand);
+         const contract_demand = contractDemandRange(SupplyVoltage, htConsumers?.cd);
         if (contract_demand) {
           setValue("new_contact_demand", "");
           setValue("contract_demand_difference", "");
@@ -1505,6 +1509,12 @@ function ApplicantReg() {
 
   //   }
   // }, [ContractDemand]);
+
+  const normalizedHtConsumer = {
+  ...htConsumers,
+  existing_contract_demand: htConsumers?.cd,
+};
+
   useEffect(() => {
     let timeoutId;
 
@@ -1516,13 +1526,15 @@ function ApplicantReg() {
           typeOfChange,
           ContractDemand,
           SubTypeOfChange,
-          htConsumers,
+          // htConsumers,
+          normalizedHtConsumer,
           totalYearConn,
           loadReductionApply
         );
 
         let contractDiff = Math.abs(
-          ContractDemand - Number(htConsumers.existing_contract_demand)
+          // ContractDemand - Number(htConsumers.existing_contract_demand)
+            ContractDemand - Number(htConsumers.cd)
         );
         setValue("contract_demand_difference", contractDiff);
 

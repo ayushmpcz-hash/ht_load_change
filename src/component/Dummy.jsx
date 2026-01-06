@@ -10,6 +10,7 @@ const Dummy = () => {
   const navigate = useNavigate();
   const { empId } = useParams();
   const dispatch = useDispatch();
+  console.log(empId,'employeee idddddddd')
 
 useEffect(() => {
   if (!empId) {
@@ -31,7 +32,7 @@ if (localStorage.getItem("officer_data")) {
   })
     .then(res => res.json())
     .then(data => {
-      // console.log("Dummy Response:", data);
+      console.log("Dummy Response:", data);
 
       if (data.status !== "success") {
         navigate("/department-login");

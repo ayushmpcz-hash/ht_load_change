@@ -10,6 +10,7 @@ const LoadChangePay = () => {
   const location = useLocation();
   const { result, locationData } = location.state || {};
   const id = result?.data?.application ? result?.data?.application : result?.id
+  const total_pay_amount = result?.data?.total_pay_amount ? result?.data?.total_pay_amount : result?.tariff_charges?.total_pay_amount
 
   const [paymentType, setPaymentType] = useState("online");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -123,7 +124,7 @@ const LoadChangePay = () => {
                     48.48/50.89
                   </td> */}
                   <td className="px-6 py-4 text-center border border-gray-300">
-                    {result?.data?.total_pay_amount ?? "—"}
+                    {total_pay_amount}
                   </td>
 
                   <td className="px-6 py-4 text-sm font-medium text-center border border-gray-300">
@@ -159,7 +160,8 @@ const LoadChangePay = () => {
                         // >
                         //   <Button label="Pay" className="p-2" />
                         // </Link>
-                        <a href={`${HT_LOAD_CHANGE_PUBLIC_URL}/ht-load-change-api/call_lc_regfee/${id}`} target="_blank" rel="noopener noreferrer" onClick={() => {
+                        <a href={`${HT_LOAD_CHANGE_PUBLIC_URL}/ht_load_change/call_lc_regfee/${id}`} target="_blank" rel="noopener noreferrer"
+                          onClick={() => {
                           setPayClicked(true);
                           localStorage.setItem(`regfee_clicked_${id}`, "true");
                         }}
@@ -167,9 +169,9 @@ const LoadChangePay = () => {
                           <Button
                             label="Pay"
                             className="p-2"
-                            disabled={
-                              payClicked                         
-                            }
+                            // disabled={
+                            //   payClicked                         
+                            // }
                           />
                         </a>
 
