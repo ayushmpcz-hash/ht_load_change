@@ -116,6 +116,15 @@ const Sidebar = () => {
   }
 }, [dispatch, officerData]);
 
+useEffect(() => {
+  const savedUser = localStorage.getItem("login_user");
+
+  if (savedUser) {
+    dispatch(setLoginUser(JSON.parse(savedUser)));
+  }
+}, [dispatch]);
+
+
 
   useEffect(() => {
     const savedState = localStorage.getItem('isSidebarOpen');
@@ -128,30 +137,6 @@ const Sidebar = () => {
     localStorage.setItem('isSidebarOpen', JSON.stringify(newState));
   };
    
-  
-  // const handleLogout = () => {
-  //   try {
-  //     // remove cookie (path must match how it was set)
-  //     Cookies.remove('accessToken', { path: '/' });
-
-  //     // clear redux user data
-  //     dispatch(setOfficerData(null));
-  //     dispatch(setLoginUser(null));
-
-  //     // optional: clear any other local state you want
-  //     // localStorage.removeItem('someKey');
-
-  //     // redirect to appropriate login
-  //     if (officerData) {
-  //       navigate('/department-login');
-  //     } else {
-  //       navigate('/'); // or '/user-login' if you have a separate route
-  //     }
-  //   } catch (err) {
-  //     console.error('Logout error:', err);
-  //     // optionally show a toast / set redux error
-  //   }
-  // };
   
   const handleLogout = () => {
   Cookies.remove('accessToken', { path: '/' });

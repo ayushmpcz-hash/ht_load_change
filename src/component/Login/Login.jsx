@@ -249,7 +249,7 @@ const Login = () => {
         const result = await response.json();
         dispatch(setLoginUser(result));
         localStorage.setItem("loginType", "APPLICANT");
-localStorage.removeItem("officer_data"); // safety
+        localStorage.removeItem("officer_data"); // safety
         navigate("/user-dashboard");
       }
     } catch (err) {

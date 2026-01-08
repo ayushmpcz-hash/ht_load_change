@@ -982,6 +982,7 @@ function ApplicantReg() {
 
   const [otpSent, setOtpSent] = useState(false);
   const [isBtnDisabled, setBtnDisabled] = useState(false);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
 
   const reduxUserData = useSelector(state => state.user.userData);
   const data = location.state?.data || reduxUserData;
@@ -1272,6 +1273,8 @@ function ApplicantReg() {
   const handleSendOtp = async (formDataValues) => {
     try {
       dispatch(setLoading(true));
+      setIsSendingOtp(true); // ✅ Disable Save button when OTP is being sent
+      setIsDisabled(true);
       const rawMobile = htConsumers?.mobile || "";
       // const rawMobile = String(9754548330)
       const mobileNo = String(rawMobile);
@@ -1289,12 +1292,16 @@ function ApplicantReg() {
           type: 'manual',
           message: otpResp.message,
         })
+        setIsSendingOtp(false); // ✅ Enable button if OTP fails
+        setIsDisabled(false);
       }
     } catch (err) {
       setError('otpStatus', {
         type: 'manual',
         message: sentOtp.message,
       });
+      setIsSendingOtp(false); // ✅ Enable button on error
+      setIsDisabled(false);   // ✅ Enable form fields on error
     } finally {
       dispatch(setLoading(false));
     }
@@ -1384,18 +1391,41 @@ function ApplicantReg() {
   // };
 
   // 🔄 Resend OTP
+  // const handleReSendOtp = async () => {
+  //   const rawMobile = htConsumers?.mobile || "";
+  //   const mobileNo = String(rawMobile);
+  //   clearErrors("otp");
+  //   const otpResp = await sendOtpNew(mobileNo);
+  //   if (otpResp.success) {
+  //     setError('otpSuccess', {
+  //       type: 'manual',
+  //       message: `OTP Resent successfully to ****${mobileNo.slice(-4)}`,
+  //     });
+  //   } else {
+  //     alert("Failed to resend OTP.");
+  //   }
+  // };
   const handleReSendOtp = async () => {
     const rawMobile = htConsumers?.mobile || "";
     const mobileNo = String(rawMobile);
     clearErrors("otp");
-    const otpResp = await sendOtpNew(mobileNo);
-    if (otpResp.success) {
-      setError('otpSuccess', {
-        type: 'manual',
-        message: `OTP Resent successfully to ****${mobileNo.slice(-4)}`,
-      });
-    } else {
+
+    try {
+      setBtnDisabled(true); // ✅ Disable Resend button
+      const otpResp = await sendOtpNew(mobileNo);
+
+      if (otpResp.success) {
+        setError('otpSuccess', {
+          type: 'manual',
+          message: `OTP Resent successfully to ****${mobileNo.slice(-4)}`,
+        });
+      } else {
+        alert("Failed to resend OTP.");
+      }
+    } catch (err) {
       alert("Failed to resend OTP.");
+    } finally {
+      setBtnDisabled(false); // ✅ Enable Resend button
     }
   };
 
@@ -1836,7 +1866,7 @@ function ApplicantReg() {
                           errorMsg={errors.otp?.message}
                         />
                         <div className="flex space-x-3 mt-3">
-                          <button
+                          {/* <button
                             type="button"
                             onClick={handleVerifyOtp}
                             disabled={isBtnDisabled}
@@ -1846,13 +1876,31 @@ function ApplicantReg() {
                               }`}
                           >
                             {isBtnDisabled ? "Verifying..." : "Verify OTP"}
-                          </button>
+                          </button> */}
                           <button
+                            type="button"
+                            onClick={handleVerifyOtp}
+                            disabled={isBtnDisabled}
+                            className={`px-4 py-2 rounded text-white ${isBtnDisabled
+                              ? "bg-gray-400 cursor-not-allowed"
+                              : "bg-green-600 hover:bg-green-700"}`}
+                          >
+                            {isBtnDisabled ? "Verifying..." : "Verify OTP"}
+                          </button>
+                          {/* <button
                             type="button"
                             onClick={handleReSendOtp}
                             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                           >
                             Resend OTP
+                          </button> */}
+                          <button
+                            type="button"
+                            onClick={handleReSendOtp}
+                            disabled={isBtnDisabled}
+                            className={`px-4 py-2 rounded text-white ${isBtnDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"}`}
+                          >
+                            {isBtnDisabled ? "Resending..." : "Resend OTP"}
                           </button>
                         </div>
                         {errors?.otpSuccess && (
@@ -1869,12 +1917,19 @@ function ApplicantReg() {
                         <button type='reset' className="rounded-lg px-4 py-2 bg-blue-500 text-blue-100 hover:bg-red-600 duration-300" onClick={() => reset()}>
                           Reset
                         </button>
-                        <button
+                        {/* <button
                           type="submit"
                           disabled={isDisabled}
                           className="bg-orange-500 text-white px-4 py-2 rounded"
                         >
                           Save
+                        </button> */}
+                        <button
+                          type="submit"
+                          disabled={isDisabled || isSendingOtp} // ✅ Disable when sending OTP
+                          className={`bg-orange-500 text-white px-4 py-2 rounded ${isSendingOtp ? 'opacity-50 cursor-not-allowed' : 'hover:bg-orange-600'}`}
+                        >
+                          {isSendingOtp ? 'Sending OTP...' : 'Save'} {/* ✅ Show loading text */}
                         </button>
                       </div>
                     </div>
