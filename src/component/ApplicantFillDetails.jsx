@@ -1,7 +1,7 @@
 import React from 'react';
 import { InputTag } from '../component/importComponents';
 
-export default function ApplicantBasicDetails({ htConsumers ,register ,errors,isUpdatePage}) {
+export default function ApplicantBasicDetails({ htConsumers ,register ,errors}) {
  
   // console.log(htConsumers,"htConsumers")
   return (
@@ -11,7 +11,7 @@ export default function ApplicantBasicDetails({ htConsumers ,register ,errors,is
           Connection Details..
         </h2>
         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8">
-          {htConsumers?.application_no && !isUpdatePage &&(
+          {htConsumers?.application_no &&(
             <InputTag
               LName="Application No"
               {...register('application_no')}
@@ -137,7 +137,7 @@ export default function ApplicantBasicDetails({ htConsumers ,register ,errors,is
           {htConsumers?.connection_type === 'Permanent' && (
             <InputTag
               LName="Existing Contract Demand"
-              {...register('cd')}
+              {...register('existing_contract_demand')}
              readOnly={true}
               errorMsg={errors.existing_contract_demand?.message}
             />

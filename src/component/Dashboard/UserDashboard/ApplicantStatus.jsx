@@ -240,7 +240,7 @@ const ApplicantStatus = () => {
                 </td>
                 
                 <td className="px-4 py-3 align-middle">
-                  <span className="inline-flex px-3 py-1.5 text-xs font-semibold text-green-800 bg-green-100 rounded-full truncate max-w-[140px]" title={items?.application_status_text}>
+                  <span className="inline-flex px-3 py-1.5 text-xs font-semibold text-green-800 bg-green-100 rounded-full truncate max-w-[220px]" title={items?.application_status_text}>
                     {items?.application_status_text}
                   </span>
                 </td>

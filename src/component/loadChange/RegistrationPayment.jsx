@@ -169,9 +169,9 @@ const LoadChangePay = () => {
                           <Button
                             label="Pay"
                             className="p-2"
-                            // disabled={
-                            //   payClicked                         
-                            // }
+                            disabled={
+                              payClicked                         
+                            }
                           />
                         </a>
 

@@ -12,9 +12,6 @@ const LoadChangePay = () => {
    const printRef = useRef(null); // ✅ Add print ref
    const locationData = location.state || {};
 
-   console.log(HT_NSC_BASE,'HT_NSC_BASE inside load change pay details page ')
-    console.log(NGB_UAT_BASE,'NGB_UAT_BASE details page')
-    console.log(HT_LOAD_CHANGE_BASE,"HT_LOAD_CHANGE_BASE details page")
     
 
   const {

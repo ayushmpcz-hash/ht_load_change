@@ -4,11 +4,16 @@ import { useNavigate, Link } from 'react-router-dom';
 import { getHtConsumerData } from '../../utils/htConsumerApi.js';
 import { transformDataKeys } from '../../utils/transFormDataKey.js';
 
+import { useDispatch } from "react-redux";
+import { setUserData } from "../../redux/slices/userSlice";
+
 export default function LoadChangeInstruction() {
   const [consumer, setConsumer] = useState('');
   const [error, setError] = useState({});
   const [isDisabled, setIsDisabled] = useState(false);
   const [message, setMessage] = useState('');
+
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = async e => {
@@ -45,6 +50,7 @@ export default function LoadChangeInstruction() {
         }
         setError({});
         setMessage('');
+        dispatch(setUserData(transformedData));
         navigate(`/ht-load-change/consumer-registration/${transformedData.consumer_id}`, {
           state: { data: transformedData },
         });
