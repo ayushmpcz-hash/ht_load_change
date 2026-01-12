@@ -10,9 +10,9 @@
 //    const location = useLocation();
 //   const [isDisabled, setIsDisabled] = useState(false);
 //    const printRef = useRef(null); // ✅ Add print ref
-//    const locationData = location.state || {};
+//    const locationData = location.state || location.state.data;
 
-  
+
 
 //   const {
 //     new_supply_voltage,
@@ -228,7 +228,7 @@
 
 //     console.log(postData, 'postData');
 //   };
-  
+
 //   console.log(locationData,'locationData')
 //   return (
 //     <div>
@@ -395,21 +395,21 @@
 
 // export default LoadChangePay;
 
-import React, { useState, useEffect ,useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { handleGetApi } from '../../utils/handleGetApi';
-import { useNavigate,useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { HT_NSC_BASE, NGB_UAT_BASE, HT_LOAD_CHANGE_BASE } from '../../api/api.js';
 import "./LoadChangePay.css"
 
 const LoadChangePay = () => {
   const navigate = useNavigate();
-   const location = useLocation();
+  const location = useLocation();
   const [isDisabled, setIsDisabled] = useState(false);
-   const printRef = useRef(null); // ✅ Add print ref
-   const locationData = location.state || location.state.data;
+  const printRef = useRef(null); // ✅ Add print ref
+  const locationData = location.state || location.state.data;
 
-  
+
 
   const {
     new_supply_voltage,
@@ -424,15 +424,15 @@ const LoadChangePay = () => {
     existing_supply_voltage,
     existing_contract_demand,
     id,
-    type_of_change,connection_type,
+    type_of_change, connection_type,
     registration_pdf,
   } = useSelector(state => state.user.userData);
 
   const fppasRateNew = 0.0841;
   const unitPerKva = 190;
   let registrationFeeCharges = 16800;
-  const transcoCharges = 1100;
-  const discomCharges = 160;
+  const transcoCharges =   new_supply_voltage === "11 KV" && lc_type === "Load_Enhancement_without_Voltage_Change" ? 0 : 1100 
+  const discomCharges = new_supply_voltage === "11 KV" && lc_type === "Load_Enhancement_without_Voltage_Change" ? 1260 : 160 
   if (type_of_change === 'Load_Reduction') {
     registrationFeeCharges = 25;
   }
@@ -483,9 +483,23 @@ const LoadChangePay = () => {
         ? contract_demand_difference
         : new_contact_demand;
 
-      const totalTranscoCharges = demand * transcoCharges;
-      const totalDiscomCharges = demand * discomCharges;
-      const totalSupplyAffording = totalTranscoCharges + totalDiscomCharges;
+      let totalTranscoCharges = 0;
+      let totalDiscomCharges = 0;
+      let totalSupplyAffording = 0;
+      if (
+        new_supply_voltage === "11 KV" &&
+        lc_type === "Load_Enhancement_without_Voltage_Change"
+      ) {
+        // 🔥 POORA AMOUNT DISCOM ME JAYEGA
+        totalTranscoCharges = 0;
+        totalDiscomCharges = demand * 1260;
+        totalSupplyAffording = totalDiscomCharges;
+      } else {
+        // ✅ EXISTING LOGIC (UNCHANGED)
+        totalTranscoCharges = demand * transcoCharges;
+        totalDiscomCharges = demand * discomCharges;
+        totalSupplyAffording = totalTranscoCharges + totalDiscomCharges;
+      }
       setCharges(prev => ({
         ...prev,
         totalTranscoCharges,
@@ -506,9 +520,23 @@ const LoadChangePay = () => {
         ? contract_demand_difference
         : new_contact_demand;
 
-      const totalTranscoCharges = demand * transcoCharges;
-      const totalDiscomCharges = demand * discomCharges;
-      const totalSupplyAffording = totalTranscoCharges + totalDiscomCharges;
+      let totalTranscoCharges = 0;
+      let totalDiscomCharges = 0;
+      let totalSupplyAffording = 0;
+      if (
+        new_supply_voltage === "11 KV" &&
+        lc_type === "Load_Enhancement_without_Voltage_Change"
+      ) {
+        // 🔥 POORA AMOUNT DISCOM ME JAYEGA
+        totalTranscoCharges = 0;
+        totalDiscomCharges = demand * 1260;
+        totalSupplyAffording = totalDiscomCharges;
+      } else {
+        // ✅ EXISTING LOGIC (UNCHANGED)
+        totalTranscoCharges = demand * transcoCharges;
+        totalDiscomCharges = demand * discomCharges;
+        totalSupplyAffording = totalTranscoCharges + totalDiscomCharges;
+      }
 
       // Fetch duty and charges in the same block
       const fetchCharges = async () => {
@@ -537,7 +565,7 @@ const LoadChangePay = () => {
           const dutyAmount = Math.round(((energyAmount + fppasAmount) * dutyPercentage) / 100);
           const totalChargesAmount = Math.round(fixedAmount + energyAmount + fppasAmount + dutyAmount);
 
-          const sdDays = [48, 24, 189, 190,1059,1060,1061,1062,3,4,5,16,37,52,1063,1064].includes(Number(connection_purpose_id)) ? 90 : 45;
+          const sdDays = [48, 24, 189, 190, 1059, 1060, 1061, 1062, 3, 4, 5, 16, 37, 52, 1063, 1064].includes(Number(connection_purpose_id)) ? 90 : 45;
           const totalSdDayAmount = Math.ceil((totalChargesAmount * sdDays) / 30);
           const totalSdRequired = roundUpToNearest100(totalSdDayAmount);
 
@@ -575,7 +603,7 @@ const LoadChangePay = () => {
     connection_category,
   ]);
 
-console.log(charges,'chargessssssss')
+  console.log(charges, 'chargessssssss')
   const submitHandler = async () => {
     const postData = {
       application: id || '',
@@ -617,7 +645,7 @@ console.log(charges,'chargessssssss')
       const result = await response.json();
       console.log(result, 'result in payment')
       // console.log('API Response:', result);
-      navigate(`/ht-load-change/payment/${id}`, { state: { result ,locationData} });
+      navigate(`/ht-load-change/payment/${id}`, { state: { result, locationData } });
     } catch (error) {
       setIsDisabled(false);
       console.error('API Error:', error);
@@ -625,11 +653,11 @@ console.log(charges,'chargessssssss')
 
     console.log(postData, 'postData');
   };
-  
-  console.log(locationData,'locationData')
+
+  console.log(locationData, 'locationData')
   return (
     <div>
-       <div 
+      <div
         ref={printRef}
         className="card mt-2 mb-2 bg-white rounded shadow-md mt-6 ml-30 mr-30 print-container"
       >
@@ -744,7 +772,7 @@ console.log(charges,'chargessssssss')
                       <td className="px-6 py-4">Type of Fee</td>
                       <td className="px-6 py-4">Security Deposit (SD)</td>
                       <td className="px-6 py-4">Account Head</td>
-                      <td className="px-6 py-4">{connection_type ==="Permanent" ? 48.151: 48.400}</td>
+                      <td className="px-6 py-4">{connection_type === "Permanent" ? 48.151 : 48.400}</td>
                       <td className="px-6 py-4">Security Deposit Amount</td>
                       <td className="px-6 py-4">
                         {charges.totalSdRequired}
@@ -791,4 +819,6 @@ console.log(charges,'chargessssssss')
 };
 
 export default LoadChangePay;
+
+
 
