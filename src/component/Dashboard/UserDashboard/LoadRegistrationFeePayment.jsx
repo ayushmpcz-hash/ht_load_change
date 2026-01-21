@@ -152,6 +152,27 @@ const LoadRegistrationFeePayment = () => {
                 <h2 className="text-lg font-bold capitalize ">
                 { hasTariffCharges && `HT Load Change ${items.application_status_text}`}
                 </h2>
+
+                <div>
+                    {/* 🔴 IMPORTANT NOTE (ENGLISH + HINDI) */}
+      <div className="mt-4 p-4 border-l-4 border-red-500 bg-red-50 rounded">
+        <p className="text-sm text-red-700 font-semibold">
+          Important Note:
+        </p>
+        <p className="text-sm text-red-600 mt-1">
+          If the payment has been deducted against the online application, DO
+          NOT make same payment further until the deducted amount is refunded.
+        </p>
+
+        <p className="text-sm text-red-700 font-semibold mt-3">
+          महत्वपूर्ण टीप:
+        </p>
+        <p className="text-sm text-red-600 mt-1">
+          यदि ऑनलाइन आवेदन के विरुद्ध भुगतान काट लिया गया है, तो कटे हुए
+          राशि के वापस मिलने तक उसी भुगतान को फिर से न करें।
+        </p>
+      </div>
+                </div>
               </div>
               {/* {items?.tariff_charges?.total_pay_amount && (
                 <>

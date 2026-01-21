@@ -152,7 +152,7 @@ useEffect(() => {
   return (
     <>
       <aside
-        className={`fixed inset-y-0 z-10 flex flex-col w-64 max-h-screen overflow-hidden border-r shadow-lg transition-all bg-[#000080] text-white transform lg:static lg:z-auto lg:shadow-none ${
+        className={`fixed inset-y-0 z-10 flex flex-col w-64 max-h-screen overflow-hidden border-r shadow-lg transition-all bg-[#0000bb] text-white transform lg:static lg:z-auto lg:shadow-none ${
           !isSidebarOpen ? '-translate-x-full lg:translate-x-0 lg:w-20' : ''
         }`}
       >
@@ -177,7 +177,7 @@ useEffect(() => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
                   </span>
-                  {isSidebarOpen && <span className='text-md'>Officer Dashboard</span>}
+                  {isSidebarOpen && <span className='text-lg'>Officer Dashboard</span>}
                 </Link>
               </li>
             ) : (
@@ -188,7 +188,7 @@ useEffect(() => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
                   </span>
-                  {isSidebarOpen && <span className='text-md'>User Dashboard</span>}
+                  {isSidebarOpen && <span className='text-lg'>User Dashboard</span>}
                 </Link>
               </li>
             )}
@@ -211,13 +211,13 @@ useEffect(() => {
         <div className="border-t border-gray-100">
           <button
             onClick={handleLogout}
-            className="flex items-center justify-start w-full px-4 py-2 space-x-1 cursor-pointer hover:bg-red-600 transition"
+            className="flex items-center justify-start w-full px-4 py-2 space-x-1 cursor-pointer hover:bg-white hover:text-black transition"
             type="button"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            {isSidebarOpen && <span className='text-md'>Logout</span>}
+            {isSidebarOpen && <span className='text-lg'>Logout</span>}
           </button>
         </div>
       </aside>

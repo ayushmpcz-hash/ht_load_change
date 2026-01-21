@@ -105,8 +105,8 @@
 import logo from '../../../assets/image/logo.jpg'
 import Modal from '../Modal'
 import { useState, useMemo } from 'react';
-import { useSelector,useDispatch } from "react-redux";
-import {setSearchText} from "../../../redux/slices/userSlice"
+import { useSelector, useDispatch } from "react-redux";
+import { setSearchText } from "../../../redux/slices/userSlice"
 const Header = ({ toggleSidebar }) => {
   const [ModalIsOpen, setModalIsOpen] = useState(false);
   const dispatch = useDispatch();
@@ -115,9 +115,12 @@ const Header = ({ toggleSidebar }) => {
   const openModal = () => setModalIsOpen(true);
   const closeModal = () => setModalIsOpen(false);
 
+  let officerData = useSelector(state => state.user.officerData)
+  let officer_data = officerData?.employee_detail
+
   const handleSearch = (e) => {
     const val = e.target.value;
-    console.log(val,'valueeeee')
+    console.log(val, 'valueeeee')
     setValue(val);
     dispatch(setSearchText(val));   // 👈 GLOBAL UPDATE
   };
@@ -169,13 +172,13 @@ const Header = ({ toggleSidebar }) => {
               />
             </svg>
           </span>
-              <input
-      type="text"
-      value={value}
-      onChange={handleSearch}
-      placeholder="Search Application No / Consumer Name"
-      className="px-4 py-2 rounded-md border focus:ring"
-    />
+          <input
+            type="text"
+            value={value}
+            onChange={handleSearch}
+            placeholder="Search Application No / Consumer Name"
+            className="px-4 py-2 rounded-md border focus:ring"
+          />
         </div>
 
         {/* Navbar right */}
@@ -183,7 +186,8 @@ const Header = ({ toggleSidebar }) => {
           <div className="relative">
             <div className="absolute right-0 p-1 bg-red-400 rounded-full animate-ping"></div>
             <div className="absolute right-0 p-1 bg-red-400 border rounded-full"></div>
-            <button className="" onClick={() => openModal()}>
+             {officer_data && (
+              <button className="" onClick={() => openModal()}>
               <svg xmlns="http://www.w3.org/2000/svg" width="30px" height="30px" viewBox="0 0 24 24" fill="none">
                 <path d="M18.5 19.5L20 21M4 21C4 17.134 7.13401 14 11 14M19 17.5C19 18.8807 17.8807 20 16.5 20C15.1193 20 14 18.8807 14 17.5C14 16.1193 15.1193 15 16.5 15C17.8807 15 19 16.1193 19 17.5ZM15 7C15 9.20914 13.2091 11 11 11C8.79086 11 7 9.20914 7 7C7 4.79086 8.79086 3 11 3C13.2091 3 15 4.79086 15 7Z" stroke="#000000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
 
@@ -195,6 +199,7 @@ const Header = ({ toggleSidebar }) => {
                 />
               </svg>
             </button>
+             )}
           </div>
 
 

@@ -1325,7 +1325,7 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
         <th className="font-medium text-gray-900 whitespace-nowrap dark:text-white">
           <div className="text-center">
             {docLink ? (
-              <Link to={docLink} target="_blank" rel="noopener noreferrer"
+              <Link to={`https://htsanyojan.mpcz.in:8089${docLink}`} target="_blank" rel="noopener noreferrer"
                 className="rounded-lg mt-2 px-3 py-2 text-green-100 bg-indigo-500 hover:bg-fuchsia-500 duration-300">
                 View PDF File
               </Link>

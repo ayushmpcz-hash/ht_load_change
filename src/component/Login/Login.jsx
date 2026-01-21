@@ -248,6 +248,7 @@ const Login = () => {
         );
         const result = await response.json();
         dispatch(setLoginUser(result));
+        localStorage.setItem("loginUser", JSON.stringify(result));
         localStorage.setItem("loginType", "APPLICANT");
         localStorage.removeItem("officer_data"); // safety
         navigate("/user-dashboard");

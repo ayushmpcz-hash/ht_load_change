@@ -365,15 +365,39 @@ useEffect(() => {
       const formValue = fromDataValue;
       const formData = new FormData();
 
-      Object.keys(formValue).forEach(key => {
-        if (formValue[key] instanceof FileList) {
-          if (formValue[key].length > 0) {
-            formData.append(key, formValue[key][0]);
-          }
-        } else {
-          formData.append(key, formValue[key]);
-        }
-      });
+      // Object.keys(formValue).forEach(key => {
+      //   if (formValue[key] instanceof FileList) {
+      //     if (formValue[key].length > 0) {
+      //       formData.append(key, formValue[key][0]);
+      //     }
+      //   } else {
+      //     formData.append(key, formValue[key]);
+      //   }
+      // });
+      Object.entries(formValue).forEach(([key, value]) => {
+  // ✅ FileList handle
+  if (value instanceof FileList) {
+    if (value.length > 0) {
+      formData.append(key, value[0]);
+    }
+    return; // empty FileList skip
+  }
+
+  // ✅ Single File
+  if (value instanceof File) {
+    formData.append(key, value);
+    return;
+  }
+
+  // ❌ empty / null / undefined skip
+  if (value === undefined || value === null || value === "") {
+    return;
+  }
+
+  // ✅ normal fields
+  formData.append(key, value);
+});
+               
       console.log(formData, "formData")
       const { data } = await axios.post(`${HT_LOAD_CHANGE_BASE}/surveys/`, formData, {
         headers: {

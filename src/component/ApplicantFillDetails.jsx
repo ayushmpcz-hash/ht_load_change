@@ -142,6 +142,14 @@ export default function ApplicantBasicDetails({ htConsumers ,register ,errors}) 
               errorMsg={errors.existing_contract_demand?.message}
             />
           )}
+            {/* {htConsumers?.connection_type === 'Permanent' && (
+            <InputTag
+              LName="Existing Contract Demand"
+              {...register('cd')}
+             readOnly={true}
+              errorMsg={errors.existing_contract_demand?.message}
+            />
+          )} */}
 
           {htConsumers?.connection_type === 'Temporary' && (
             <InputTag

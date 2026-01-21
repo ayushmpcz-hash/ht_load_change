@@ -966,6 +966,7 @@ import {
   checkLoadReductionDate,
   validateContractDemand,
 } from '../../utils/handleLogicLoad.js';
+import { saveAppAuth } from "../../utils/Storage/Storage.js";
 
 function ApplicantReg() {
   const { consumerId, application_no } = useParams();
@@ -1027,7 +1028,7 @@ function ApplicantReg() {
   const SupplyVoltage = watch('new_supply_voltage');
   const ContractDemand = watch('new_contact_demand');
 
-  console.log(htConsumers, 'htconsumer details')
+  // console.log(htConsumers, 'htconsumer details')
 
   // useEffect(() => {
   //   if (Object.keys(data).length) {
@@ -1043,7 +1044,7 @@ function ApplicantReg() {
     }
   }, [data, reset]);
 
-
+  console.log(htConsumers, 'ht consumer cdddddddd')
 
   // useEffect(() => {
   //   if (isUpdatePage) {
@@ -1094,11 +1095,11 @@ function ApplicantReg() {
       // clearErrors("new_contact_demand");
       if (SubTypeOfChange === "Only_Voltage_Upgrade") {
         setValue("contract_demand_difference", 0);
-        // setValue("new_contact_demand", htConsumers?.existing_contract_demand);
-        setValue("new_contact_demand", htConsumers?.cd);
+        setValue("new_contact_demand", htConsumers?.existing_contract_demand);
+        // setValue("new_contact_demand", htConsumers?.cd);
         setIsLocked(true)
-        // const contract_demand = contractDemandRange(SupplyVoltage, htConsumers?.existing_contract_demand);
-        const contract_demand = contractDemandRange(SupplyVoltage, htConsumers?.cd);
+        const contract_demand = contractDemandRange(SupplyVoltage, htConsumers?.existing_contract_demand);
+        // const contract_demand = contractDemandRange(SupplyVoltage, htConsumers?.cd);
         if (contract_demand) {
           setValue("new_contact_demand", "");
           setValue("contract_demand_difference", "");
@@ -1184,7 +1185,7 @@ function ApplicantReg() {
 
   const normalizedHtConsumer = {
     ...htConsumers,
-    existing_contract_demand: htConsumers?.cd,
+    existing_contract_demand: htConsumers?.existing_contract_demand,
   };
 
   useEffect(() => {
@@ -1205,8 +1206,8 @@ function ApplicantReg() {
         );
 
         let contractDiff = Math.abs(
-          // ContractDemand - Number(htConsumers.existing_contract_demand)
-          ContractDemand - Number(htConsumers.cd)
+          ContractDemand - Number(htConsumers.existing_contract_demand)
+          // ContractDemand - Number(htConsumers.cd)
         );
         setValue("contract_demand_difference", contractDiff);
 
@@ -1247,13 +1248,23 @@ function ApplicantReg() {
       dispatch(setLoading(true));
       setIsDisabled(true);
       const formData = toFormData(data);
-
+      console.log(formData,'formDataaa')
       const apiUrl = `${HT_LOAD_CHANGE_BASE}/submit-load-change-application/`;
       const response = await axios.post(apiUrl, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       const result = response?.data;
       if (!result) throw new Error("No response from server");
+
+      // 🔐 SAVE application_no + password (MOST IMPORTANT)
+      if (result.application_no && result.password) {
+        saveAppAuth({
+          application_no: result.application_no,
+          password: result.password,
+          consumer_name: result.data?.consumer_name,
+          consumer_id: result.data?.consumer_id,
+        });
+      }
 
       if (result.data) dispatch(setUserData(result.data));
 
@@ -1345,6 +1356,7 @@ function ApplicantReg() {
       if (verifyResp.success) {
         // ✅ PURE FORM DATA PASS KARO
         const formData = getValues();
+        console.log(formData,'form dataaaaa')
         await handleSubmitNewApplication(formData);
       } else {
         setError("otp", {
@@ -1752,6 +1764,25 @@ function ApplicantReg() {
                     <br></br>
                     <strong>Note:</strong> Please merge the documents pdfs, if mulltiple documents to be upload.
 
+                  </div>
+
+                  {/* 🔴 IMPORTANT NOTE (ENGLISH + HINDI) */}
+                  <div className="mt-4 p-4 border-l-4 border-red-500 bg-red-50 rounded">
+                    <p className="text-sm text-red-700 font-semibold">
+                      Important Note:
+                    </p>
+                    <p className="text-sm text-red-600 mt-1">
+                      If the payment has been deducted against the online application, DO
+                      NOT make same payment further until the deducted amount is refunded.
+                    </p>
+
+                    <p className="text-sm text-red-700 font-semibold mt-3">
+                      महत्वपूर्ण टीप:
+                    </p>
+                    <p className="text-sm text-red-600 mt-1">
+                      यदि ऑनलाइन आवेदन के विरुद्ध भुगतान काट लिया गया है, तो कटे हुए
+                      राशि के वापस मिलने तक उसी भुगतान को फिर से न करें।
+                    </p>
                   </div>
 
 

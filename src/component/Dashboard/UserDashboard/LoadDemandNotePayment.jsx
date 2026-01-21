@@ -56,7 +56,7 @@ const LoadDemandNotePayment = () => {
                       disabled={isDisabled}
                       readOnly
                     />
-                    <Link to={`https://htsanyojan.mpcz.in:8089/ht-load-change-api/call_demand_note_payment/${items?.id}`}><Button label=' Pay Demand Note'></Button></Link>
+                    <Link to={`https://htsanyojan.mpcz.in:8089/ht_load_change/call_demand_note_payment/${items?.id}`}><Button label=' Pay Demand Note'></Button></Link>
                   </div>
 
                 </div>

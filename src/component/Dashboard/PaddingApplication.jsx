@@ -138,7 +138,7 @@
 //               </tbody>
 //             </table>
 //           </div>
-          
+
 //           <div>
 //             <nav class="Page navigation example mt-2 mb-5">
 //               <ul className="flex items-center justify-end">
@@ -198,7 +198,7 @@ export default function PaddingApplication() {
   const [loading, setLoading] = useState(true);
   const token = Cookies.get('accessToken');
 
-  console.log(HT_LOAD_CHANGE_BASE,"HT_LOAD_CHANGE_BASE inside pending application")
+  console.log(HT_LOAD_CHANGE_BASE, "HT_LOAD_CHANGE_BASE inside pending application")
 
   const dispatch = useDispatch()
   const applications = useSelector(state => state.user.applications);
@@ -240,7 +240,7 @@ export default function PaddingApplication() {
         setLoading(false);
       }
     };
-    
+
     if (emp_id && flag_id) {
       fetchData();
     } else {
@@ -257,7 +257,7 @@ export default function PaddingApplication() {
   function handlePageChange(n) {
     setCurrantPage(n);
   }
-  
+
   const goToPrevPage = () => {
     setCurrantPage(prev => prev - 1);
   };
@@ -272,7 +272,7 @@ export default function PaddingApplication() {
     // Replace underscores with spaces and add proper spacing
     return type.replace(/_/g, ' ');
   };
-  
+
   return (
     <>
       <div className="bg-white rounded-lg shadow-md">
@@ -281,36 +281,39 @@ export default function PaddingApplication() {
             {applicationStatusName.name || 'Applications'}
           </h2>
         </div>
-        
+
         <div className="p-6">
           <div className="w-full">
             <table className="w-full divide-y divide-gray-200">
               <thead className="bg-[#000080]">
                 <tr>
-                  <th className="px-4 py-3 text-xs font-medium text-left text-white uppercase tracking-wider whitespace-nowrap">
-                    App No
-                  </th>
-                  <th className="px-4 py-3 text-xs font-medium text-left text-white uppercase tracking-wider whitespace-nowrap">
-                    Firm Name
-                  </th>
-                  <th className="px-4 py-3 text-xs font-medium text-left text-white uppercase tracking-wider whitespace-nowrap">
+                  <th className="px-4 py-3 text-md font-medium text-left text-white uppercase tracking-wider whitespace-nowrap">
                     Circle
                   </th>
-                  <th className="px-4 py-3 text-xs font-medium text-left text-white uppercase tracking-wider whitespace-nowrap">
+
+                  <th className="px-4 py-3 text-md font-medium text-left text-white uppercase tracking-wider whitespace-nowrap">
                     Division
                   </th>
-                  <th className="px-4 py-3 text-xs font-medium text-left text-white uppercase tracking-wider whitespace-nowrap">
-                    Change Type
+
+                  <th className="px-4 py-3 text-md font-medium text-left text-white uppercase tracking-wider whitespace-nowrap">
+                    App No
                   </th>
-                  <th className="px-4 py-3 text-xs font-medium text-left text-white uppercase tracking-wider whitespace-nowrap">
+                  <th className="px-4 py-3 text-md font-medium text-left text-white uppercase tracking-wider whitespace-nowrap">
+                    Firm Name
+                  </th>
+
+                  {/* <th className="px-4 py-3 text-md font-medium text-left text-white uppercase tracking-wider whitespace-nowrap">
+                    Change Type
+                  </th> */}
+                  <th className="px-4 py-3 text-md font-medium text-left text-white uppercase tracking-wider whitespace-nowrap">
                     Load Change Type
                   </th>
-                  <th className="px-4 py-3 text-xs font-medium text-left text-white uppercase tracking-wider whitespace-nowrap">
+                  <th className="px-4 py-3 text-md font-medium text-left text-white uppercase tracking-wider whitespace-nowrap">
                     Action
                   </th>
                 </tr>
               </thead>
-              
+
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading ? (
                   <tr>
@@ -326,42 +329,44 @@ export default function PaddingApplication() {
                     {filteredApplications.length > 0 ? (
                       filteredApplications.slice(Start, End).map((items, index) => (
                         <tr key={index} className="hover:bg-gray-50 transition-colors duration-150">
+
                           <td className="px-4 py-3 align-middle">
-                            <div className="text-sm font-semibold text-gray-900 truncate max-w-[120px]" title={items.application_no}>
-                              {items.application_no}
-                            </div>
-                          </td>
-                          
-                          <td className="px-4 py-3 align-middle">
-                            <div className="text-sm text-gray-900 truncate max-w-[160px]" title={items.consumer_name}>
-                              {items.consumer_name}
-                            </div>
-                          </td>
-                          
-                          <td className="px-4 py-3 align-middle">
-                            <span className="inline-flex px-3 py-1.5 text-xs font-semibold text-green-800 bg-green-100 rounded-full truncate max-w-[100px]" title={items.circle}>
+                            <span className="inline-flex px-3 py-1.5 text-base font-semibold text-green-800 bg-green-100 rounded-full truncate max-w-[100px]" title={items.circle}>
                               {items.circle}
                             </span>
                           </td>
-                          
+
                           <td className="px-4 py-3 align-middle">
-                            <div className="text-sm text-gray-900 truncate max-w-[120px]" title={items.division}>
+                            <div className="text-base text-gray-900 truncate max-w-[120px]" title={items.division}>
                               {items.division}
                             </div>
                           </td>
-                          
+
                           <td className="px-4 py-3 align-middle">
+                            <div className="text-base font-semibold text-gray-900 truncate max-w-[120px]" title={items.application_no}>
+                              {items.application_no}
+                            </div>
+                          </td>
+
+                          <td className="px-4 py-3 align-middle">
+                            <div className="text-base text-gray-900 truncate max-w-[160px]" title={items.consumer_name}>
+                              {items.consumer_name}
+                            </div>
+                          </td>
+
+
+                          {/* <td className="px-4 py-3 align-middle">
                             <div className="text-sm text-gray-900 truncate max-w-[140px]" title={items.type_of_change}>
                               {items.type_of_change ? items.type_of_change.replace(/_/g, ' ') : 'N/A'}
                             </div>
-                          </td>
-                          
+                          </td> */}
+
                           <td className="px-4 py-3 align-middle">
-                            <div className="text-sm text-gray-900 break-words max-w-[180px] min-w-[150px]" title={items.lc_type}>
+                            <div className="text-base text-gray-900 break-words max-w-[180px] min-w-[150px]" title={items.lc_type}>
                               {formatLoadChangeType(items.lc_type)}
                             </div>
                           </td>
-                          
+
                           <td className="px-4 py-3 align-middle">
                             {statusUrl && (
                               <NavLink
@@ -369,7 +374,7 @@ export default function PaddingApplication() {
                                 state={{ items }}
                                 className="inline-flex justify-center"
                               >
-                                <button className="bg-[#0c0d52] text-white px-3 py-1.5 rounded-md text-xs font-medium hover:bg-blue-700 transition-colors duration-200 whitespace-nowrap">
+                                <button className="bg-[#0c0d52] text-white px-3 py-1.5 rounded-md text-base font-medium hover:bg-blue-700 transition-colors duration-200 whitespace-nowrap">
                                   View
                                 </button>
                               </NavLink>
@@ -395,7 +400,7 @@ export default function PaddingApplication() {
               </tbody>
             </table>
           </div>
-          
+
           {!loading && filteredApplications.length > 0 && (
             <div className="mt-6">
               <nav className="flex items-center justify-between border-t border-gray-200 px-4 py-4 sm:px-6">
@@ -403,11 +408,10 @@ export default function PaddingApplication() {
                   <button
                     disabled={currentPage === 0}
                     onClick={goToPrevPage}
-                    className={`relative inline-flex items-center rounded-lg px-4 py-2.5 text-sm font-medium ${
-                      currentPage === 0 
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                        : 'bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 border border-gray-300'
-                    }`}
+                    className={`relative inline-flex items-center rounded-lg px-4 py-2.5 text-sm font-medium ${currentPage === 0
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 border border-gray-300'
+                      }`}
                   >
                     Previous
                   </button>
@@ -419,16 +423,15 @@ export default function PaddingApplication() {
                   <button
                     disabled={currentPage === numOfPages - 1}
                     onClick={goToNextPage}
-                    className={`relative ml-3 inline-flex items-center rounded-lg px-4 py-2.5 text-sm font-medium ${
-                      currentPage === numOfPages - 1
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 border border-gray-300'
-                    }`}
+                    className={`relative ml-3 inline-flex items-center rounded-lg px-4 py-2.5 text-sm font-medium ${currentPage === numOfPages - 1
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 border border-gray-300'
+                      }`}
                   >
                     Next
                   </button>
                 </div>
-                
+
                 <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm text-gray-700">
@@ -439,48 +442,45 @@ export default function PaddingApplication() {
                       of <span className="font-semibold">{itemsLength}</span> results
                     </p>
                   </div>
-                  
+
                   <div>
                     <ul className="flex items-center space-x-1">
                       <li>
                         <button
                           disabled={currentPage === 0}
                           onClick={goToPrevPage}
-                          className={`relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg ${
-                            currentPage === 0
-                              ? 'text-gray-400 bg-gray-100 cursor-not-allowed border border-gray-200'
-                              : 'text-gray-700 bg-white hover:bg-gray-50 hover:text-gray-900 border border-gray-300'
-                          }`}
+                          className={`relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg ${currentPage === 0
+                            ? 'text-gray-400 bg-gray-100 cursor-not-allowed border border-gray-200'
+                            : 'text-gray-700 bg-white hover:bg-gray-50 hover:text-gray-900 border border-gray-300'
+                            }`}
                         >
                           ← Previous
                         </button>
                       </li>
-                      
+
                       <li className="flex items-center space-x-1">
                         {[...Array(numOfPages).keys()].map(n => (
                           <button
                             key={n}
                             onClick={() => handlePageChange(n)}
-                            className={`relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg min-w-[36px] justify-center ${
-                              n === currentPage
-                                ? 'z-10 bg-[#0c0d52] text-white border border-[#0c0d52]'
-                                : 'text-gray-700 bg-white hover:bg-gray-50 border border-gray-300'
-                            }`}
+                            className={`relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg min-w-[36px] justify-center ${n === currentPage
+                              ? 'z-10 bg-[#0c0d52] text-white border border-[#0c0d52]'
+                              : 'text-gray-700 bg-white hover:bg-gray-50 border border-gray-300'
+                              }`}
                           >
                             {n + 1}
                           </button>
                         ))}
                       </li>
-                      
+
                       <li>
                         <button
                           disabled={currentPage === numOfPages - 1}
                           onClick={goToNextPage}
-                          className={`relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg ${
-                            currentPage === numOfPages - 1
-                              ? 'text-gray-400 bg-gray-100 cursor-not-allowed border border-gray-200'
-                              : 'text-gray-700 bg-white hover:bg-gray-50 hover:text-gray-900 border border-gray-300'
-                          }`}
+                          className={`relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg ${currentPage === numOfPages - 1
+                            ? 'text-gray-400 bg-gray-100 cursor-not-allowed border border-gray-200'
+                            : 'text-gray-700 bg-white hover:bg-gray-50 hover:text-gray-900 border border-gray-300'
+                            }`}
                         >
                           Next →
                         </button>

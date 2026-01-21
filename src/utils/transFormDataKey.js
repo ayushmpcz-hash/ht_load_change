@@ -9,6 +9,7 @@ export const transformDataKeys = apiData => {
   }
   return transformed;
 };
+
 const keyMapping = {
   regionCode: 'region_code',
   region: 'region',
@@ -32,9 +33,12 @@ const keyMapping = {
   purposeInstal: 'connection_purpose',
   tariff: 'connection_category',
   tariffDes: 'connection_sub_category',
-  sanctionLoad: 'existing_contract_demand',
+  // sanctionLoad: 'existing_contract_demand',
+ cd: 'existing_contract_demand',
+
+
   unit: 'unit',
-  cd: 'cd',
+  // cd: 'cd',
   tempCd: 'temporaryLoad',
   govtFlag: 'govt_flag',
   meterMake: 'meter_make',

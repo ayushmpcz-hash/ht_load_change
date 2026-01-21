@@ -36,6 +36,7 @@ export default function LoadChangeInstruction() {
       if (result?.list?.length > 0) {
         let current_month_outstandin_amt = Number(result.list[0].netBill) - Number(result.list[0].paidAmt)
         const transformedData = transformDataKeys(result.list[0]);
+        console.log(transformedData,'transformedData')
         transformedData.current_month_outstandin_amt = current_month_outstandin_amt;
         transformedData.current_bill_units = result?.list?.[0]?.billedUnits
           ? Math.round(result.list[0].billedUnits)

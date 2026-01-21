@@ -20,8 +20,8 @@ const SuccessRespones = ({}) => {
       </div>
       <h1 className="text-[#88B04B] font-black text-[40px] mt-4 mb-2">{apiData.message}</h1>
       <p className="text-[#404F5E] text-[20px] text-center">
-        We received your purchase request;
-        <br /> we'll be in touch shortly!
+        Application  submitted successfully 
+        <br /> Further processing is under progress !
       </p>
       <div className="border-b border-gray-900/10 pb-12 ">
               <div className="mt-10 flex flex-col justify-center items-center">
@@ -32,9 +32,9 @@ const SuccessRespones = ({}) => {
                     </NavLink>
                     
                   </button>
-                  <button className="rounded-lg px-4 py-2 bg-blue-500 text-blue-100 hover:bg-green-600 duration-300">
+                  {/* <button className="rounded-lg px-4 py-2 bg-blue-500 text-blue-100 hover:bg-green-600 duration-300">
                     Show Pandding Application
-                  </button>
+                  </button> */}
                    
                 </div>
                 
