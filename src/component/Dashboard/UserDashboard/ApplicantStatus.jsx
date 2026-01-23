@@ -364,6 +364,7 @@ const ApplicantStatus = () => {
                 <td className="px-4 py-3 align-middle">
                   {items?.application_status === 1 ||
                     items?.application_status === 2 ||
+                    items?.application_status === 11 || 
                     items?.application_status === 9 ? (
                     <NavLink
                       to={{

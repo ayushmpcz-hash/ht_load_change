@@ -30,6 +30,7 @@ import LoadCommissioningPermission from "./component/Dashboard/LoadCommissioning
 import LoadCommissioning from "./component/Dashboard/LoadCommissioning"
 import TranscoApproval from "./component/Dashboard/TranscoApproval"
 import LoadDemandNotePayment from './component/Dashboard/UserDashboard/LoadDemandNotePayment';
+import LoadAgreementFinalize from './component/Dashboard/UserDashboard/LoadAgreementFinalize';
 
 import {
   TrackApplicationStatus, LoadRegistrationFeePayment, LoadResubmission, RegistrationPayment, LoadConnectionServed,
@@ -118,6 +119,7 @@ function App() {
             <Route path="/user-dashboard/pending_for_registration_fee_payment/:id" element={<LoadRegistrationFeePayment />} />
             <Route path="/user-dashboard/pending_for_application_resubmission/:id" element={<LoadResubmission />} />
             <Route path="/user-dashboard/pending_for_demand_note_payment/:id" element={<LoadDemandNotePayment />} />
+            <Route path="/user-dashboard/pending_for_agreement_finalization/:id" element={<LoadAgreementFinalize/>} />
             {/* <Route path="/user-dashboard/pending_for_agreement_finalization/:id" element={<LoadAgreement/>}/> */}
             {/* <Route
               path="/user-dashboard/applicant-padding-application"
