@@ -230,7 +230,7 @@ const ApplicantStatus = () => {
   const isRegistrationFeePaid =
     items?.is_regfee_submitted === true ||
     items?.is_regfee_submitted_bypg === true;
-
+     console.log(isRegistrationFeePaid,'isRegistrationFeePaid')
   if (!items?.tariff_charges && !isRegistrationFeePaid) {
     setStatusMessage("Pending for application submission");
   } 
@@ -242,6 +242,7 @@ const ApplicantStatus = () => {
   }
 }, [items]);
 
+console.log(items?.is_regfee_submitted,'is_regfee_submitted')
 
   useEffect(() => {
     if (loadingRef.current) {

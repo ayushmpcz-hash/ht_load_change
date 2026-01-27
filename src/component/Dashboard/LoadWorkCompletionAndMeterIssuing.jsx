@@ -14,7 +14,7 @@ import {
   verifyOtpNew,
 } from '../importComponents.js';
 import { responseOption, revertOption } from '../newComponents/commonOption.js';
-import { NGB_PRO_BASE, HT_LOAD_CHANGE_BASE,HT_NSC_NGB_ID,HT_NGB_PASSWORD } from '../../api/api.js';
+import { NGB_PRO_BASE, HT_LOAD_CHANGE_BASE,HT_NGB_ID,HT_NGB_PASSWORD } from '../../api/api.js';
 const LoadWorkCompletionAndMeterIssuing = () => {
   // let base_url = import.meta.env.VITE_NGB_URL;
   const officerData = useSelector(state => state.user.officerData);
@@ -88,7 +88,7 @@ const LoadWorkCompletionAndMeterIssuing = () => {
     (async () => {
       try {
         const data = {
-          userId: HT_NSC_NGB_ID,
+          userId: HT_NGB_ID,
           userPwd: HT_NGB_PASSWORD,
         };
         const url = `${NGB_PRO_BASE}/login/verification`;

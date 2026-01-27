@@ -1778,6 +1778,13 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
                 </tr>
               )}
 
+               {htConsumers?.is_demandnote_fee_submitted_bypg || htConsumers?.is_demandnote_fee_submitted && (
+                <tr>
+                  <TableTrBloack Lable={'Next Action'} Value={'Agreement Finalization'} />
+                  <TableTrBloack Lable={'Demand Note Payment Status'} Value={htConsumers?.is_demandnote_fee_submitted_bypg || htConsumers?.is_demandnote_fee_submitted? "Done" : "Pending"} colSpan={3} />
+                </tr>
+              )}
+
               {/* Agreement Finalization */}
               {htConsumers?.agreement_details && renderStepSummary(htConsumers?.agreement_details, {
                 name: 'Agreement Finalization Details',

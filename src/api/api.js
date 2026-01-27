@@ -10,7 +10,7 @@ export const HT_NSC_DASHBOARD_URL = import.meta.env.VITE_HT_NSC_DASHBOARD_URL;
 export const HT_LOAD_CHANGE_PUBLIC_URL = import.meta.env.VITE_LOAD_CHANGE_PUBLIC_URL
 export const HT_HOME_URL = import.meta.env.VITE_HOME_URL;
 
-export const HT_NSC_NGB_ID = import.meta.env.VITE_NGB_ID;
+export const HT_NGB_ID = import.meta.env.VITE_NGB_ID;
 export const HT_NGB_PASSWORD = import.meta.env.VITE_NGB_PASSWORD
 export const HT_NGB_URL = import.meta.env.VITE_NGB_URL;
 
