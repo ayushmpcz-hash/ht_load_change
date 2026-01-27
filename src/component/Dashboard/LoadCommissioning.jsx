@@ -37,16 +37,23 @@ const LoadCommissioning = () => {
   const token = Cookies.get('accessToken');
 
   // States
-  const [mobileNo] = useState(officerData?.employee_detail.cug_mobile);
+ const [mobileNo, setMobileNo] = useState('');
   const [showOtpBtn, setShowOtpBtn] = useState(false);
   const [formDataValue, setFormDataValue] = useState(null);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isBtnDisabled, setBtnIsDisabled] = useState(false);
   const bi_cell_response = watch('bi_cell_response');
 
+    useEffect(() => {
+    if (officerData?.employee_detail?.cug_mobile) {
+      setMobileNo(officerData.employee_detail.cug_mobile);
+    }
+  }, [officerData]);
+
   // 🔹 Send OTP
   const handleSendOtp = async formData => {
     setFormDataValue(formData);
+    console.log(mobileNo,'mobile nooooo')
     const sentOtp = await sendOtpNew(mobileNo);
     if (sentOtp.success) {
       setShowOtpBtn(true);

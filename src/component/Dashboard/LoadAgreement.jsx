@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -20,14 +20,16 @@ const LoadAgreement = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { items } = location.state || {};
+  const [mobileNo, setMobileNo] = useState('');
+
   // console.log(items, "items")
   // console.log(HT_LOAD_CHANGE_BASE,'HT_LOAD_CHANGE_BASE in Load Aggrement')
   const required = items?.survey?.is_estimate_required?.split(',') || [];
 
   const token = Cookies.get("accessToken");
 
-  // States
-  const [mobileNo] = useState(officerData?.employee_detail.cug_mobile);
+
+
   const [showOtpBtn, setShowOtpBtn] = useState(false);
   const [formDataValue, setFormDataValue] = useState(null);
   const [isDisabled, setIsDisabled] = useState(false);
@@ -58,18 +60,72 @@ const LoadAgreement = () => {
 
   const agreement_response = watch("agreement_response");
 
-  // 🔹 Send OTP
-  const handleSendOtp = async (formData) => {
-    setFormDataValue(formData);
-    const sentOtp = await sendOtpNew(mobileNo);
-    if (sentOtp.success) {
-      setShowOtpBtn(true);
-      setIsDisabled(true);
-      setError("otpSuccess", { type: "manual", message: sentOtp.message });
-    } else {
-      setError("otpStatus", { type: "manual", message: sentOtp.message });
+  useEffect(() => {
+  const reduxMobile = officerData?.employee_detail?.cug_mobile;
+
+  // ✅ Redux available
+  if (reduxMobile) {
+    setMobileNo(reduxMobile);
+    localStorage.setItem(
+      'employee_detail',
+      JSON.stringify(officerData.employee_detail)
+    );
+    return;
+  }
+
+  // ✅ Redux missing → localStorage fallback
+  const storedEmployee = localStorage.getItem('employee_detail');
+  if (storedEmployee) {
+    try {
+      const parsed = JSON.parse(storedEmployee);
+      if (parsed?.cug_mobile) {
+        setMobileNo(parsed.cug_mobile);
+      }
+    } catch (e) {
+      console.error('Invalid employee_detail in localStorage');
     }
-  };
+  }
+}, [officerData]);
+
+
+  // 🔹 Send OTP
+  // const handleSendOtp = async (formData) => {
+  //   setFormDataValue(formData);
+  //   console.log(mobileNo,'mobileNo0000000')
+  //   const sentOtp = await sendOtpNew(mobileNo);
+  //   if (sentOtp.success) {
+  //     setShowOtpBtn(true);
+  //     setIsDisabled(true);
+  //     setError("otpSuccess", { type: "manual", message: sentOtp.message });
+  //   } else {
+  //     setError("otpStatus", { type: "manual", message: sentOtp.message });
+  //   }
+  // };
+  const handleSendOtp = async (formData) => {
+  setFormDataValue(formData);
+
+  // 🚨 BLOCK if mobile missing
+  if (!mobileNo || mobileNo.length !== 10) {
+    setError("otpStatus", {
+      type: "manual",
+      message: "Mobile number not available. Please reload dashboard.",
+    });
+    return;
+  }
+
+  console.log("OTP sending to:", mobileNo);
+
+  const sentOtp = await sendOtpNew(mobileNo);
+
+  if (sentOtp.success) {
+    setShowOtpBtn(true);
+    setIsDisabled(true);
+    setError("otpSuccess", { type: "manual", message: sentOtp.message });
+  } else {
+    setError("otpStatus", { type: "manual", message: sentOtp.message });
+  }
+};
+
 
   // 🔹 Verify OTP
   const handleVerifyOtp = async () => {

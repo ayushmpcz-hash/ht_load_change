@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect} from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -25,9 +25,11 @@ import {
 } from '../newComponents/commonOption.js';
 import ViewTag from '../newComponents/ViewTag.jsx';
 
-const LoadDemandNote = () => {
+const LoadDemandNote = () => {  
   const officerData = useSelector(state => state.user.officerData);
-  const [mobileNo, setMobileNo] = useState(officerData?.employee_detail.cug_mobile);
+  // const [mobileNo, setMobileNo] = useState(officerData?.employee_detail.cug_mobile);
+  
+ const [mobileNo, setMobileNo] = useState('');
   const [showOtpBtn, setShowOtpBtn] = useState(false);
   const [fromDataValue, setFromDataValue] = useState(null);
   const [isDisabled, setIsDisabled] = useState(false);
@@ -38,8 +40,8 @@ const LoadDemandNote = () => {
   console.log(items, 'items');
   const token = Cookies.get('accessToken');
 
-   console.log(HT_LOAD_CHANGE_BASE,'HT_LOAD_CHANGE_BASE in Demand note')
-
+  console.log(HT_LOAD_CHANGE_BASE, 'HT_LOAD_CHANGE_BASE in Demand note')
+  
   const {
     register,
     handleSubmit,
@@ -62,8 +64,24 @@ const LoadDemandNote = () => {
   setValue('total_estimate_amt', total_estimate_amt);
   setValue('application', items.id);
   const demand_note_response = watch('demand_note_response');
+
+  const loadDemandNoteRevertOption = [
+    ...revertOption,
+    {
+      label: "Resubmission application for survey",
+      value: "Resubmission application for survey",
+    },
+  ];
+
+    useEffect(() => {
+  if (officerData?.employee_detail?.cug_mobile) {
+    setMobileNo(officerData.employee_detail.cug_mobile);
+  }
+}, [officerData]);
+
   const handleSendOtp = async formData => {
     setFromDataValue(formData);
+    console.log(mobileNo,'mobileNo000000')
     const sentOtp = await sendOtpNew(mobileNo);
     if (sentOtp.success) {
       setShowOtpBtn(true);
@@ -375,30 +393,30 @@ const LoadDemandNote = () => {
                   <h2 className="text-lg font-bold capitalize "></h2>
                 </div>
                 <div className="card-body px-4 pb-4">
-                  <input type="hidden" {...register('application')}></input> 
-                    <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                      <SelectTag
-                        LName="Acceptance"
-                        options={responseOption}
-                        {...register('demand_note_response', {
-                          required: 'Please Select  Acceptance is required',
-                        })}
-                        errorMsg={errors.demand_note_response?.message}
-                        labelKey="label"
-                        valueKey="value"
-                        disabled={isDisabled}
-                      />
-                      {demand_note_response === 'Accepted' && (
-                        <>
-                          <input type="hidden" {...register('total_demand_note_amt')}></input>
-                          <input type="hidden" {...register('total_me_estimate_amt')}></input>
-                          <input type="hidden" {...register('total_ext_estimate_amt')}></input>
-                          <input type="hidden" {...register('total_estimate_amt')}></input>
-                        </>
-                      )}
-                      {demand_note_response === 'Reverted' && (
-                        <>
-                          <SelectTag
+                  <input type="hidden" {...register('application')}></input>
+                  <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                    <SelectTag
+                      LName="Acceptance"
+                      options={responseOption}
+                      {...register('demand_note_response', {
+                        required: 'Please Select  Acceptance is required',
+                      })}
+                      errorMsg={errors.demand_note_response?.message}
+                      labelKey="label"
+                      valueKey="value"
+                      disabled={isDisabled}
+                    />
+                    {demand_note_response === 'Accepted' && (
+                      <>
+                        <input type="hidden" {...register('total_demand_note_amt')}></input>
+                        <input type="hidden" {...register('total_me_estimate_amt')}></input>
+                        <input type="hidden" {...register('total_ext_estimate_amt')}></input>
+                        <input type="hidden" {...register('total_estimate_amt')}></input>
+                      </>
+                    )}
+                    {demand_note_response === 'Reverted' && (
+                      <>
+                        {/* <SelectTag
                             options={revertOption}
                             LName="Revert Reason"
                             {...register('revert_reason', {
@@ -408,97 +426,109 @@ const LoadDemandNote = () => {
                             labelKey="label"
                             valueKey="value"
                             disabled={isDisabled}
-                          />
+                          /> */}
+                        <SelectTag
+                          options={loadDemandNoteRevertOption}
+                          LName="Revert Reason"
+                          {...register('revert_reason', {
+                            required: 'Please Select Revert Reason is required',
+                          })}
+                          errorMsg={errors.revert_reason?.message}
+                          labelKey="label"
+                          valueKey="value"
+                          disabled={isDisabled}
+                        />
+
+                        <InputTag
+                          LName="Revert Reason Remark"
+                          placeholder="Please Enter Revert Reason Remark"
+                          {...register('revert_reason_remark', {
+                            required: 'Revert Reason Remark is required',
+                          })}
+                          errorMsg={errors.revert_reason_remark?.message}
+                          disabled={isDisabled}
+                        />
+                        <InputTag
+                          LName="Upload Revert Docs"
+                          type="file"
+                          {...register('upload_revert_docs', {
+                            required: 'Upload Upload Revert Docs is required',
+                          })}
+                          errorMsg={errors.upload_revert_docs?.message}
+                          disabled={isDisabled}
+                        />
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className="border-b border-gray-900/10 pb-12">
+                  <div className="mt-10 flex flex-col justify-center items-center">
+                    <div className="flex space-x-2 space-y-2 flex-wrap justify-center items-baseline">
+                      {!showOtpBtn && (
+                        <>
+                          <button className="rounded-lg px-4 py-2 bg-blue-500 text-blue-100 hover:bg-red-600 duration-300">
+                            Reset
+                          </button>
+                          {demand_note_response === 'Reverted' ? (
+                            <button
+                              type="submit"
+                              className={`  text-white px-4 py-2 mt-4 rounded 
+                                            ${isDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-purple-800 text-white'}`}
+                              disabled={isDisabled}
+                            >
+                              {isDisabled ? 'Please wait...' : 'Revet For Survey'}
+                            </button>
+                          ) : (
+                            <button
+                              type="submit"
+                              className={`  text-white px-4 py-2 mt-4 rounded 
+                                            ${isDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-purple-800 text-white'}`}
+                              disabled={isDisabled}
+                            >
+                              {isDisabled ? 'Please wait...' : 'Send for Applicant'}
+                            </button>
+                          )}
+                        </>
+                      )}
+                      {showOtpBtn && (
+                        <>
                           <InputTag
-                            LName="Revert Reason Remark"
-                            placeholder="Please Enter Revert Reason Remark"
-                            {...register('revert_reason_remark', {
-                              required: 'Revert Reason Remark is required',
+                            LName=""
+                            placeholder="Please Enter Otp."
+                            {...register('otp', {
+                              required: 'Otp is required',
                             })}
-                            errorMsg={errors.revert_reason_remark?.message}
-                            disabled={isDisabled}
+                            errorMsg={errors.otp?.message}
                           />
-                          <InputTag
-                            LName="Upload Revert Docs"
-                            type="file"
-                            {...register('upload_revert_docs', {
-                              required: 'Upload Upload Revert Docs is required',
-                            })}
-                            errorMsg={errors.upload_revert_docs?.message}
-                            disabled={isDisabled}
-                          />
+                          <button
+                            type="button"
+                            onClick={handleVerifyOtp}
+                            className={`bg-green-600 text-white px-4 py-2 mt-4 rounded"
+                                                                      ${isBtnDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-purple-800 text-white'}`}
+                            disabled={isBtnDisabled}
+                          >
+                            {isBtnDisabled ? 'Please wait...' : ' Verify Otp'}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={handleReSendOtp}
+                            className="bg-emerald-600 text-white px-4 py-2 mt-4 rounded"
+                          >
+                            Resend Otp
+                          </button>
                         </>
                       )}
                     </div>
-                </div>
-                  <div className="border-b border-gray-900/10 pb-12">
-                    <div className="mt-10 flex flex-col justify-center items-center">
-                      <div className="flex space-x-2 space-y-2 flex-wrap justify-center items-baseline">
-                        {!showOtpBtn && (
-                          <>
-                            <button className="rounded-lg px-4 py-2 bg-blue-500 text-blue-100 hover:bg-red-600 duration-300">
-                              Reset
-                            </button>
-                            {demand_note_response === 'Reverted' ? (
-                              <button
-                                type="submit"
-                                className={`  text-white px-4 py-2 mt-4 rounded 
-                                            ${isDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-purple-800 text-white'}`}
-                                disabled={isDisabled}
-                              >
-                                {isDisabled ? 'Please wait...' : 'Revet For Survey'}
-                              </button>
-                            ) : (
-                              <button
-                                type="submit"
-                                className={`  text-white px-4 py-2 mt-4 rounded 
-                                            ${isDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-purple-800 text-white'}`}
-                                disabled={isDisabled}
-                              >
-                                {isDisabled ? 'Please wait...' : 'Send for Applicant'}
-                              </button>
-                            )}
-                          </>
-                        )}
-                        {showOtpBtn && (
-                          <>
-                            <InputTag
-                              LName=""
-                              placeholder="Please Enter Otp."
-                              {...register('otp', {
-                                required: 'Otp is required',
-                              })}
-                              errorMsg={errors.otp?.message}
-                            />
-                            <button
-                              type="button"
-                              onClick={handleVerifyOtp}
-                              className={`bg-green-600 text-white px-4 py-2 mt-4 rounded"
-                                                                      ${isBtnDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-purple-800 text-white'}`}
-                              disabled={isBtnDisabled}
-                            >
-                              {isBtnDisabled ? 'Please wait...' : ' Verify Otp'}
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={handleReSendOtp}
-                              className="bg-emerald-600 text-white px-4 py-2 mt-4 rounded"
-                            >
-                              Resend Otp
-                            </button>
-                          </>
-                        )}
-                      </div>
-                      {errors?.otpSuccess && (
-                        <p className="text-green-500 text-sm mt-1">{errors?.otpSuccess?.message}</p>
-                      )}
-                      {errors?.otpStatus && (
-                        <p className="text-red-500 text-sm mt-1">{errors?.otpStatus?.message}</p>
-                      )}
-                    </div>
+                    {errors?.otpSuccess && (
+                      <p className="text-green-500 text-sm mt-1">{errors?.otpSuccess?.message}</p>
+                    )}
+                    {errors?.otpStatus && (
+                      <p className="text-red-500 text-sm mt-1">{errors?.otpStatus?.message}</p>
+                    )}
                   </div>
-                </div> 
+                </div>
+              </div>
             </form>
           </>
         )}

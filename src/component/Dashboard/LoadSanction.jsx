@@ -476,7 +476,7 @@ import { responseOption, revertOption } from '../newComponents/commonOption.js';
 import { use } from 'react';
 const LoadSanction = () => {
   const officerData = useSelector(state => state.user.officerData);
-  const [mobileNo, setMobileNo] = useState(officerData?.employee_detail.cug_mobile);
+  const [mobileNo, setMobileNo] = useState('');
   const [showOtpBtn, setShowOtpBtn] = useState(false);
   const [fromDataValue, setFromDataValue] = useState(null);
   const navigate = useNavigate();
@@ -515,6 +515,13 @@ const LoadSanction = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [modalAction, setModalAction] = useState(() => () => { });
+
+  useEffect(() => {
+  if (officerData?.employee_detail?.cug_mobile) {
+    setMobileNo(officerData.employee_detail.cug_mobile);
+  }
+}, [officerData]);
+
   const showModal = (message, action = () => { }) => {
     setModalMessage(message);
     setModalAction(() => action); // save callback
@@ -566,7 +573,7 @@ const LoadSanction = () => {
 
   const handleSendOtp = async formData => {
     setFromDataValue(formData);
-
+    console.log(mobileNo,'mobile numberrrrrr')
     const sentOtp = await sendOtpNew(mobileNo);
     if (sentOtp.success) {
       setShowOtpBtn(true);
