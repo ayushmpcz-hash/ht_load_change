@@ -1,4 +1,4 @@
-import React, { useState,useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -25,11 +25,11 @@ import {
 } from '../newComponents/commonOption.js';
 import ViewTag from '../newComponents/ViewTag.jsx';
 
-const LoadDemandNote = () => {  
+const LoadDemandNote = () => {
   const officerData = useSelector(state => state.user.officerData);
   // const [mobileNo, setMobileNo] = useState(officerData?.employee_detail.cug_mobile);
-  
- const [mobileNo, setMobileNo] = useState('');
+
+  const [mobileNo, setMobileNo] = useState('');
   const [showOtpBtn, setShowOtpBtn] = useState(false);
   const [fromDataValue, setFromDataValue] = useState(null);
   const [isDisabled, setIsDisabled] = useState(false);
@@ -41,7 +41,7 @@ const LoadDemandNote = () => {
   const token = Cookies.get('accessToken');
 
   console.log(HT_LOAD_CHANGE_BASE, 'HT_LOAD_CHANGE_BASE in Demand note')
-  
+
   const {
     register,
     handleSubmit,
@@ -73,15 +73,15 @@ const LoadDemandNote = () => {
     },
   ];
 
-    useEffect(() => {
-  if (officerData?.employee_detail?.cug_mobile) {
-    setMobileNo(officerData.employee_detail.cug_mobile);
-  }
-}, [officerData]);
+  useEffect(() => {
+    if (officerData?.employee_detail?.cug_mobile) {
+      setMobileNo(officerData.employee_detail.cug_mobile);
+    }
+  }, [officerData]);
 
   const handleSendOtp = async formData => {
     setFromDataValue(formData);
-    console.log(mobileNo,'mobileNo000000')
+    console.log(mobileNo, 'mobileNo000000')
     const sentOtp = await sendOtpNew(mobileNo);
     if (sentOtp.success) {
       setShowOtpBtn(true);
@@ -412,6 +412,18 @@ const LoadDemandNote = () => {
                         <input type="hidden" {...register('total_me_estimate_amt')}></input>
                         <input type="hidden" {...register('total_ext_estimate_amt')}></input>
                         <input type="hidden" {...register('total_estimate_amt')}></input>
+
+                        {/* NEW FIELD */}
+                        <InputTag
+                          LName="Supplement Draft Agreement (PDF)"
+                          type="file"
+                          accept="application/pdf"
+                          {...register('supplement_draft_agreement', {
+                            required: 'Supplement Draft Agreement is required',
+                          })}
+                          errorMsg={errors.supplement_draft_agreement?.message}
+                          disabled={isDisabled}
+                        />
                       </>
                     )}
                     {demand_note_response === 'Reverted' && (

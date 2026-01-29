@@ -1778,10 +1778,10 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
                 </tr>
               )}
 
-               {htConsumers?.is_demandnote_fee_submitted_bypg || htConsumers?.is_demandnote_fee_submitted && (
+              {htConsumers?.is_demandnote_fee_submitted_bypg || htConsumers?.is_demandnote_fee_submitted && (
                 <tr>
                   <TableTrBloack Lable={'Next Action'} Value={'Agreement Finalization'} />
-                  <TableTrBloack Lable={'Demand Note Payment Status'} Value={htConsumers?.is_demandnote_fee_submitted_bypg || htConsumers?.is_demandnote_fee_submitted? "Done" : "Pending"} colSpan={3} />
+                  <TableTrBloack Lable={'Demand Note Payment Status'} Value={htConsumers?.is_demandnote_fee_submitted_bypg || htConsumers?.is_demandnote_fee_submitted ? "Done" : "Pending"} colSpan={3} />
                 </tr>
               )}
 
@@ -1854,12 +1854,25 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
                   {htConsumers?.agreement_details?.me_meter_work_order_docs && <DocumentTrBloack Lable={'View ME Meter Work Order'} docLink={htConsumers?.agreement_details?.me_meter_work_order_docs} />}
                   {htConsumers?.agreement_details?.ex_work_order_docs && <DocumentTrBloack Lable={'View Extension Work'} docLink={htConsumers?.agreement_details?.ex_work_order_docs} />}
                   {htConsumers?.commissioning_permission?.commissioning_permission_letter && <DocumentTrBloack Lable={'View Commissioning Permission Letter'} docLink={htConsumers?.commissioning_permission?.commissioning_permission_letter} />}
+                  {htConsumers?.demand_note_generation?.supplement_draft_agreement && <DocumentTrBloack Lable={'View supplementa Draft Pdf'} docLink={htConsumers?.demand_note_generation?.supplement_draft_agreement} />}
+              
                   {htConsumers?.bicell_response?.agreement_doc && <DocumentTrBloack Lable={'View Commissioning  Pdf'} docLink={htConsumers?.bicell_response?.agreement_doc} />}
 
                   {/* Generate PDF buttons - conditions kept as before */}
 
                   {htConsumers?.application_status == "4" && <GeneratePDF baseUrl={HT_LOAD_CHANGE_BASE} url={"/GenerateChecklistPdf/"} id={htConsumers?.id} Lable={'Generate Sign Check List '} />}
-                  {(htConsumers?.survey?.is_required == "is_estimate_required" && htConsumers?.application_status == "8") && <GeneratePDF baseUrl={HT_LOAD_CHANGE_BASE} url={"/GenerateDemandNote_Estimate/"} id={htConsumers?.id} Lable={'Generate Demand Note Challan '} />}
+                  {/* {(htConsumers?.survey?.is_required == "is_estimate_required" && htConsumers?.application_status == "8" || htConsumers?.application_status == "9" ) && <GeneratePDF baseUrl={HT_LOAD_CHANGE_BASE} url={"/GenerateDemandNote_Estimate/"} id={htConsumers?.id} Lable={'Generate Demand Note Estimate '} />} */}
+                  {(
+                    htConsumers?.survey?.is_required === "is_estimate_required" &&
+                    ["8", "9", "11"].includes(String(htConsumers?.application_status))
+                  ) && (
+                      <GeneratePDF
+                        baseUrl={HT_LOAD_CHANGE_BASE}
+                        url="/GenerateDemandNote_Estimate/"
+                        id={htConsumers?.id}
+                        Lable="Generate Demand Note Estimate"
+                      />
+                    )}
 
                   {htConsumers?.transco_approval?.status === "accepted_from_cgm" && <DocumentTrBloack Lable={'View Transco Approval Letter'} docLink={htConsumers?.transco_approval?.document} />}
                 </tbody>
