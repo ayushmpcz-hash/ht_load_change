@@ -454,10 +454,12 @@
 // export default LoadSanction;
 
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector,useDispatch } from 'react-redux';
 import Cookies from 'js-cookie';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { HT_LOAD_CHANGE_BASE } from '../../api/api.js';
+import { handleOfficerFlagCount } from "../../utils/handleOfficerFlagCount.js";
+import { setOfficerData } from "../../redux/slices/userSlice.js";
 
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
@@ -488,6 +490,8 @@ const LoadSanction = () => {
   const [ptRatio, setPtRatio] = useState([]);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isBtnDisabled, setBtnIsDisabled] = useState(false);
+
+  const dispatch = useDispatch()
   const {
     register,
     handleSubmit,
@@ -644,6 +648,9 @@ const LoadSanction = () => {
       const { data: apiData, ...rest } = data;
 
       navigate(`/dashboard/respones/${apiData.application}`, { state: apiData, rest });
+      const updatedFlags = await handleOfficerFlagCount();
+      dispatch(setOfficerData(updatedFlags));
+      
     } catch (error) {
       console.error('API Error:', error);
       alert('Something went wrong ❌');

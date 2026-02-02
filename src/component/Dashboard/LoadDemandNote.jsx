@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector,useDispatch } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { HT_LOAD_CHANGE_BASE } from '../../api/api.js';
+import { handleOfficerFlagCount } from "../../utils/handleOfficerFlagCount.js";
+import { setOfficerData } from "../../redux/slices/userSlice.js";
 
 import {
   InputTag,
@@ -39,9 +41,9 @@ const LoadDemandNote = () => {
   const { items } = location.state || {};
   console.log(items, 'items');
   const token = Cookies.get('accessToken');
-
+  const dispatch = useDispatch()
   console.log(HT_LOAD_CHANGE_BASE, 'HT_LOAD_CHANGE_BASE in Demand note')
-
+   
   const {
     register,
     handleSubmit,
@@ -151,6 +153,8 @@ const LoadDemandNote = () => {
       const { data: apiData, ...rest } = data;
       alert(apiData?.demand_note_response === "Reverted" ? "Application Reverted successfully" : "Demand Note submitted successfully ✅");
       navigate(`/dashboard/respones/${apiData.application}`, { state: apiData, rest });
+      const updatedFlags = await handleOfficerFlagCount();
+      dispatch(setOfficerData(updatedFlags));
     } catch (error) {
       console.error('API Error:', error);
       alert('Something went wrong ❌');

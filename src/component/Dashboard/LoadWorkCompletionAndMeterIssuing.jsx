@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch} from 'react-redux';
 import { useNavigate, useLocation, useParams, Link } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { useForm } from 'react-hook-form';
@@ -15,12 +15,16 @@ import {
 } from '../importComponents.js';
 import { responseOption, revertOption } from '../newComponents/commonOption.js';
 import { NGB_PRO_BASE, HT_LOAD_CHANGE_BASE,HT_NGB_ID,HT_NGB_PASSWORD } from '../../api/api.js';
+import { setOfficerData } from "../../redux/slices/userSlice.js";
+import { handleOfficerFlagCount } from "../../utils/handleOfficerFlagCount.js";
+
 const LoadWorkCompletionAndMeterIssuing = () => {
   // let base_url = import.meta.env.VITE_NGB_URL;
   const officerData = useSelector(state => state.user.officerData);
   const location = useLocation();
   const navigate = useNavigate();
   const { items } = location.state || {};
+  const dispatch = useDispatch()
 
    console.log(NGB_PRO_BASE,'NGB_PRO_BASE inside work completion and isue meter')
 
@@ -222,6 +226,8 @@ const LoadWorkCompletionAndMeterIssuing = () => {
       const { data: apiData, ...rest } = data;
       alert('Work Completion Certifying Submit successfully ✅');
       navigate(`/dashboard/respones/${apiData.application}`, { state: apiData, rest });
+      const updatedFlags = await handleOfficerFlagCount();
+      dispatch(setOfficerData(updatedFlags));
     } catch (error) {
       console.error('API Error:', error);
       alert('Something went wrong ❌');

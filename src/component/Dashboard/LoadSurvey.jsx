@@ -1398,6 +1398,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { HT_LOAD_CHANGE_BASE, DSP_PRO_BASE, HT_NSC_BASE } from '../../api/api.js';
+import { setOfficerData } from "../../redux/slices/userSlice.js";
+import { useDispatch } from 'react-redux';
+import { handleOfficerFlagCount } from "../../utils/handleOfficerFlagCount.js";
 
 // import { In, FileUpload, SelectTag } from '../InputTag.jsx'
 import {
@@ -1431,7 +1434,7 @@ import Cookies from 'js-cookie';
 const LoadSurvey = () => {
   const officerData = useSelector(state => state.user.officerData);
   // const [mobileNo, setMobileNo] = useState(officerData?.employee_detail.cug_mobile);
-   const [mobileNo, setMobileNo] = useState('');
+  const [mobileNo, setMobileNo] = useState('');
   const [showOtpBtn, setShowOtpBtn] = useState(false);
   const [fromDataValue, setFromDataValue] = useState(null);
   const [isDisabled, setIsDisabled] = useState(false);
@@ -1472,7 +1475,7 @@ const LoadSurvey = () => {
 
   const [isMeErpFetched, setIsMeErpFetched] = useState(false);
   const [isExtErpFetched, setIsExtErpFetched] = useState(false);
-
+  const dispatch = useDispatch()
 
   console.log(DSP_PRO_BASE, 'DSP_PRO_BASE inside load survey')
   console.log(HT_NSC_BASE, 'HT_NSC_BASE inside survey')
@@ -1494,14 +1497,14 @@ const LoadSurvey = () => {
     name: 'new_ct_ratio',
   });
 
-    useEffect(() => {
-      if (officerData?.employee_detail?.cug_mobile) {
-        setMobileNo(officerData.employee_detail.cug_mobile);
-      }
-    }, [officerData]);
+  useEffect(() => {
+    if (officerData?.employee_detail?.cug_mobile) {
+      setMobileNo(officerData.employee_detail.cug_mobile);
+    }
+  }, [officerData]);
 
   const filteredSurveyOptions = React.useMemo(() => {
-    // agar dono values available hain aur same hain
+
     if (
       existingMeCtRatio &&
       selectedNewCtRatio &&
@@ -1704,7 +1707,12 @@ const LoadSurvey = () => {
 
       if (type == "ME" && projectData.SCHEMECODE !== "DEPOSITE") {
         setMeExtimateblock(false);
+
         setError(erpField, { message: 'No data found for ME METER ERP No' });
+        alert(
+          "This ERP data is under the SCCW scheme. ME meter estimate is not permitted."
+        );
+
         return;
       }
       // clear error if data found
@@ -1734,7 +1742,7 @@ const LoadSurvey = () => {
 
       if (STATUS === 'Approved') {
         const estimateDate = new Date(ESTIMATE_DATE).toISOString().split('T')[0];
-          const sanctionDate = new Date(SANCTION_DATE).toISOString().split('T')[0];
+        const sanctionDate = new Date(SANCTION_DATE).toISOString().split('T')[0];
         if (type === 'ME') {
           setMeExtimateblock(true);
           setIsMeErpFetched(true);
@@ -1754,7 +1762,7 @@ const LoadSurvey = () => {
           setValue('ndf_division_name', ORG);
           setValue('ndf_total_amt', SANCT_COST);
           setValue('ndf_estimate_no', ESTIMATE_NO);
-           setValue('ndf_est_without_super_cost', EST_WITHOUT_SUPER_COST);
+          setValue('ndf_est_without_super_cost', EST_WITHOUT_SUPER_COST);
         } else if (type === 'EXT') {
           let super_tax = SUPER_TAX / 2;
 
@@ -1765,16 +1773,18 @@ const LoadSurvey = () => {
           setValue('supervision_cgst', SUPER_CGST);
           setValue('supervision_sgst', SUPER_SGST);
           setValue('supervision_amt', SUPERVISION_COST);
-          setValue('estimate_amt', ESTIMATED_COST);
+          setValue('total_estimated_amt', ESTIMATED_COST);
           setValue('sanction_amt', SANCT_COST);
           setValue('estimate_date', new Date(ESTIMATE_DATE).toISOString().split('T')[0]);
           setValue('sanction_date', new Date(SANCTION_DATE).toISOString().split('T')[0]);
           setValue('long_name', LONG_NAME);
+          setValue('est_without_super_cost', EST_WITHOUT_SUPER_COST);
 
           if (SCHEMECODE === 'SCCW') {
             setValue(
               'total_estimated_amt',
-              Math.ceil(Number(SUPER_TAX) + Number(SUPERVISION_COST))
+              // Math.ceil(Number(SUPER_TAX) + Number(SUPERVISION_COST))
+              Math.ceil(Number(ESTIMATED_COST))
             );
           } else {
             setValue('total_estimated_amt', Math.ceil(ESTIMATED_COST));
@@ -1916,86 +1926,87 @@ const LoadSurvey = () => {
   //     setBtnIsDisabled(false);
   //   }
   // };
-   const handleFinalSubmit = async () => {
+  const handleFinalSubmit = async () => {
 
-  // 🚨 ERP VALIDATION (as-is, no change)
-  if (is_required === 'is_estimate_required') {
+    // 🚨 ERP VALIDATION (as-is, no change)
+    if (is_required === 'is_estimate_required') {
 
-    if (
-      is_estimate_required.includes('is_me_meter_required') &&
-      !isMeErpFetched
-    ) {
-      setError('ndf_erp_no', {
-        type: 'manual',
-        message: 'ME Meter ERP data not fetched',
-      });
-      return;
-    }
-
-    if (
-      is_estimate_required.includes('is_extension_work_required') &&
-      !isExtErpFetched
-    ) {
-      setError('erp_no', {
-        type: 'manual',
-        message: 'Extension Work ERP data not fetched',
-      });
-      return;
-    }
-  }
-
-  try {
-    // ✅ TAKE FRESH VALUES (THIS IS THE FIX)
-    const formValue = getValues();   // ⭐⭐⭐ MAIN FIX ⭐⭐⭐
-    const formData = new FormData();
-
-    Object.entries(formValue).forEach(([key, value]) => {
-
-      // FileList
-      if (value instanceof FileList && value.length > 0) {
-        formData.append(key, value[0]);
+      if (
+        is_estimate_required.includes('is_me_meter_required') &&
+        !isMeErpFetched
+      ) {
+        setError('ndf_erp_no', {
+          type: 'manual',
+          message: 'ME Meter ERP data not fetched',
+        });
         return;
       }
 
-      // File
-      if (value instanceof File) {
+      if (
+        is_estimate_required.includes('is_extension_work_required') &&
+        !isExtErpFetched
+      ) {
+        setError('erp_no', {
+          type: 'manual',
+          message: 'Extension Work ERP data not fetched',
+        });
+        return;
+      }
+    }
+
+    try {
+      // ✅ TAKE FRESH VALUES (THIS IS THE FIX)
+      const formValue = getValues();   // ⭐⭐⭐ MAIN FIX ⭐⭐⭐
+      const formData = new FormData();
+
+      Object.entries(formValue).forEach(([key, value]) => {
+
+        // FileList
+        if (value instanceof FileList && value.length > 0) {
+          formData.append(key, value[0]);
+          return;
+        }
+
+        // File
+        if (value instanceof File) {
+          formData.append(key, value);
+          return;
+        }
+
+        // Skip empty
+        if (value === undefined || value === null || value === '') {
+          return;
+        }
+
+        // Normal fields
         formData.append(key, value);
-        return;
+      });
+
+      // 🧪 DEBUG (optional – once)
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
       }
 
-      // Skip empty
-      if (value === undefined || value === null || value === '') {
-        return;
-      }
+      const { data } = await axios.post(
+        `${HT_LOAD_CHANGE_BASE}/surveys/`,
+        formData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-      // Normal fields
-      formData.append(key, value);
-    });
+      alert('Survey submitted successfully ✅');
+      navigate(`/dashboard/respones/${data.data.application}`, {
+        state: data.data,
+      });
+      const updatedFlags = await handleOfficerFlagCount();
+      dispatch(setOfficerData(updatedFlags));
 
-    // 🧪 DEBUG (optional – once)
-    for (let pair of formData.entries()) {
-      console.log(pair[0], pair[1]);
+    } catch (error) {
+      console.error(error);
+      alert('Submission failed ❌');
+    } finally {
+      setBtnIsDisabled(false);
     }
-
-    const { data } = await axios.post(
-      `${HT_LOAD_CHANGE_BASE}/surveys/`,
-      formData,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    alert('Survey submitted successfully ✅');
-
-    navigate(`/dashboard/respones/${data.data.application}`, {
-      state: data.data,
-    });
-
-  } catch (error) {
-    console.error(error);
-    alert('Submission failed ❌');
-  } finally {
-    setBtnIsDisabled(false);
-  }
-};
+  };
 
 
   return (
@@ -2481,14 +2492,15 @@ const LoadSurvey = () => {
                                                       errorMsg={errors.ndf_sanction_date?.message}
                                                       readOnly
                                         /> */}
-                                        <InputTag
+                                        {/* <InputTag
                                           LName="Sanction Cost"
                                           {...register('ndf_sanction_amt', {
                                             required: 'Sanction Cost is required',
                                           })}
                                           errorMsg={errors.ndf_sanction_amt?.message}
                                           readOnly
-                                        />
+                                        /> */}
+
                                         <InputTag
                                           LName="Status"
                                           {...register('ndf_status', {
@@ -2514,7 +2526,41 @@ const LoadSurvey = () => {
                                           errorMsg={errors.ndf_scheme_name?.message}
                                           readOnly
                                         />
-
+                                        <InputTag
+                                          LName="Estimate Cost Without Supervision Amount"
+                                          placeholder="Estimate Cost Without Supervision Amount."
+                                          {...register('ndf_est_without_super_cost', {
+                                            required: 'ndf_est_without_super_cost',
+                                          })}
+                                          errorMsg={errors.ndf_Est_Without_Super_Cost?.message}
+                                          readOnly
+                                        />
+                                        <InputTag
+                                          LName="Supervision Amount"
+                                          {...register('ndf_supervision_cost', {
+                                            required: 'Sanction Cost is required',
+                                          })}
+                                          errorMsg={errors.ndf_supervision_cost?.message}
+                                          readOnly
+                                        />
+                                        <InputTag
+                                          LName=" Supervision CGST Cost"
+                                          placeholder=" Supervision CGST Cost."
+                                          {...register('ndf_supervision_cgst', {
+                                            required: ' Supervision CGST Cost is required',
+                                          })}
+                                          errorMsg={errors.ndf_supervision_cgst?.message}
+                                          readOnly
+                                        />
+                                        <InputTag
+                                          LName="Supervision SGST Cost"
+                                          placeholder="Supervision SGST Cost."
+                                          {...register('ndf_supervision_sgst', {
+                                            required: 'Supervision SGST Cost is required',
+                                          })}
+                                          errorMsg={errors.ndf_supervision_sgst?.message}
+                                          readOnly
+                                        />
                                         <InputTag
                                           LName="Total Amount"
                                           placeholder="Total Amount."
@@ -2580,6 +2626,7 @@ const LoadSurvey = () => {
                                             required: 'Estimate Date is required',
                                           })}
                                           errorMsg={errors.estimate_date?.message}
+                                          readOnly
                                         />
                                         <InputTag
                                           LName="Long Name"
@@ -2588,7 +2635,7 @@ const LoadSurvey = () => {
                                             required: 'lond Name is required',
                                           })}
                                           errorMsg={errors.long_name?.message}
-
+                                          readOnly
                                         />
 
 
@@ -2599,6 +2646,7 @@ const LoadSurvey = () => {
                                             required: 'Estimate Status is required',
                                           })}
                                           errorMsg={errors.ndf_status?.message}
+                                          readOnly
                                         />
                                         <InputTag
                                           LName="Scheme Name"
@@ -2607,6 +2655,16 @@ const LoadSurvey = () => {
                                             required: 'Estimate Scheme Name is required',
                                           })}
                                           errorMsg={errors.scheme_name?.message}
+                                          readOnly
+                                        />
+                                        <InputTag
+                                          LName="Estimate Cost Without Supervision Amount"
+                                          placeholder="Estimate Cost Without Supervision Amount."
+                                          {...register('est_without_super_cost', {
+                                            required: 'est_without_super_cost',
+                                          })}
+                                          errorMsg={errors.est_without_super_cost?.message}
+                                          readOnly
                                         />
                                         <InputTag
                                           LName="Supervision Amount"
@@ -2615,6 +2673,7 @@ const LoadSurvey = () => {
                                             required: 'Estimate Cost is required',
                                           })}
                                           errorMsg={errors.supervision_amt?.message}
+                                          readOnly
                                         />
                                         <InputTag
                                           LName=" Supervision CGST Cost"
@@ -2623,6 +2682,7 @@ const LoadSurvey = () => {
                                             required: ' Supervision CGST Cost is required',
                                           })}
                                           errorMsg={errors.supervision_cgst?.message}
+                                          readOnly
                                         />
                                         <InputTag
                                           LName="Supervision SGST Cost"
@@ -2631,6 +2691,7 @@ const LoadSurvey = () => {
                                             required: 'Supervision SGST Cost is required',
                                           })}
                                           errorMsg={errors.supervision_sgst?.message}
+                                          readOnly
                                         />
                                         <InputTag
                                           LName="Total Amount"
@@ -2639,6 +2700,7 @@ const LoadSurvey = () => {
                                             required: 'Total Amount is required',
                                           })}
                                           errorMsg={errors.total_estimated_amt?.message}
+                                          readOnly
                                         />
                                         <InputTag
                                           LName="Extension Estimate Pdf"
@@ -2647,6 +2709,7 @@ const LoadSurvey = () => {
                                             required: 'Extension Estimate Letter is required',
                                           })}
                                           errorMsg={errors.extension_work_estimate_docs?.message}
+                                          readOnly
                                         />
                                       </>
                                     )}

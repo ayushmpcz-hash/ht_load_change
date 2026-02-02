@@ -1458,7 +1458,7 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
 
               <tr>
                 <TableTrBloack Lable={'Email'} Value={htConsumers?.email} />
-                <TableTrBloack Lable={'Address'} Value={htConsumers?.address} />
+                <TableTrBloack Lable={'Application Date'} Value={htConsumers?.registration_date || 'N/A'} />
               </tr>
 
               <tr>
@@ -1483,6 +1483,7 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
 
               <tr>
                 <TableTrBloack Lable={'Feeder Name'} Value={htConsumers?.feeder_name || 'N/A'} />
+                  <TableTrBloack Lable={'Address'} Value={htConsumers?.address} />
               </tr>
 
               {/* Connection Details */}
@@ -1843,6 +1844,7 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
                   {htConsumers?.registration_pdf && <DocumentTrBloack Lable={'Applicant Registration Details PDF'} docLink={htConsumers?.registration_pdf} />}
                   {htConsumers?.regfee_receipt_pdf && <DocumentTrBloack Lable={'Registration Fee Invoice'} docLink={htConsumers?.regfee_receipt_pdf} />}
                   {htConsumers?.reg_invoice_pdf && <DocumentTrBloack Lable={'Initial Payment Invoice'} docLink={htConsumers?.reg_invoice_pdf} />}
+                  {htConsumers?.estimate_invoice_pdf && <DocumentTrBloack Lable={'Estimate Invoice'} docLink={htConsumers?.estimate_invoice_pdf} />}
                   {htConsumers?.load_sanction?.draft_agreement_pdf && <DocumentTrBloack Lable={'Draft Agreement Letter'} docLink={htConsumers?.load_sanction?.draft_agreement_pdf} />}
                   {htConsumers?.survey?.survey_checklist_docs && <DocumentTrBloack Lable={'Survey Checklist Docs'} docLink={htConsumers?.survey?.survey_checklist_docs} />}
                   {htConsumers?.survey?.upload_single_line_docs && <DocumentTrBloack Lable={'Single Line Diagram Including VR Calculation'} docLink={htConsumers?.survey?.upload_single_line_docs} />}
@@ -1854,7 +1856,7 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
                   {htConsumers?.agreement_details?.me_meter_work_order_docs && <DocumentTrBloack Lable={'View ME Meter Work Order'} docLink={htConsumers?.agreement_details?.me_meter_work_order_docs} />}
                   {htConsumers?.agreement_details?.ex_work_order_docs && <DocumentTrBloack Lable={'View Extension Work'} docLink={htConsumers?.agreement_details?.ex_work_order_docs} />}
                   {htConsumers?.commissioning_permission?.commissioning_permission_letter && <DocumentTrBloack Lable={'View Commissioning Permission Letter'} docLink={htConsumers?.commissioning_permission?.commissioning_permission_letter} />}
-                  {htConsumers?.demand_note_generation?.supplement_draft_agreement && <DocumentTrBloack Lable={'View supplementa Draft Pdf'} docLink={htConsumers?.demand_note_generation?.supplement_draft_agreement} />}
+                  {htConsumers?.demand_note_generation?.supplement_draft_agreement && <DocumentTrBloack Lable={'View supplement Draft Pdf'} docLink={htConsumers?.demand_note_generation?.supplement_draft_agreement} />}
               
                   {htConsumers?.bicell_response?.agreement_doc && <DocumentTrBloack Lable={'View Commissioning  Pdf'} docLink={htConsumers?.bicell_response?.agreement_doc} />}
 
@@ -1870,7 +1872,7 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
                         baseUrl={HT_LOAD_CHANGE_BASE}
                         url="/GenerateDemandNote_Estimate/"
                         id={htConsumers?.id}
-                        Lable="Generate Demand Note Estimate"
+                        Lable="Generated Demand Note Estimate"
                       />
                     )}
 

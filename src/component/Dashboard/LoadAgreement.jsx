@@ -1,5 +1,5 @@
 import React, { useState,useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import Cookies from "js-cookie";
@@ -14,6 +14,8 @@ import {
 } from "../importComponents.js";
 import { responseOption, revertOption } from "../newComponents/commonOption.js";
 import { HT_LOAD_CHANGE_BASE } from '../../api/api.js'
+import { setOfficerData } from "../../redux/slices/userSlice.js";
+import { handleOfficerFlagCount } from "../../utils/handleOfficerFlagCount.js";
 
 const LoadAgreement = () => {
   const officerData = useSelector((state) => state.user.officerData);
@@ -27,7 +29,7 @@ const LoadAgreement = () => {
   const required = items?.survey?.is_estimate_required?.split(',') || [];
 
   const token = Cookies.get("accessToken");
-
+  const dispatch = useDispatch()
 
 
   const [showOtpBtn, setShowOtpBtn] = useState(false);
@@ -184,6 +186,8 @@ const LoadAgreement = () => {
 
       alert("Agreement And Work Order submitted successfully ✅");
       navigate(`/dashboard/respones/${data.data.application}`, { state: data });
+      const updatedFlags = await handleOfficerFlagCount();
+      dispatch(setOfficerData(updatedFlags));
     } catch (error) {
       console.error("API Error:", error);
       alert("Something went wrong ❌");
