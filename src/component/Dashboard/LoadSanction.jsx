@@ -454,7 +454,7 @@
 // export default LoadSanction;
 
 import React, { useState, useEffect } from 'react';
-import { useSelector,useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import Cookies from 'js-cookie';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { HT_LOAD_CHANGE_BASE } from '../../api/api.js';
@@ -490,6 +490,8 @@ const LoadSanction = () => {
   const [ptRatio, setPtRatio] = useState([]);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isBtnDisabled, setBtnIsDisabled] = useState(false);
+  const [isSendOtpLoading, setIsSendOtpLoading] = useState(false);
+
 
   const dispatch = useDispatch()
   const {
@@ -521,10 +523,10 @@ const LoadSanction = () => {
   const [modalAction, setModalAction] = useState(() => () => { });
 
   useEffect(() => {
-  if (officerData?.employee_detail?.cug_mobile) {
-    setMobileNo(officerData.employee_detail.cug_mobile);
-  }
-}, [officerData]);
+    if (officerData?.employee_detail?.cug_mobile) {
+      setMobileNo(officerData.employee_detail.cug_mobile);
+    }
+  }, [officerData]);
 
   const showModal = (message, action = () => { }) => {
     setModalMessage(message);
@@ -540,7 +542,7 @@ const LoadSanction = () => {
   }, [new_ct_ratio, resetField]);
 
   useEffect(() => {
-    if (HIGH_VOLT && !items?.transco_approval ) {
+    if (HIGH_VOLT && !items?.transco_approval) {
       setRadioOptions([
         { label: 'EDCRA Required', value: 'is_EDCRA_required' }
       ])
@@ -557,11 +559,11 @@ const LoadSanction = () => {
         { label: 'Agreement is Required', value: 'is_agreement_required' },
       ]);
     }
-  }, [new_ct_ratio,is_required]);
+  }, [new_ct_ratio, is_required]);
 
 
   useEffect(() => {
-    if (HIGH_VOLT && !items?.transco_approval ) return
+    if (HIGH_VOLT && !items?.transco_approval) return
     const fetchData = async () => {
       const ratioData = await fetchCtPtData(items);
       setCtRatio(ratioData.ct_result.data);
@@ -575,24 +577,56 @@ const LoadSanction = () => {
     }
   }, [items?.new_supply_voltage]);
 
+  // const handleSendOtp = async formData => {
+  //   setFromDataValue(formData);
+  //   console.log(mobileNo,'mobile numberrrrrr')
+  //   const sentOtp = await sendOtpNew(mobileNo);
+  //   if (sentOtp.success) {
+  //     setShowOtpBtn(true);
+  //     setIsDisabled(true);
+  //     setError('otpSuccess', {
+  //       type: 'manual',
+  //       message: sentOtp.message,
+  //     });
+  //   } else {
+  //     setError('otpStatus', {
+  //       type: 'manual',
+  //       message: sentOtp.message,
+  //     });
+  //   }
+  // };
   const handleSendOtp = async formData => {
+    if (isSendOtpLoading) return; // safety guard
+
+    setIsSendOtpLoading(true);   // ⬅️ button disable start
     setFromDataValue(formData);
-    console.log(mobileNo,'mobile numberrrrrr')
-    const sentOtp = await sendOtpNew(mobileNo);
-    if (sentOtp.success) {
-      setShowOtpBtn(true);
-      setIsDisabled(true);
-      setError('otpSuccess', {
-        type: 'manual',
-        message: sentOtp.message,
-      });
-    } else {
+
+    try {
+      const sentOtp = await sendOtpNew(mobileNo);
+
+      if (sentOtp.success) {
+        setShowOtpBtn(true);
+        setIsDisabled(true); // form fields lock
+        setError('otpSuccess', {
+          type: 'manual',
+          message: sentOtp.message,
+        });
+      } else {
+        setError('otpStatus', {
+          type: 'manual',
+          message: sentOtp.message,
+        });
+      }
+    } catch (err) {
       setError('otpStatus', {
         type: 'manual',
-        message: sentOtp.message,
+        message: 'Failed to send OTP. Please try again.',
       });
+    } finally {
+      setIsSendOtpLoading(false); // ⬅️ button enable back
     }
   };
+
   const handleVerifyOtp = async () => {
     const otpValue = getValues('otp');
     setBtnIsDisabled(true);
@@ -650,7 +684,7 @@ const LoadSanction = () => {
       navigate(`/dashboard/respones/${apiData.application}`, { state: apiData, rest });
       const updatedFlags = await handleOfficerFlagCount();
       dispatch(setOfficerData(updatedFlags));
-      
+
     } catch (error) {
       console.error('API Error:', error);
       alert('Something went wrong ❌');
@@ -687,7 +721,7 @@ const LoadSanction = () => {
 
           <div class="card mt-2 mb-2 bg-white rounded shadow-md ">
             <div className="card-header px-4 py-2 border-b border-gray-300">
-              <h2 className="text-lg font-bold capitalize ">{HIGH_VOLT && !items?.transco_approval  ? "Forward to CGM Region for Approval" : "Required ME Details.."}</h2>
+              <h2 className="text-lg font-bold capitalize ">{HIGH_VOLT && !items?.transco_approval ? "Forward to CGM Region for Approval" : "Required ME Details.."}</h2>
             </div>
             <div className="card-body px-4 pb-4">
               {/* <div className=" grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6"> */}
@@ -708,7 +742,7 @@ const LoadSanction = () => {
                     value={officerData?.employee_detail.employee_login_id}
                   ></input>
                   <SelectTag
-                    LName={HIGH_VOLT && !items?.transco_approval  ? "Forward to CGM Region for Approval" : "Load Acceptance"}
+                    LName={HIGH_VOLT && !items?.transco_approval ? "Forward to CGM Region for Approval" : "Load Acceptance"}
                     options={responseOption}
                     {...register('load_sanction_response', {
                       required: 'Please Select Load Acceptance is required',
@@ -722,7 +756,7 @@ const LoadSanction = () => {
                     load_sanction_response === 'Accepted' && (
                       <>
                         {/* HIGH VOLTAGE CASE (>33kV) */}
-                        {HIGH_VOLT && !items?.transco_approval  ? (
+                        {HIGH_VOLT && !items?.transco_approval ? (
                           <>
                             {/* Only one radio button */}
 
@@ -855,7 +889,7 @@ const LoadSanction = () => {
                         ) : (
                           <>
                             {/* -------------------- HIGH VOLT LOGIC (>33kV) -------------------- */}
-                            {HIGH_VOLT && !items?.transco_approval  ? (
+                            {HIGH_VOLT && !items?.transco_approval ? (
                               is_required === "is_EDCRA_required" && (
                                 <button
                                   type="submit"
@@ -870,23 +904,42 @@ const LoadSanction = () => {
                               <>
                                 {/* -------------------- NORMAL FLOW (<=33kV) -------------------- */}
                                 {is_required === "is_agreement_required" ? (
+                                  //             <button
+                                  //               type="submit"
+                                  //               className={`text-white px-4 py-2 mt-4 rounded 
+                                  // ${isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-orange-500 hover:bg-purple-800"}`}
+                                  //               disabled={isDisabled}
+                                  //             >
                                   <button
                                     type="submit"
-                                    className={`text-white px-4 py-2 mt-4 rounded 
-                      ${isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-orange-500 hover:bg-purple-800"}`}
-                                    disabled={isDisabled}
+                                    className={`text-white px-4 py-2 mt-4 rounded
+                                    ${isSendOtpLoading || isDisabled
+                                        ? "bg-gray-400 cursor-not-allowed"
+                                        : "bg-emerald-600 hover:bg-purple-800"}`}
+                                    disabled={isSendOtpLoading || isDisabled}
                                   >
                                     {isDisabled ? "Please wait..." : "Send for Agreement"}
                                   </button>
                                 ) : (
+                                  //             <button
+                                  //               type="submit"
+                                  //               className={`text-white px-4 py-2 mt-4 rounded
+                                  // ${isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-emerald-600 hover:bg-purple-800"}`}
+                                  //               disabled={isDisabled}
+                                  //             >
+                                  //               {isDisabled ? "Please wait..." : "Send for Survey"}
+                                  //             </button>
                                   <button
                                     type="submit"
                                     className={`text-white px-4 py-2 mt-4 rounded
-                      ${isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-emerald-600 hover:bg-purple-800"}`}
-                                    disabled={isDisabled}
+                                    ${isSendOtpLoading || isDisabled
+                                        ? "bg-gray-400 cursor-not-allowed"
+                                        : "bg-emerald-600 hover:bg-purple-800"}`}
+                                    disabled={isSendOtpLoading || isDisabled}
                                   >
-                                    {isDisabled ? "Please wait..." : "Send for Survey"}
+                                    {isSendOtpLoading ? "Sending OTP..." : "Send for Survey"}
                                   </button>
+
                                 )}
                               </>
                             )}

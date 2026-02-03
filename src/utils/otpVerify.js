@@ -31,7 +31,7 @@ export const verifyOtp = async (mobileNo, otp) => {
 };
 
 
-// verifyOtp.js
+// verifyOtp.js using this
 export const verifyOtpNew = async (mobileNo, otp) => {
   try {
     if (!otp) {
@@ -70,5 +70,44 @@ console.log(result.code);
   }
 };
 
+// export const verifyOtpNew = async (mobileNo, otp) => {
+//   try {
+//     if (!otp) {
+//       return { success: false, type: "EMPTY_OTP", error: "Please enter OTP" };
+//     }
+
+//     const response = await fetch(
+//       `https://resourceutils.mpcz.in:8888/MPCZ_OTP/api/otp/verifyOtpAll`,
+//       {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({
+//           source: "HT SANYOJAN PORTAL",
+//           mobileNo,
+//           otp,
+//         }),
+//       }
+//     );
+
+//     const result = await response.json();
+
+//     if (result.code === "200" && result.message === "Success") {
+//       return { success: true };
+//     }
+
+//     return {
+//       success: false,
+//       type: "INVALID_OTP",
+//       error: "Invalid OTP. Please check and try again."
+//     };
+
+//   } catch (error) {
+//     return {
+//       success: false,
+//       type: "OTP_SERVICE_DOWN",
+//       error: "OTP verification service is unavailable."
+//     };
+//   }
+// };
 
 

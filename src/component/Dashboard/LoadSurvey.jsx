@@ -1401,6 +1401,7 @@ import { HT_LOAD_CHANGE_BASE, DSP_PRO_BASE, HT_NSC_BASE } from '../../api/api.js
 import { setOfficerData } from "../../redux/slices/userSlice.js";
 import { useDispatch } from 'react-redux';
 import { handleOfficerFlagCount } from "../../utils/handleOfficerFlagCount.js";
+import { handleTokenExpiry } from '../../utils/handleTokenExpiry';
 
 // import { In, FileUpload, SelectTag } from '../InputTag.jsx'
 import {
@@ -1472,6 +1473,8 @@ const LoadSurvey = () => {
   const [ptRatio, setPtRatio] = useState([]);
   const [meExtimateblock, setMeExtimateblock] = useState(false);
   const [exExtimateblock, setExExtimateblock] = useState(false);
+  const [isSendOtpLoading, setIsSendOtpLoading] = useState(false);
+
 
   const [isMeErpFetched, setIsMeErpFetched] = useState(false);
   const [isExtErpFetched, setIsExtErpFetched] = useState(false);
@@ -1809,28 +1812,82 @@ const LoadSurvey = () => {
       setIsDisabled(false);
     }
   };
+   //old 
+  // const handleSendOtp = async formData => {
+  //   setFromDataValue(formData);
+  //   const sentOtp = await sendOtpNew(mobileNo);
+  //   if (sentOtp.success) {
+  //     setShowOtpBtn(true);
+  //     setIsDisabled(true);
+  //     setError('otpSuccess', {
+  //       type: 'manual',
+  //       message: sentOtp.message,
+  //     });
+  //   } else {
+  //     setError('otpStatus', {
+  //       type: 'manual',
+  //       message: sentOtp.message,
+  //     });
+  //   }
+  // };
 
+  //using this func
   const handleSendOtp = async formData => {
+    if (isSendOtpLoading) return; // safety guard
+
+    setIsSendOtpLoading(true);   // ⬅️ button disable start
     setFromDataValue(formData);
-    const sentOtp = await sendOtpNew(mobileNo);
-    if (sentOtp.success) {
-      setShowOtpBtn(true);
-      setIsDisabled(true);
-      setError('otpSuccess', {
-        type: 'manual',
-        message: sentOtp.message,
-      });
-    } else {
+
+    try {
+      const sentOtp = await sendOtpNew(mobileNo);
+      console.log(sentOtp,'sent otpppppppp')
+      if (sentOtp.success) {
+        setShowOtpBtn(true);
+        setIsDisabled(true); // form fields lock
+        setError('otpSuccess', {
+          type: 'manual',
+          message: sentOtp.message,
+        });
+      } else {
+        setError('otpStatus', {
+          type: 'manual',
+          message: sentOtp.message,
+        });
+      }
+    } catch (err) {
       setError('otpStatus', {
         type: 'manual',
-        message: sentOtp.message,
+        message: 'Failed to send OTP. Please try again.',
       });
+    } finally {
+      setIsSendOtpLoading(false); // ⬅️ button enable back
     }
   };
+
+  //new func
+//   const handleSendOtp = async (formData) => {
+//   setIsSendOtpLoading(true);
+//   setFromDataValue(formData);
+
+//   const result = await sendOtpNew(mobileNo);
+
+//   if (result.success) {
+//     setShowOtpBtn(true);
+//     setIsDisabled(true);
+//     setError("otpSuccess", { message: result.message });
+//   } else {
+//     setError("otpStatus", { message: result.message });
+//   }
+
+//   setIsSendOtpLoading(false);
+// };
+
+ //using this func
   const handleVerifyOtp = async () => {
     const otpValue = getValues('otp');
     setBtnIsDisabled(true);
     const verifyOtpResponse = await verifyOtpNew(mobileNo, otpValue);
+    console.log(verifyOtpResponse,'verifyOtpResponseeeee')
     if (verifyOtpResponse.success) {
       handleFinalSubmit();
     } else {
@@ -1841,6 +1898,21 @@ const LoadSurvey = () => {
       setBtnIsDisabled(false);
     }
   };
+  
+  //new func based on msg
+//   const handleVerifyOtp = async () => {
+//   setBtnIsDisabled(true);
+
+//   const result = await verifyOtpNew(mobileNo, getValues("otp"));
+
+//   if (result.success) {
+//     handleFinalSubmit();
+//   } else {
+//     setError("otp", { message: result.error });
+//     setBtnIsDisabled(false);
+//   }
+// };
+
   const handleReSendOtp = async () => {
     clearErrors('otpSuccess');
     const sentOtp = await sendOtpNew(mobileNo);
@@ -2001,6 +2073,9 @@ const LoadSurvey = () => {
       dispatch(setOfficerData(updatedFlags));
 
     } catch (error) {
+      if (handleTokenExpiry(error, navigate)) return;
+
+      // normal error handling
       console.error(error);
       alert('Submission failed ❌');
     } finally {
@@ -2738,16 +2813,16 @@ const LoadSurvey = () => {
                             ${isDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-purple-800 text-white'}`}
                                 disabled={isDisabled}
                               >
-                                {isDisabled ? 'Please wait...' : 'Revet For Survey'}
+                                {isSendOtpLoading ? 'Please wait...' : 'Revet For Survey'}
                               </button>
                             ) : (
                               <button
                                 type="submit"
                                 className={`  text-white px-4 py-2 mt-4 rounded 
-                            ${isDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-purple-800 text-white'}`}
-                                disabled={isDisabled}
+                               ${isSendOtpLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-purple-800 text-white'}`}
+                                disabled={isSendOtpLoading}
                               >
-                                {isDisabled
+                                {isSendOtpLoading
                                   ? "Please wait..."
                                   : is_required === "is_estimate_required"
                                     ? "Send for Demand Note"
