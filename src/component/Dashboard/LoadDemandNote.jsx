@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector,useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
@@ -7,6 +7,7 @@ import Cookies from 'js-cookie';
 import { HT_LOAD_CHANGE_BASE } from '../../api/api.js';
 import { handleOfficerFlagCount } from "../../utils/handleOfficerFlagCount.js";
 import { setOfficerData } from "../../redux/slices/userSlice.js";
+import { handleTokenExpiry } from '../../utils/handleTokenExpiry';
 
 import {
   InputTag,
@@ -36,14 +37,21 @@ const LoadDemandNote = () => {
   const [fromDataValue, setFromDataValue] = useState(null);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isBtnDisabled, setBtnIsDisabled] = useState(false);
+  const [isSendOtpLoading, setIsSendOtpLoading] = useState(false);
+
+  const [timer, setTimer] = useState(0);
+  const [isOtpExpired, setIsOtpExpired] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false)
+
   const navigate = useNavigate();
   const location = useLocation();
   const { items } = location.state || {};
   console.log(items, 'items');
   const token = Cookies.get('accessToken');
   const dispatch = useDispatch()
+
   console.log(HT_LOAD_CHANGE_BASE, 'HT_LOAD_CHANGE_BASE in Demand note')
-   
+
   const {
     register,
     handleSubmit,
@@ -70,10 +78,35 @@ const LoadDemandNote = () => {
   const loadDemandNoteRevertOption = [
     ...revertOption,
     {
-      label: "Resubmission application for survey",
-      value: "Resubmission application for survey",
+      label: "Reverted due to Incorrect Estimate Details",
+      value: "Reverted due to Incorrect Estimate Details",
     },
   ];
+
+  //timer 
+  useEffect(() => {
+    let interval;
+
+    if (timer > 0 && !isProcessing) {
+      interval = setInterval(() => {
+        setTimer(prev => prev - 1);
+      }, 1000);
+    }
+
+    if (timer === 0 && showOtpBtn && !isProcessing) {
+      setIsOtpExpired(true);
+    }
+
+    return () => clearInterval(interval);
+  }, [timer, showOtpBtn, isProcessing]);
+
+  // ---------- FORMAT TIME ----------
+  const formatTime = sec => {
+    const m = String(Math.floor(sec / 60)).padStart(2, "0");
+    const s = String(sec % 60).padStart(2, "0");
+    return `${m}:${s}`;
+  };
+
 
   useEffect(() => {
     if (officerData?.employee_detail?.cug_mobile) {
@@ -81,51 +114,156 @@ const LoadDemandNote = () => {
     }
   }, [officerData]);
 
+
+  // const handleSendOtp = async formData => {
+  //     if (isSendOtpLoading) return; // safety guard
+
+  //     setIsSendOtpLoading(true);   // ⬅️ button disable start
+  //     setFromDataValue(formData);
+
+  //     try {
+  //       const sentOtp = await sendOtpNew(mobileNo);
+  //       console.log(sentOtp,'sent otpppppppp')
+  //       if (sentOtp.success) {
+  //         setShowOtpBtn(true);
+  //         setIsDisabled(true); // form fields lock
+  //         setError('otpSuccess', {
+  //           type: 'manual',
+  //           message: sentOtp.message,
+  //         });
+  //       } else {
+  //         setError('otpStatus', {
+  //           type: 'manual',
+  //           message: sentOtp.message,
+  //         });
+  //       }
+  //     } catch (err) {
+  //       setError('otpStatus', {
+  //         type: 'manual',
+  //         message: 'Failed to send OTP. Please try again.',
+  //       });
+  //     } finally {
+  //       setIsSendOtpLoading(false); // ⬅️ button enable back
+  //     }
+  //   };
+  // ---------- SEND OTP ----------
   const handleSendOtp = async formData => {
+    if (isSendOtpLoading) return;
+
+    setIsSendOtpLoading(true);
     setFromDataValue(formData);
-    console.log(mobileNo, 'mobileNo000000')
-    const sentOtp = await sendOtpNew(mobileNo);
-    if (sentOtp.success) {
-      setShowOtpBtn(true);
-      setIsDisabled(true);
-      setError('otpSuccess', {
-        type: 'manual',
-        message: sentOtp.message,
+    clearErrors();
+
+    try {
+      const res = await sendOtpNew(mobileNo);
+
+      if (res.success) {
+        setShowOtpBtn(true);
+        setIsDisabled(true);
+
+        setTimer(120);          // ⬅ start 2-min timer
+        setIsOtpExpired(false);
+
+        setError("otpSuccess", {
+          type: "manual",
+          message: res.message,
+        });
+      } else {
+        setError("otpStatus", {
+          type: "manual",
+          message: res.message,
+        });
+      }
+    } catch {
+      setError("otpStatus", {
+        type: "manual",
+        message: "Failed to send OTP. Please try again.",
       });
-    } else {
-      setError('otpStatus', {
-        type: 'manual',
-        message: sentOtp.message,
-      });
+    } finally {
+      setIsSendOtpLoading(false);
     }
   };
+
+
+  // const handleVerifyOtp = async () => {
+  //   const otpValue = getValues('otp');
+  //   setBtnIsDisabled(true);
+  //   const verifyOtpResponse = await verifyOtpNew(mobileNo, otpValue);
+  //   if (verifyOtpResponse.success) {
+  //     handleFinalSubmit();
+  //   } else {
+  //     setError('otp', {
+  //       type: 'manual',
+  //       message: verifyOtpResponse.error,
+  //     });
+  //     setBtnIsDisabled(false);
+  //   }
+  // };
   const handleVerifyOtp = async () => {
-    const otpValue = getValues('otp');
-    setBtnIsDisabled(true);
-    const verifyOtpResponse = await verifyOtpNew(mobileNo, otpValue);
-    if (verifyOtpResponse.success) {
-      handleFinalSubmit();
-    } else {
-      setError('otp', {
-        type: 'manual',
-        message: verifyOtpResponse.error,
+    if (isOtpExpired) {
+      setError("otp", {
+        type: "manual",
+        message: "OTP expired. Please resend OTP.",
       });
+      return;
+    }
+
+    const otpValue = getValues("otp");
+    // setBtnIsDisabled(true);
+    setBtnIsDisabled(true);
+
+    const res = await verifyOtpNew(mobileNo, otpValue);
+
+    if (res.success) {
+      // 🔥 SUCCESS FLOW
+      setIsProcessing(true);   // show processing text
+      setTimer(0);             // stop timer
+      setShowOtpBtn(false);    // hide OTP UI
+
+      await handleFinalSubmit();  // call final API
+    } else {
+      setError("otp", {
+        type: "manual",
+        message: res.error,
+      });
+      // setBtnIsDisabled(false);
       setBtnIsDisabled(false);
     }
   };
+
+  // const handleReSendOtp = async () => {
+  //   clearErrors('otpSuccess');
+  //   const sentOtp = await sendOtpNew(mobileNo);
+  //   setShowOtpBtn(true);
+  //   if (sentOtp) {
+  //     setError('otpSuccess', {
+  //       type: 'manual',
+  //       message: `OTP Resent successfully to ****${mobileNo.slice(-4)}`,
+  //     });
+  //   } else {
+  //     setError('otp', {
+  //       type: 'manual',
+  //       message: `Failed to send OTP on ****${mobileNo.slice(-4)}`,
+  //     });
+  //   }
+  // };
   const handleReSendOtp = async () => {
-    clearErrors('otpSuccess');
-    const sentOtp = await sendOtpNew(mobileNo);
-    setShowOtpBtn(true);
-    if (sentOtp) {
-      setError('otpSuccess', {
-        type: 'manual',
-        message: `OTP Resent successfully to ****${mobileNo.slice(-4)}`,
+    clearErrors();
+
+    const res = await sendOtpNew(mobileNo);
+
+    if (res.success) {
+      setTimer(120);          // restart timer
+      setIsOtpExpired(false);
+
+      setError("otpSuccess", {
+        type: "manual",
+        message: `OTP resent to ****${mobileNo.slice(-4)}`,
       });
     } else {
-      setError('otp', {
-        type: 'manual',
-        message: `Failed to send OTP on ****${mobileNo.slice(-4)}`,
+      setError("otp", {
+        type: "manual",
+        message: res.message,
       });
     }
   };
@@ -156,7 +294,10 @@ const LoadDemandNote = () => {
       const updatedFlags = await handleOfficerFlagCount();
       dispatch(setOfficerData(updatedFlags));
     } catch (error) {
-      console.error('API Error:', error);
+      if (handleTokenExpiry(error, navigate)) return;
+
+      // normal error handling
+      console.log(error, 'error from api');
       alert('Something went wrong ❌');
     } finally {
       setBtnIsDisabled(false);
@@ -490,23 +631,23 @@ const LoadDemandNote = () => {
                               type="submit"
                               className={`  text-white px-4 py-2 mt-4 rounded 
                                             ${isDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-purple-800 text-white'}`}
-                              disabled={isDisabled}
+                              disabled={isDisabled || isBtnDisabled}
                             >
-                              {isDisabled ? 'Please wait...' : 'Revet For Survey'}
+                              {isSendOtpLoading ? 'Please wait...' : 'Revet For Survey'}
                             </button>
                           ) : (
                             <button
                               type="submit"
                               className={`  text-white px-4 py-2 mt-4 rounded 
-                                            ${isDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-purple-800 text-white'}`}
-                              disabled={isDisabled}
+                                            ${isSendOtpLoading || isBtnDisabled? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-purple-800 text-white'}`}
+                              disabled={isSendOtpLoading || isBtnDisabled || isProcessing}
                             >
-                              {isDisabled ? 'Please wait...' : 'Send for Applicant'}
+                              {isSendOtpLoading ? 'Please wait...' : 'Send for Applicant'}
                             </button>
                           )}
                         </>
                       )}
-                      {showOtpBtn && (
+                      {/* {showOtpBtn && (
                         <>
                           <InputTag
                             LName=""
@@ -534,7 +675,53 @@ const LoadDemandNote = () => {
                             Resend Otp
                           </button>
                         </>
+                      )} */}
+                      {showOtpBtn && !isProcessing && (
+                        <>
+                          <InputTag
+                            placeholder="Enter OTP"
+                            {...register("otp", { required: "OTP is required" })}
+                            errorMsg={errors.otp?.message}
+                          />
+
+                          {/* RED TIMER */}
+                          <p className="text-red-600 font-semibold text-sm mt-1">
+                            {timer > 0
+                              ? `OTP expires in ${formatTime(timer)}`
+                              : "OTP expired. Please resend OTP."}
+                          </p>
+
+                          {/* VERIFY BUTTON */}
+                          <button
+                            type="button"
+                            onClick={handleVerifyOtp}
+                            disabled={isBtnDisabled || isOtpExpired}
+                            className={`px-4 py-2 mt-3 rounded text-white
+                                               ${isBtnDisabled || isOtpExpired
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-green-600 hover:bg-green-800"}`}
+                          >
+                            {isBtnDisabled ? "Verifying..." : "Verify OTP"}
+                          </button>
+
+                          {/* RESEND BUTTON */}
+                          <button
+                            type="button"
+                            onClick={handleReSendOtp}
+                            className="px-4 py-2 mt-3 rounded bg-emerald-600 text-white hover:bg-emerald-800"
+                          >
+                            Resend OTP
+                          </button>
+                        </>
                       )}
+
+                      {/* PROCESSING MESSAGE */}
+                      {isProcessing && (
+                        <p className="text-blue-700 font-semibold mt-2 animate-pulse">
+                          Processing... Please wait
+                        </p>
+                      )}
+
                     </div>
                     {errors?.otpSuccess && (
                       <p className="text-green-500 text-sm mt-1">{errors?.otpSuccess?.message}</p>

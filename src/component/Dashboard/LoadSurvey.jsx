@@ -1,6 +1,10 @@
 // import React, { useEffect, useState } from 'react';
 // import axios from 'axios';
 // import { HT_LOAD_CHANGE_BASE, DSP_PRO_BASE, HT_NSC_BASE } from '../../api/api.js';
+// import { setOfficerData } from "../../redux/slices/userSlice.js";
+// import { useDispatch } from 'react-redux';
+// import { handleOfficerFlagCount } from "../../utils/handleOfficerFlagCount.js";
+// import { handleTokenExpiry } from '../../utils/handleTokenExpiry';
 
 // // import { In, FileUpload, SelectTag } from '../InputTag.jsx'
 // import {
@@ -33,7 +37,8 @@
 
 // const LoadSurvey = () => {
 //   const officerData = useSelector(state => state.user.officerData);
-//   const [mobileNo, setMobileNo] = useState(officerData?.employee_detail.cug_mobile);
+//   // const [mobileNo, setMobileNo] = useState(officerData?.employee_detail.cug_mobile);
+//   const [mobileNo, setMobileNo] = useState('');
 //   const [showOtpBtn, setShowOtpBtn] = useState(false);
 //   const [fromDataValue, setFromDataValue] = useState(null);
 //   const [isDisabled, setIsDisabled] = useState(false);
@@ -71,10 +76,12 @@
 //   const [ptRatio, setPtRatio] = useState([]);
 //   const [meExtimateblock, setMeExtimateblock] = useState(false);
 //   const [exExtimateblock, setExExtimateblock] = useState(false);
+//   const [isSendOtpLoading, setIsSendOtpLoading] = useState(false);
+
 
 //   const [isMeErpFetched, setIsMeErpFetched] = useState(false);
 //   const [isExtErpFetched, setIsExtErpFetched] = useState(false);
-
+//   const dispatch = useDispatch()
 
 //   console.log(DSP_PRO_BASE, 'DSP_PRO_BASE inside load survey')
 //   console.log(HT_NSC_BASE, 'HT_NSC_BASE inside survey')
@@ -96,8 +103,14 @@
 //     name: 'new_ct_ratio',
 //   });
 
+//   useEffect(() => {
+//     if (officerData?.employee_detail?.cug_mobile) {
+//       setMobileNo(officerData.employee_detail.cug_mobile);
+//     }
+//   }, [officerData]);
+
 //   const filteredSurveyOptions = React.useMemo(() => {
-//     // agar dono values available hain aur same hain
+
 //     if (
 //       existingMeCtRatio &&
 //       selectedNewCtRatio &&
@@ -228,108 +241,7 @@
 //     }
 //   }, [ThirtyThreeSubstation]);
 
-//   // 🔹 Common reusable function
-//   // const fetchEstimateDetails = async (erpField, type) => {
-//   //   console.log(type, 'type')
-//   //   try {
-//   //     let erp_no = getValues(erpField);
-//   //     if (!erp_no) {
-//   //       setError(erpField, { type: 'manual', message: 'ERP Number is required' });
-//   //       return;
-//   //     }
 
-//   //     setIsDisabled(true);
-
-//   //     const response = await axios.get(`${DSP_PRO_BASE}/XXPA_PROJECTS_HT_V/${erp_no}`);
-//   //     console.log(response, 'response erp')
-//   //     const projectData = response?.data?.data?.[0];
-//   //     console.log(projectData.SCHEMECODE, "projectData")
-
-//   //     // if (!projectData) {
-//   //     //   setError(erpField, { message: 'No data found for this ERP No' });
-//   //     //   return;
-//   //     // }
-//   //     if (!projectData) {
-//   //       setIsMeErpFetched(false);
-//   //       setIsExtErpFetched(false);
-//   //       setError(erpField, { message: 'No data found for this ERP No' });
-//   //       return;
-//   //     }
-//   //     if (type == "ME" && projectData.SCHEMECODE !== "DEPOSITE") {
-//   //       setMeExtimateblock(false);
-//   //       setError(erpField, { message: 'No data found for ME METER ERP No' });
-//   //       return;
-//   //     }
-//   //     // clear error if data found
-//   //     setError(erpField, { message: '' });
-
-//   //     // destructure response
-//   //     const {
-//   //       STATUS,
-//   //       SUPER_TAX,
-//   //       ESTIMATE_DATE,
-//   //       SANCTION_DATE,
-//   //       ESTIMATED_TAX,
-//   //       SUPERVISION_COST,
-//   //       ESTIMATED_COST,
-//   //       PROJECT_TYPE,
-//   //       SCHEMECODE,
-//   //       APPROVED_BY_NAME,
-//   //       SANCT_COST,
-//   //       ORG1,
-//   //       ORG,
-//   //       LONG_NAME,
-//   //     } = projectData;
-
-//   //     if (STATUS === 'Approved') {
-//   //       const date = new Date(SANCTION_DATE).toISOString().split('T')[0];
-
-//   //       if (type === 'ME') {
-//   //         setMeExtimateblock(true);
-//   //         setIsMeErpFetched(true);
-//   //         setValue('ndf_approved_by_name', APPROVED_BY_NAME);
-//   //         setValue('ndf_estimate_date', date);
-//   //         setValue('ndf_sanction_amt', SANCT_COST);
-//   //         // setValue("ndf_sanction_date", SANCTION_DATE);
-//   //         setValue('ndf_long_name', LONG_NAME);
-//   //         setValue('ndf_status', STATUS);
-//   //         setValue('ndf_scheme_name', SCHEMECODE);
-//   //         setValue('ndf_circle_name', ORG1);
-//   //         setValue('ndf_division_name', ORG);
-//   //         setValue('ndf_total_amt', SANCT_COST);
-//   //       } else if (type === 'EXT') {
-//   //         let super_tax = SUPER_TAX / 2;
-
-//   //         setExExtimateblock(true);
-//   //         setIsExtErpFetched(true);
-//   //         setValue('status', STATUS);
-//   //         setValue('scheme_name', SCHEMECODE);
-//   //         setValue('supervision_cgst', super_tax.toFixed(2));
-//   //         setValue('supervision_sgst', super_tax.toFixed(2));
-//   //         setValue('supervision_amt', Math.ceil(SUPERVISION_COST));
-//   //         setValue('long_name', LONG_NAME);
-
-//   //         if (SCHEMECODE === 'SCCW') {
-//   //           setValue(
-//   //             'total_estimated_amt',
-//   //             Math.ceil(Number(SUPER_TAX) + Number(SUPERVISION_COST))
-//   //           );
-//   //         } else {
-//   //           setValue('total_estimated_amt', Math.ceil(ESTIMATED_COST));
-//   //         }
-//   //         setValue('estimate_date', date);
-//   //       }
-//   //     }
-//   //     // } catch (error) {
-//   //     //   console.error('API Error:', error);
-//   //     //   setError(erpField, { message: 'Erp Number Does Not exist' });
-//   //     setIsMeErpFetched(false);
-//   //     setIsExtErpFetched(false);
-//   //     setError(erpField, { message: 'ERP Number does not exist' });
-//   //   } finally {
-//   //     setIsDisabled(false);
-//   //   }
-//   // };
 //   const fetchEstimateDetails = async (erpField, type) => {
 //     console.log(type, 'type')
 //     try {
@@ -401,7 +313,12 @@
 
 //       if (type == "ME" && projectData.SCHEMECODE !== "DEPOSITE") {
 //         setMeExtimateblock(false);
+
 //         setError(erpField, { message: 'No data found for ME METER ERP No' });
+//         alert(
+//           "This ERP data is under the SCCW scheme. ME meter estimate is not permitted."
+//         );
+
 //         return;
 //       }
 //       // clear error if data found
@@ -411,11 +328,14 @@
 //       const {
 //         STATUS,
 //         SUPER_TAX,
+//         SUPER_CGST,
+//         SUPER_SGST,
 //         ESTIMATE_DATE,
 //         SANCTION_DATE,
 //         ESTIMATED_TAX,
 //         SUPERVISION_COST,
 //         ESTIMATED_COST,
+//         ESTIMATE_NO,
 //         PROJECT_TYPE,
 //         SCHEMECODE,
 //         APPROVED_BY_NAME,
@@ -423,17 +343,23 @@
 //         ORG1,
 //         ORG,
 //         LONG_NAME,
+//         EST_WITHOUT_SUPER_COST,
 //       } = projectData;
 
 //       if (STATUS === 'Approved') {
-//         const date = new Date(SANCTION_DATE).toISOString().split('T')[0];
-
+//         const estimateDate = new Date(ESTIMATE_DATE).toISOString().split('T')[0];
+//         const sanctionDate = new Date(SANCTION_DATE).toISOString().split('T')[0];
 //         if (type === 'ME') {
 //           setMeExtimateblock(true);
 //           setIsMeErpFetched(true);
 //           setValue('ndf_approved_by_name', APPROVED_BY_NAME);
-//           setValue('ndf_estimate_date', date);
+//           setValue('ndf_estimate_date', estimateDate);
+//           setValue('ndf_sanction_date', sanctionDate);
 //           setValue('ndf_sanction_amt', SANCT_COST);
+//           setValue('ndf_supervision_cost', SUPERVISION_COST);
+//           setValue('ndf_estimate_amt', ESTIMATED_COST);
+//           setValue('ndf_supervision_cgst', SUPER_CGST);
+//           setValue('ndf_supervision_sgst', SUPER_SGST);
 //           // setValue("ndf_sanction_date", SANCTION_DATE);
 //           setValue('ndf_long_name', LONG_NAME);
 //           setValue('ndf_status', STATUS);
@@ -441,6 +367,8 @@
 //           setValue('ndf_circle_name', ORG1);
 //           setValue('ndf_division_name', ORG);
 //           setValue('ndf_total_amt', SANCT_COST);
+//           setValue('ndf_estimate_no', ESTIMATE_NO);
+//           setValue('ndf_est_without_super_cost', EST_WITHOUT_SUPER_COST);
 //         } else if (type === 'EXT') {
 //           let super_tax = SUPER_TAX / 2;
 
@@ -448,15 +376,21 @@
 //           setIsExtErpFetched(true);
 //           setValue('status', STATUS);
 //           setValue('scheme_name', SCHEMECODE);
-//           setValue('supervision_cgst', super_tax.toFixed(2));
-//           setValue('supervision_sgst', super_tax.toFixed(2));
-//           setValue('supervision_amt', Math.ceil(SUPERVISION_COST));
+//           setValue('supervision_cgst', SUPER_CGST);
+//           setValue('supervision_sgst', SUPER_SGST);
+//           setValue('supervision_amt', SUPERVISION_COST);
+//           setValue('total_estimated_amt', ESTIMATED_COST);
+//           setValue('sanction_amt', SANCT_COST);
+//           setValue('estimate_date', new Date(ESTIMATE_DATE).toISOString().split('T')[0]);
+//           setValue('sanction_date', new Date(SANCTION_DATE).toISOString().split('T')[0]);
 //           setValue('long_name', LONG_NAME);
+//           setValue('est_without_super_cost', EST_WITHOUT_SUPER_COST);
 
 //           if (SCHEMECODE === 'SCCW') {
 //             setValue(
 //               'total_estimated_amt',
-//               Math.ceil(Number(SUPER_TAX) + Number(SUPERVISION_COST))
+//               // Math.ceil(Number(SUPER_TAX) + Number(SUPERVISION_COST))
+//               Math.ceil(Number(ESTIMATED_COST))
 //             );
 //           } else {
 //             setValue('total_estimated_amt', Math.ceil(ESTIMATED_COST));
@@ -481,28 +415,82 @@
 //       setIsDisabled(false);
 //     }
 //   };
+//    //old 
+//   // const handleSendOtp = async formData => {
+//   //   setFromDataValue(formData);
+//   //   const sentOtp = await sendOtpNew(mobileNo);
+//   //   if (sentOtp.success) {
+//   //     setShowOtpBtn(true);
+//   //     setIsDisabled(true);
+//   //     setError('otpSuccess', {
+//   //       type: 'manual',
+//   //       message: sentOtp.message,
+//   //     });
+//   //   } else {
+//   //     setError('otpStatus', {
+//   //       type: 'manual',
+//   //       message: sentOtp.message,
+//   //     });
+//   //   }
+//   // };
 
+//   //using this func
 //   const handleSendOtp = async formData => {
+//     if (isSendOtpLoading) return; // safety guard
+
+//     setIsSendOtpLoading(true);   // ⬅️ button disable start
 //     setFromDataValue(formData);
-//     const sentOtp = await sendOtpNew(mobileNo);
-//     if (sentOtp.success) {
-//       setShowOtpBtn(true);
-//       setIsDisabled(true);
-//       setError('otpSuccess', {
-//         type: 'manual',
-//         message: sentOtp.message,
-//       });
-//     } else {
+
+//     try {
+//       const sentOtp = await sendOtpNew(mobileNo);
+//       console.log(sentOtp,'sent otpppppppp')
+//       if (sentOtp.success) {
+//         setShowOtpBtn(true);
+//         setIsDisabled(true); // form fields lock
+//         setError('otpSuccess', {
+//           type: 'manual',
+//           message: sentOtp.message,
+//         });
+//       } else {
+//         setError('otpStatus', {
+//           type: 'manual',
+//           message: sentOtp.message,
+//         });
+//       }
+//     } catch (err) {
 //       setError('otpStatus', {
 //         type: 'manual',
-//         message: sentOtp.message,
+//         message: 'Failed to send OTP. Please try again.',
 //       });
+//     } finally {
+//       setIsSendOtpLoading(false); // ⬅️ button enable back
 //     }
 //   };
+
+//   //new func
+// //   const handleSendOtp = async (formData) => {
+// //   setIsSendOtpLoading(true);
+// //   setFromDataValue(formData);
+
+// //   const result = await sendOtpNew(mobileNo);
+
+// //   if (result.success) {
+// //     setShowOtpBtn(true);
+// //     setIsDisabled(true);
+// //     setError("otpSuccess", { message: result.message });
+// //   } else {
+// //     setError("otpStatus", { message: result.message });
+// //   }
+
+// //   setIsSendOtpLoading(false);
+// // };
+
+//  //using this func
 //   const handleVerifyOtp = async () => {
 //     const otpValue = getValues('otp');
 //     setBtnIsDisabled(true);
 //     const verifyOtpResponse = await verifyOtpNew(mobileNo, otpValue);
+//     console.log(verifyOtpResponse,'verifyOtpResponseeeee')
 //     if (verifyOtpResponse.success) {
 //       handleFinalSubmit();
 //     } else {
@@ -513,6 +501,21 @@
 //       setBtnIsDisabled(false);
 //     }
 //   };
+
+//   //new func based on msg
+// //   const handleVerifyOtp = async () => {
+// //   setBtnIsDisabled(true);
+
+// //   const result = await verifyOtpNew(mobileNo, getValues("otp"));
+
+// //   if (result.success) {
+// //     handleFinalSubmit();
+// //   } else {
+// //     setError("otp", { message: result.error });
+// //     setBtnIsDisabled(false);
+// //   }
+// // };
+
 //   const handleReSendOtp = async () => {
 //     clearErrors('otpSuccess');
 //     const sentOtp = await sendOtpNew(mobileNo);
@@ -530,56 +533,77 @@
 //     }
 //   };
 
+
 //   // const handleFinalSubmit = async () => {
+
+//   //   // 🚨 ERP REQUIRED BUT NOT FETCHED
+//   //   if (is_required === 'is_estimate_required') {
+
+//   //     if (
+//   //       is_estimate_required.includes('is_me_meter_required') &&
+//   //       !isMeErpFetched
+//   //     ) {
+//   //       setError('ndf_erp_no', {
+//   //         type: 'manual',
+//   //         message: 'ME Meter ERP data not fetched',
+//   //       });
+//   //       return; // ⛔ STOP SUBMIT
+//   //     }
+
+//   //     if (
+//   //       is_estimate_required.includes('is_extension_work_required') &&
+//   //       !isExtErpFetched
+//   //     ) {
+//   //       setError('erp_no', {
+//   //         type: 'manual',
+//   //         message: 'Extension Work ERP data not fetched',
+//   //       });
+//   //       return; // ⛔ STOP SUBMIT
+//   //     }
+//   //   }
+
+//   //   // ✅ All validations passed → API CALL
 //   //   try {
 //   //     const formValue = fromDataValue;
 //   //     const formData = new FormData();
 
 //   //     Object.entries(formValue).forEach(([key, value]) => {
-//   //       // ✅ FileList handle
-//   //       if (value instanceof FileList) {
-//   //         if (value.length > 0) {
-//   //           formData.append(key, value[0]);
-//   //         }
-//   //         return; // empty FileList skip
+//   //       if (value instanceof FileList && value.length > 0) {
+//   //         formData.append(key, value[0]);
+//   //         return;
 //   //       }
-
-//   //       // ✅ Single File
 //   //       if (value instanceof File) {
 //   //         formData.append(key, value);
 //   //         return;
 //   //       }
-
-//   //       // ❌ empty / null / undefined skip
-//   //       if (value === undefined || value === null || value === "") {
-//   //         return;
+//   //       if (value !== undefined && value !== null && value !== '') {
+//   //         formData.append(key, value);
 //   //       }
-
-//   //       // ✅ normal fields
-//   //       formData.append(key, value);
 //   //     });
 
-//   //     console.log(formData, "formData")
-//   //     const { data } = await axios.post(`${HT_LOAD_CHANGE_BASE}/surveys/`, formData, {
-//   //       headers: {
-//   //         // 'Content-Type': 'application/json',
-//   //         Authorization: `Bearer ${token}`,
-//   //       },
+//   //     const { data } = await axios.post(
+//   //       `${HT_LOAD_CHANGE_BASE}/surveys/`,
+//   //       formData,
+//   //       {
+//   //         headers: { Authorization: `Bearer ${token}` },
+//   //       }
+//   //     );
+
+//   //     alert('Survey submitted successfully ✅');
+//   //     navigate(`/dashboard/respones/${data.data.application}`, {
+//   //       state: data.data,
 //   //     });
-//   //     const { data: apiData, ...rest } = data;
-//   //     alert(apiData?.survey_response === "Reverted" ? "Application Reverted  Successfully " : "Survey Application submitted Successfully ✅");
-//   //     navigate(`/dashboard/respones/${apiData.application}`, { state: apiData, rest });
+
 //   //   } catch (error) {
-//   //     console.error('API Error:', error);
-//   //     alert('Something went wrong ❌');
+//   //     console.error(error);
+//   //     alert('Submission failed ❌');
 //   //   } finally {
 //   //     setBtnIsDisabled(false);
 //   //   }
 //   // };
-
 //   const handleFinalSubmit = async () => {
 
-//     // 🚨 ERP REQUIRED BUT NOT FETCHED
+//     // 🚨 ERP VALIDATION (as-is, no change)
 //     if (is_required === 'is_estimate_required') {
 
 //       if (
@@ -590,7 +614,7 @@
 //           type: 'manual',
 //           message: 'ME Meter ERP data not fetched',
 //         });
-//         return; // ⛔ STOP SUBMIT
+//         return;
 //       }
 
 //       if (
@@ -601,43 +625,60 @@
 //           type: 'manual',
 //           message: 'Extension Work ERP data not fetched',
 //         });
-//         return; // ⛔ STOP SUBMIT
+//         return;
 //       }
 //     }
 
-//     // ✅ All validations passed → API CALL
 //     try {
-//       const formValue = fromDataValue;
+//       // ✅ TAKE FRESH VALUES (THIS IS THE FIX)
+//       const formValue = getValues();   // ⭐⭐⭐ MAIN FIX ⭐⭐⭐
 //       const formData = new FormData();
 
 //       Object.entries(formValue).forEach(([key, value]) => {
+
+//         // FileList
 //         if (value instanceof FileList && value.length > 0) {
 //           formData.append(key, value[0]);
 //           return;
 //         }
+
+//         // File
 //         if (value instanceof File) {
 //           formData.append(key, value);
 //           return;
 //         }
-//         if (value !== undefined && value !== null && value !== '') {
-//           formData.append(key, value);
+
+//         // Skip empty
+//         if (value === undefined || value === null || value === '') {
+//           return;
 //         }
+
+//         // Normal fields
+//         formData.append(key, value);
 //       });
+
+//       // 🧪 DEBUG (optional – once)
+//       for (let pair of formData.entries()) {
+//         console.log(pair[0], pair[1]);
+//       }
 
 //       const { data } = await axios.post(
 //         `${HT_LOAD_CHANGE_BASE}/surveys/`,
 //         formData,
-//         {
-//           headers: { Authorization: `Bearer ${token}` },
-//         }
+//         { headers: { Authorization: `Bearer ${token}` } }
 //       );
 
 //       alert('Survey submitted successfully ✅');
 //       navigate(`/dashboard/respones/${data.data.application}`, {
 //         state: data.data,
 //       });
+//       const updatedFlags = await handleOfficerFlagCount();
+//       dispatch(setOfficerData(updatedFlags));
 
 //     } catch (error) {
+//       if (handleTokenExpiry(error, navigate)) return;
+
+//       // normal error handling
 //       console.error(error);
 //       alert('Submission failed ❌');
 //     } finally {
@@ -1128,15 +1169,16 @@
 //                                                       })}
 //                                                       errorMsg={errors.ndf_sanction_date?.message}
 //                                                       readOnly
-//                                                     /> */}
-//                                         <InputTag
+//                                         /> */}
+//                                         {/* <InputTag
 //                                           LName="Sanction Cost"
 //                                           {...register('ndf_sanction_amt', {
 //                                             required: 'Sanction Cost is required',
 //                                           })}
 //                                           errorMsg={errors.ndf_sanction_amt?.message}
 //                                           readOnly
-//                                         />
+//                                         /> */}
+
 //                                         <InputTag
 //                                           LName="Status"
 //                                           {...register('ndf_status', {
@@ -1162,7 +1204,41 @@
 //                                           errorMsg={errors.ndf_scheme_name?.message}
 //                                           readOnly
 //                                         />
-
+//                                         <InputTag
+//                                           LName="Estimate Cost Without Supervision Amount"
+//                                           placeholder="Estimate Cost Without Supervision Amount."
+//                                           {...register('ndf_est_without_super_cost', {
+//                                             required: 'ndf_est_without_super_cost',
+//                                           })}
+//                                           errorMsg={errors.ndf_Est_Without_Super_Cost?.message}
+//                                           readOnly
+//                                         />
+//                                         <InputTag
+//                                           LName="Supervision Amount"
+//                                           {...register('ndf_supervision_cost', {
+//                                             required: 'Sanction Cost is required',
+//                                           })}
+//                                           errorMsg={errors.ndf_supervision_cost?.message}
+//                                           readOnly
+//                                         />
+//                                         <InputTag
+//                                           LName=" Supervision CGST Cost"
+//                                           placeholder=" Supervision CGST Cost."
+//                                           {...register('ndf_supervision_cgst', {
+//                                             required: ' Supervision CGST Cost is required',
+//                                           })}
+//                                           errorMsg={errors.ndf_supervision_cgst?.message}
+//                                           readOnly
+//                                         />
+//                                         <InputTag
+//                                           LName="Supervision SGST Cost"
+//                                           placeholder="Supervision SGST Cost."
+//                                           {...register('ndf_supervision_sgst', {
+//                                             required: 'Supervision SGST Cost is required',
+//                                           })}
+//                                           errorMsg={errors.ndf_supervision_sgst?.message}
+//                                           readOnly
+//                                         />
 //                                         <InputTag
 //                                           LName="Total Amount"
 //                                           placeholder="Total Amount."
@@ -1228,6 +1304,7 @@
 //                                             required: 'Estimate Date is required',
 //                                           })}
 //                                           errorMsg={errors.estimate_date?.message}
+//                                           readOnly
 //                                         />
 //                                         <InputTag
 //                                           LName="Long Name"
@@ -1236,7 +1313,7 @@
 //                                             required: 'lond Name is required',
 //                                           })}
 //                                           errorMsg={errors.long_name?.message}
-
+//                                           readOnly
 //                                         />
 
 
@@ -1247,6 +1324,7 @@
 //                                             required: 'Estimate Status is required',
 //                                           })}
 //                                           errorMsg={errors.ndf_status?.message}
+//                                           readOnly
 //                                         />
 //                                         <InputTag
 //                                           LName="Scheme Name"
@@ -1255,6 +1333,16 @@
 //                                             required: 'Estimate Scheme Name is required',
 //                                           })}
 //                                           errorMsg={errors.scheme_name?.message}
+//                                           readOnly
+//                                         />
+//                                         <InputTag
+//                                           LName="Estimate Cost Without Supervision Amount"
+//                                           placeholder="Estimate Cost Without Supervision Amount."
+//                                           {...register('est_without_super_cost', {
+//                                             required: 'est_without_super_cost',
+//                                           })}
+//                                           errorMsg={errors.est_without_super_cost?.message}
+//                                           readOnly
 //                                         />
 //                                         <InputTag
 //                                           LName="Supervision Amount"
@@ -1263,6 +1351,7 @@
 //                                             required: 'Estimate Cost is required',
 //                                           })}
 //                                           errorMsg={errors.supervision_amt?.message}
+//                                           readOnly
 //                                         />
 //                                         <InputTag
 //                                           LName=" Supervision CGST Cost"
@@ -1271,6 +1360,7 @@
 //                                             required: ' Supervision CGST Cost is required',
 //                                           })}
 //                                           errorMsg={errors.supervision_cgst?.message}
+//                                           readOnly
 //                                         />
 //                                         <InputTag
 //                                           LName="Supervision SGST Cost"
@@ -1279,6 +1369,7 @@
 //                                             required: 'Supervision SGST Cost is required',
 //                                           })}
 //                                           errorMsg={errors.supervision_sgst?.message}
+//                                           readOnly
 //                                         />
 //                                         <InputTag
 //                                           LName="Total Amount"
@@ -1287,6 +1378,7 @@
 //                                             required: 'Total Amount is required',
 //                                           })}
 //                                           errorMsg={errors.total_estimated_amt?.message}
+//                                           readOnly
 //                                         />
 //                                         <InputTag
 //                                           LName="Extension Estimate Pdf"
@@ -1295,6 +1387,7 @@
 //                                             required: 'Extension Estimate Letter is required',
 //                                           })}
 //                                           errorMsg={errors.extension_work_estimate_docs?.message}
+//                                           readOnly
 //                                         />
 //                                       </>
 //                                     )}
@@ -1323,16 +1416,16 @@
 //                             ${isDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-purple-800 text-white'}`}
 //                                 disabled={isDisabled}
 //                               >
-//                                 {isDisabled ? 'Please wait...' : 'Revet For Survey'}
+//                                 {isSendOtpLoading ? 'Please wait...' : 'Revet For Survey'}
 //                               </button>
 //                             ) : (
 //                               <button
 //                                 type="submit"
 //                                 className={`  text-white px-4 py-2 mt-4 rounded 
-//                             ${isDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-purple-800 text-white'}`}
-//                                 disabled={isDisabled}
+//                                ${isSendOtpLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-purple-800 text-white'}`}
+//                                 disabled={isSendOtpLoading}
 //                               >
-//                                 {isDisabled
+//                                 {isSendOtpLoading
 //                                   ? "Please wait..."
 //                                   : is_required === "is_estimate_required"
 //                                     ? "Send for Demand Note"
@@ -1394,7 +1487,6 @@
 // };
 // export default LoadSurvey;
 
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { HT_LOAD_CHANGE_BASE, DSP_PRO_BASE, HT_NSC_BASE } from '../../api/api.js';
@@ -1403,7 +1495,6 @@ import { useDispatch } from 'react-redux';
 import { handleOfficerFlagCount } from "../../utils/handleOfficerFlagCount.js";
 import { handleTokenExpiry } from '../../utils/handleTokenExpiry';
 
-// import { In, FileUpload, SelectTag } from '../InputTag.jsx'
 import {
   InputTag,
   SelectTag,
@@ -1414,6 +1505,7 @@ import {
   verifyOtpNew,
   Button,
 } from '../importComponents.js';
+
 import {
   region,
   lineType,
@@ -1424,6 +1516,7 @@ import {
   revertOption,
   getEstimateOptions,
 } from '../newComponents/commonOption.js';
+
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { submitFormData } from '../../utils/handlePostApi.js';
 import { useSelector } from 'react-redux';
@@ -1440,6 +1533,10 @@ const LoadSurvey = () => {
   const [fromDataValue, setFromDataValue] = useState(null);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isBtnDisabled, setBtnIsDisabled] = useState(false);
+
+  const [timer, setTimer] = useState(0);
+  const [isOtpExpired, setIsOtpExpired] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -1499,6 +1596,30 @@ const LoadSurvey = () => {
     control,
     name: 'new_ct_ratio',
   });
+
+  // timer 
+  useEffect(() => {
+    let interval;
+
+    if (timer > 0 && !isProcessing) {
+      interval = setInterval(() => {
+        setTimer(prev => prev - 1);
+      }, 1000);
+    }
+
+    if (timer === 0 && showOtpBtn && !isProcessing) {
+      setIsOtpExpired(true);
+    }
+
+    return () => clearInterval(interval);
+  }, [timer, showOtpBtn, isProcessing]);
+
+  const formatTime = sec => {
+    const m = String(Math.floor(sec / 60)).padStart(2, "0");
+    const s = String(sec % 60).padStart(2, "0");
+    return `${m}:${s}`;
+  };
+
 
   useEffect(() => {
     if (officerData?.employee_detail?.cug_mobile) {
@@ -1812,128 +1933,85 @@ const LoadSurvey = () => {
       setIsDisabled(false);
     }
   };
-   //old 
-  // const handleSendOtp = async formData => {
-  //   setFromDataValue(formData);
-  //   const sentOtp = await sendOtpNew(mobileNo);
-  //   if (sentOtp.success) {
-  //     setShowOtpBtn(true);
-  //     setIsDisabled(true);
-  //     setError('otpSuccess', {
-  //       type: 'manual',
-  //       message: sentOtp.message,
-  //     });
-  //   } else {
-  //     setError('otpStatus', {
-  //       type: 'manual',
-  //       message: sentOtp.message,
-  //     });
-  //   }
-  // };
-
-  //using this func
   const handleSendOtp = async formData => {
-    if (isSendOtpLoading) return; // safety guard
+    if (isSendOtpLoading) return;
 
-    setIsSendOtpLoading(true);   // ⬅️ button disable start
+    setIsSendOtpLoading(true);
     setFromDataValue(formData);
+    clearErrors();
 
     try {
-      const sentOtp = await sendOtpNew(mobileNo);
-      console.log(sentOtp,'sent otpppppppp')
-      if (sentOtp.success) {
+      const res = await sendOtpNew(mobileNo);
+
+      if (res.success) {
         setShowOtpBtn(true);
-        setIsDisabled(true); // form fields lock
-        setError('otpSuccess', {
-          type: 'manual',
-          message: sentOtp.message,
-        });
+        setIsDisabled(true);
+
+        setTimer(120);       // ⏱ start timer
+        setIsOtpExpired(false);
+
+        setError("otpSuccess", { type: "manual", message: res.message });
       } else {
-        setError('otpStatus', {
-          type: 'manual',
-          message: sentOtp.message,
-        });
+        setError("otpStatus", { type: "manual", message: res.message });
       }
-    } catch (err) {
-      setError('otpStatus', {
-        type: 'manual',
-        message: 'Failed to send OTP. Please try again.',
+    } catch {
+      setError("otpStatus", {
+        type: "manual",
+        message: "Failed to send OTP. Please try again.",
       });
     } finally {
-      setIsSendOtpLoading(false); // ⬅️ button enable back
+      setIsSendOtpLoading(false);
     }
   };
 
-  //new func
-//   const handleSendOtp = async (formData) => {
-//   setIsSendOtpLoading(true);
-//   setFromDataValue(formData);
-
-//   const result = await sendOtpNew(mobileNo);
-
-//   if (result.success) {
-//     setShowOtpBtn(true);
-//     setIsDisabled(true);
-//     setError("otpSuccess", { message: result.message });
-//   } else {
-//     setError("otpStatus", { message: result.message });
-//   }
-
-//   setIsSendOtpLoading(false);
-// };
-
- //using this func
   const handleVerifyOtp = async () => {
-    const otpValue = getValues('otp');
-    setBtnIsDisabled(true);
-    const verifyOtpResponse = await verifyOtpNew(mobileNo, otpValue);
-    console.log(verifyOtpResponse,'verifyOtpResponseeeee')
-    if (verifyOtpResponse.success) {
-      handleFinalSubmit();
-    } else {
-      setError('otp', {
-        type: 'manual',
-        message: verifyOtpResponse.error,
+    if (isOtpExpired) {
+      setError("otp", {
+        type: "manual",
+        message: "OTP expired. Please resend OTP.",
       });
+      return;
+    }
+
+    const otpValue = getValues("otp");
+    setBtnIsDisabled(true);
+
+    const res = await verifyOtpNew(mobileNo, otpValue);
+
+    if (res.success) {
+      setIsProcessing(true);   // 🔵 show processing
+      setTimer(0);             // stop timer
+      setShowOtpBtn(false);    // hide OTP UI
+
+      await handleFinalSubmit();  // call final API
+    } else {
+      setError("otp", { type: "manual", message: res.error });
       setBtnIsDisabled(false);
     }
   };
-  
-  //new func based on msg
-//   const handleVerifyOtp = async () => {
-//   setBtnIsDisabled(true);
 
-//   const result = await verifyOtpNew(mobileNo, getValues("otp"));
-
-//   if (result.success) {
-//     handleFinalSubmit();
-//   } else {
-//     setError("otp", { message: result.error });
-//     setBtnIsDisabled(false);
-//   }
-// };
 
   const handleReSendOtp = async () => {
-    clearErrors('otpSuccess');
-    const sentOtp = await sendOtpNew(mobileNo);
-    setShowOtpBtn(true);
-    if (sentOtp) {
-      setError('otpSuccess', {
-        type: 'manual',
-        message: `OTP Resent successfully to ****${mobileNo.slice(-4)}`,
+    clearErrors();
+
+    const res = await sendOtpNew(mobileNo);
+
+    if (res.success) {
+      setTimer(120);
+      setIsOtpExpired(false);
+
+      setError("otpSuccess", {
+        type: "manual",
+        message: `OTP resent to ****${mobileNo.slice(-4)}`,
       });
     } else {
-      setError('otp', {
-        type: 'manual',
-        message: `Failed to send OTP on ****${mobileNo.slice(-4)}`,
-      });
+      setError("otp", { type: "manual", message: res.message });
     }
   };
 
-
   // const handleFinalSubmit = async () => {
 
-  //   // 🚨 ERP REQUIRED BUT NOT FETCHED
+  //   // 🚨 ERP VALIDATION (as-is, no change)
   //   if (is_required === 'is_estimate_required') {
 
   //     if (
@@ -1944,7 +2022,7 @@ const LoadSurvey = () => {
   //         type: 'manual',
   //         message: 'ME Meter ERP data not fetched',
   //       });
-  //       return; // ⛔ STOP SUBMIT
+  //       return;
   //     }
 
   //     if (
@@ -1955,49 +2033,67 @@ const LoadSurvey = () => {
   //         type: 'manual',
   //         message: 'Extension Work ERP data not fetched',
   //       });
-  //       return; // ⛔ STOP SUBMIT
+  //       return;
   //     }
   //   }
 
-  //   // ✅ All validations passed → API CALL
   //   try {
-  //     const formValue = fromDataValue;
+  //     // ✅ TAKE FRESH VALUES (THIS IS THE FIX)
+  //     const formValue = getValues();   // ⭐⭐⭐ MAIN FIX ⭐⭐⭐
   //     const formData = new FormData();
 
   //     Object.entries(formValue).forEach(([key, value]) => {
+
+  //       // FileList
   //       if (value instanceof FileList && value.length > 0) {
   //         formData.append(key, value[0]);
   //         return;
   //       }
+
+  //       // File
   //       if (value instanceof File) {
   //         formData.append(key, value);
   //         return;
   //       }
-  //       if (value !== undefined && value !== null && value !== '') {
-  //         formData.append(key, value);
+
+  //       // Skip empty
+  //       if (value === undefined || value === null || value === '') {
+  //         return;
   //       }
+
+  //       // Normal fields
+  //       formData.append(key, value);
   //     });
+
+  //     // 🧪 DEBUG (optional – once)
+  //     for (let pair of formData.entries()) {
+  //       console.log(pair[0], pair[1]);
+  //     }
 
   //     const { data } = await axios.post(
   //       `${HT_LOAD_CHANGE_BASE}/surveys/`,
   //       formData,
-  //       {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       }
+  //       { headers: { Authorization: `Bearer ${token}` } }
   //     );
 
   //     alert('Survey submitted successfully ✅');
   //     navigate(`/dashboard/respones/${data.data.application}`, {
   //       state: data.data,
   //     });
+  //     const updatedFlags = await handleOfficerFlagCount();
+  //     dispatch(setOfficerData(updatedFlags));
 
   //   } catch (error) {
+  //     if (handleTokenExpiry(error, navigate)) return;
+
+  //     // normal error handling
   //     console.error(error);
   //     alert('Submission failed ❌');
   //   } finally {
   //     setBtnIsDisabled(false);
   //   }
   // };
+
   const handleFinalSubmit = async () => {
 
     // 🚨 ERP VALIDATION (as-is, no change)
@@ -2075,9 +2171,40 @@ const LoadSurvey = () => {
     } catch (error) {
       if (handleTokenExpiry(error, navigate)) return;
 
-      // normal error handling
-      console.error(error);
-      alert('Submission failed ❌');
+      console.error("Survey Submit Error:", error);
+
+      // 🔴 Agar backend se response mila
+      if (error?.response?.data) {
+        const errData = error.response.data;
+
+        // 1️⃣ Custom backend message
+        if (errData.message) {
+          alert(errData.message);
+          return;
+        }
+
+        // 2️⃣ Serializer field errors (dictionary)
+        if (typeof errData === "object") {
+          const firstKey = Object.keys(errData)[0];
+
+          if (firstKey) {
+            const firstError = errData[firstKey];
+
+            if (Array.isArray(firstError)) {
+              alert(firstError[0]);   // "This field is required."
+            } else {
+              alert(firstError);
+            }
+            return;
+          }
+        }
+      }
+      // 🔴 Network / unknown error
+      if (error.message === "Network Error") {
+        alert("Server not reachable. Please try again later.");
+      } else {
+        alert("Something went wrong ❌");
+      }
     } finally {
       setBtnIsDisabled(false);
     }
@@ -2317,60 +2444,6 @@ const LoadSurvey = () => {
                           </div>
                         </div>
                       </div>
-
-                      {/* <div class="card mt-2 mb-2 bg-white rounded shadow-md ">
-                    <div className="card-header px-4 py-2 border-b border-gray-300">
-                      <h2 className="text-lg font-bold capitalize ">Summary of Infrastructure</h2>
-                    </div>
-                    <div className="card-body px-4 pb-4">
-                      <div className="">
-                        <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8">
-                          <SelectTag
-                            options={lineType}
-                            LName="Line Type"
-                            {...register('region_name', { required: 'Region is required' })}
-                            errorMsg={errors.me_pt_ratio?.message}
-                            labelKey="label"
-                            valueKey="value"
-                          />
-                          <InputTag
-                            LName="Distance From Existing Substation to Connection Premise(in KM)"
-                            placeholder=""
-                            {...register('distance')}
-                            errorMsg={errors.distance?.message}
-                          />
-                          <SelectTag
-                            options={conductorType}
-                            LName="Conductor Type"
-                            {...register('conductor_type', {
-                              required: 'conductor type is required',
-                            })}
-                            errorMsg={errors.conductor_type?.message}
-                            labelKey="label"
-                            valueKey="value"
-                          />
-                          <SelectTag
-                            options={poleType}
-                            LName="Pole Type"
-                            {...register('pole_type', { required: 'Pole Type is required' })}
-                            errorMsg={errors.pole_type?.message}
-                            labelKey="label"
-                            valueKey="value"
-                          />
-                          <SelectTag
-                            options={taskDescription}
-                            LName="Task Description"
-                            {...register('task_description', {
-                              required: 'Task Description is required',
-                            })}
-                            errorMsg={errors.task_description?.message}
-                            labelKey="sor_description"
-                            valueKey="scheme_name"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div> */}
                     </>
                   )}
 
@@ -2557,24 +2630,6 @@ const LoadSurvey = () => {
                                           errorMsg={errors.ndf_long_name?.message}
 
                                         />
-                                        {/* <InputTag
-                                                      LName="Sanction Date"
-                                                      placeholder="Sanction Date."
-                                                      type="date"
-                                                      {...register('ndf_sanction_date', {
-                                                        required: 'Sanction Date is required',
-                                                      })}
-                                                      errorMsg={errors.ndf_sanction_date?.message}
-                                                      readOnly
-                                        /> */}
-                                        {/* <InputTag
-                                          LName="Sanction Cost"
-                                          {...register('ndf_sanction_amt', {
-                                            required: 'Sanction Cost is required',
-                                          })}
-                                          errorMsg={errors.ndf_sanction_amt?.message}
-                                          readOnly
-                                        /> */}
 
                                         <InputTag
                                           LName="Status"
@@ -2819,8 +2874,8 @@ const LoadSurvey = () => {
                               <button
                                 type="submit"
                                 className={`  text-white px-4 py-2 mt-4 rounded 
-                               ${isSendOtpLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-purple-800 text-white'}`}
-                                disabled={isSendOtpLoading}
+                               ${isSendOtpLoading || isBtnDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-purple-800 text-white'}`}
+                                disabled={isSendOtpLoading || isBtnDisabled}
                               >
                                 {isSendOtpLoading
                                   ? "Please wait..."
@@ -2834,35 +2889,52 @@ const LoadSurvey = () => {
                             )}
                           </>
                         )}
-                        {showOtpBtn && (
+                        {showOtpBtn && !isProcessing && (
                           <>
                             <InputTag
-                              LName=""
-                              placeholder="Please Enter Otp."
-                              {...register('otp', {
-                                required: 'Otp is required',
-                              })}
+                              placeholder="Enter OTP"
+                              {...register("otp", { required: "OTP is required" })}
                               errorMsg={errors.otp?.message}
                             />
+
+                            {/* 🔴 RED TIMER */}
+                            <p className="text-red-600 font-semibold text-sm mt-1">
+                              {timer > 0
+                                ? `OTP expires in ${formatTime(timer)}`
+                                : "OTP expired. Please resend OTP."}
+                            </p>
+
+                            {/* VERIFY */}
                             <button
                               type="button"
                               onClick={handleVerifyOtp}
-                              className={`bg-green-600 text-white px-4 py-2 mt-4 rounded"
-                                                                                       ${isBtnDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-purple-800 text-white'}`}
-                              disabled={isBtnDisabled}
+                              disabled={isBtnDisabled || isOtpExpired}
+                              className={`px-4 py-2 mt-3 rounded text-white
+                            ${isBtnDisabled || isOtpExpired
+                                  ? "bg-gray-400 cursor-not-allowed"
+                                  : "bg-green-600 hover:bg-green-800"}`}
                             >
-                              {isBtnDisabled ? 'Please wait...' : ' Verify Otp'}
+                              {isBtnDisabled ? "Verifying..." : "Verify OTP"}
                             </button>
 
+                            {/* RESEND */}
                             <button
                               type="button"
                               onClick={handleReSendOtp}
-                              className="bg-emerald-600 text-white px-4 py-2 mt-4 rounded"
+                              className="px-4 py-2 mt-3 rounded bg-emerald-600 text-white hover:bg-emerald-800"
                             >
-                              Resend Otp
+                              Resend OTP
                             </button>
                           </>
                         )}
+
+                        {/* 🔵 PROCESSING MESSAGE */}
+                        {isProcessing && (
+                          <p className="text-blue-700 font-semibold mt-2 animate-pulse">
+                            Processing... Please wait
+                          </p>
+                        )}
+
                       </div>
                       {errors?.otpSuccess && (
                         <p className="text-green-500 text-sm mt-1">{errors?.otpSuccess?.message}</p>
@@ -2883,6 +2955,10 @@ const LoadSurvey = () => {
   );
 };
 export default LoadSurvey;
+
+
+
+
 
 
 

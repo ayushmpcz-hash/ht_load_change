@@ -3,9 +3,15 @@
 // import { Button } from "../importComponents";
 // // import { useSelector } from 'react-redux';
 // import { HT_LOAD_CHANGE_BASE, HT_LOAD_CHANGE_PUBLIC_URL } from "../../api/api.js";
+// import { getAppAuth } from "../../utils/Storage/Storage.js";
 
 // const LoadChangePay = () => {
-//   const [payClicked, setPayClicked] = useState(false);
+//   const [appData, setAppData] = useState(null);
+//   const [isPayDisabled, setIsPayDisabled] = useState(false);
+
+//     const auth = getAppAuth();
+//      const applicationNo = auth?.application_no;
+//      const password = auth?.password;
 
 //   const location = useLocation();
 //   const { result, locationData } = location.state || {};
@@ -23,6 +29,41 @@
 //   //     consumer_name,
 //   //   application_no,
 //   // } = useSelector(state => state.user.userData);
+
+//   const fetchApplicationStatus = async () => {
+//   if (!applicationNo || !password) {
+//     console.error("Application credentials missing");
+//     return;
+//   }
+
+//   try {
+//     const response = await fetch(
+//       `${HT_LOAD_CHANGE_BASE}/get-load-change-applications/?application_no=${applicationNo}&password=${password}`,
+//       {
+//         method: "GET",
+//         headers: { "Content-Type": "application/json" },
+//       }
+//     );
+
+//     const res = await response.json();
+
+//     if (res?.data) {
+//       setAppData(res.data);
+
+//       if (res.data.is_regfee_submitted_bypg === true) {
+//         setIsPayDisabled(true);
+//       }
+//     }
+//   } catch (error) {
+//     console.error("Failed to fetch application status", error);
+//   }
+// };
+
+// useEffect(() => {
+//   fetchApplicationStatus();
+// }, []);
+
+
 
 //   // 🧾 Function: Generate Challan
 //   const generateChallan = async () => {
@@ -81,11 +122,11 @@
 //   };
 
 //   useEffect(() => {
-//   const clicked = localStorage.getItem(`regfee_clicked_${id}`);
-//   if (clicked === "true") {
-//     setPayClicked(true);
-//   }
-// }, [id]);
+//     const clicked = localStorage.getItem(`regfee_clicked_${id}`);
+//     if (clicked === "true") {
+//       setPayClicked(true);
+//     }
+//   }, [id]);
 
 //   return (
 //     <div className="container mx-auto">
@@ -160,20 +201,20 @@
 //                         // >
 //                         //   <Button label="Pay" className="p-2" />
 //                         // </Link>
-//                         <a href={`${HT_LOAD_CHANGE_PUBLIC_URL}/ht_load_change/call_lc_regfee/${id}`} target="_blank" rel="noopener noreferrer"
-//                           onClick={() => {
-//                           setPayClicked(true);
-//                           localStorage.setItem(`regfee_clicked_${id}`, "true");
-//                         }}
+//                         <a
+//                           href={`${HT_LOAD_CHANGE_PUBLIC_URL}/ht_load_change/call_lc_regfee/${id}`}
+//                           target="_blank"
+//                           rel="noopener noreferrer"
 //                         >
 //                           <Button
-//                             label="Pay"
-//                             className="p-2"
-//                             disabled={
-//                               payClicked                         
+//                             label={
+//                               isPayDisabled ? "Payment Completed" : "Pay"
 //                             }
+//                             className="p-2"
+//                             disabled={isPayDisabled}
 //                           />
 //                         </a>
+
 
 //                       ) : (
 //                         <>
@@ -245,6 +286,24 @@
 //               </tbody>
 //             </table>
 //           </div>
+//           {/* 🔴 IMPORTANT NOTE (ENGLISH + HINDI) */}
+//           <div className="mt-4 p-4 border-l-4 border-red-500 bg-red-50 rounded">
+//             <p className="text-sm text-red-700 font-semibold">
+//               Important Note:
+//             </p>
+//             <p className="text-sm text-red-600 mt-1">
+//               If the payment has been deducted against the online application, DO
+//               NOT make same payment further until the deducted amount is refunded.
+//             </p>
+
+//             <p className="text-sm text-red-700 font-semibold mt-3">
+//               महत्वपूर्ण टीप:
+//             </p>
+//             <p className="text-sm text-red-600 mt-1">
+//               यदि ऑनलाइन आवेदन के विरुद्ध भुगतान काट लिया गया है, तो कटे हुए
+//               राशि के वापस मिलने तक उसी भुगतान को फिर से न करें।
+//             </p>
+//           </div>
 //         </div>
 //       </div>
 //     </div>
@@ -252,6 +311,7 @@
 // };
 
 // export default LoadChangePay;
+
 
 import React, { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
@@ -566,4 +626,6 @@ useEffect(() => {
 };
 
 export default LoadChangePay;
+
+
 

@@ -57,6 +57,7 @@ const LoadDemandNotePayment = () => {
                       readOnly
                     />
                     <Link to={`https://htsanyojan.mpcz.in:8089/ht_load_change/call_demand_note_payment/${items?.id}`}><Button label=' Pay Demand Note'></Button></Link>
+                     {/* <Link to={`/ht-load-change/payment/${items?.id}`}><Button label=' Pay Demand Note'></Button></Link> */}
                   </div>
 
                 </div>

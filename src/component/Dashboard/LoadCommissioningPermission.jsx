@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { useForm } from 'react-hook-form';
@@ -13,6 +13,9 @@ import {
 } from '../importComponents.js';
 import { responseOption, revertOption } from '../newComponents/commonOption.js';
 import { HT_LOAD_CHANGE_BASE } from '../../api/api.js';
+import { setOfficerData } from "../../redux/slices/userSlice.js";
+import { handleTokenExpiry } from '../../utils/handleTokenExpiry';
+import { handleOfficerFlagCount } from "../../utils/handleOfficerFlagCount.js";
 
 const revertOptionFor29 = [
   { label: "Officer Requested", value: "Officer Requested" },
@@ -23,6 +26,8 @@ const LoadCommissioningPermission = () => {
   const officerData = useSelector(state => state.user.officerData);
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch()
+
   const { items } = location.state || {};
   const {
     register,
@@ -38,102 +43,256 @@ const LoadCommissioningPermission = () => {
   });
   // console.log(officerData, 'officerData');
   // console.log(items, 'items');
-   console.log(HT_LOAD_CHANGE_BASE,'HT_LOAD_CHANGE_BASE in Coomisioning permision')
+  console.log(HT_LOAD_CHANGE_BASE, 'HT_LOAD_CHANGE_BASE in Coomisioning permision')
 
   const token = Cookies.get('accessToken');
 
   // States
-  const [mobileNo] = useState(officerData?.employee_detail.cug_mobile);
+  // const [mobileNo] = useState(officerData?.employee_detail.cug_mobile);
+  const [mobileNo, setMobileNo] = useState('');
   const [showOtpBtn, setShowOtpBtn] = useState(false);
   const [formDataValue, setFormDataValue] = useState(null);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isBtnDisabled, setBtnIsDisabled] = useState(false);
+
+  const [timer, setTimer] = useState(0);
+  const [isOtpExpired, setIsOtpExpired] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSendOtpLoading, setIsSendOtpLoading] = useState(false);
   const commissioning_permission_response = watch('commissioning_permission_response');
+
+  // timer logic
+  useEffect(() => {
+    let interval;
+
+    if (timer > 0 && !isProcessing) {
+      interval = setInterval(() => {
+        setTimer(prev => prev - 1);
+      }, 1000);
+    }
+
+    if (timer === 0 && showOtpBtn && !isProcessing) {
+      setIsOtpExpired(true);
+    }
+
+    return () => clearInterval(interval);
+  }, [timer, showOtpBtn, isProcessing]);
+
+  const formatTime = sec => {
+    const m = String(Math.floor(sec / 60)).padStart(2, "0");
+    const s = String(sec % 60).padStart(2, "0");
+    return `${m}:${s}`;
+  };
+
+  useEffect(() => {
+    if (officerData?.employee_detail?.cug_mobile) {
+      setMobileNo(officerData.employee_detail.cug_mobile);
+    }
+  }, [officerData]);
 
   const isStatus29 = items?.application_status === 29;
 
-  const handleSendOtp = async formData => {
-    setFormDataValue(formData);
-    const sentOtp = await sendOtpNew(mobileNo);
-    if (sentOtp.success) {
-      setShowOtpBtn(true);
-      setIsDisabled(true);
-      setError('otpSuccess', {
-        type: 'manual',
-        message: sentOtp.message,
+  // const handleSendOtp = async formData => {
+  //   setFormDataValue(formData);
+  //   const sentOtp = await sendOtpNew(mobileNo);
+  //   if (sentOtp.success) {
+  //     setShowOtpBtn(true);
+  //     setIsDisabled(true);
+  //     setError('otpSuccess', {
+  //       type: 'manual',
+  //       message: sentOtp.message,
+  //     });
+  //   } else {
+  //     setError('otpStatus', {
+  //       type: 'manual',
+  //       message: sentOtp.message,
+  //     });
+  //   }
+  // };
+  const handleSendOtp = async () => {
+    if (isSendOtpLoading) return;
+
+    if (!mobileNo || mobileNo.length !== 10) {
+      setError("otpStatus", {
+        type: "manual",
+        message: "Mobile number not available. Please reload dashboard.",
       });
-    } else {
-      setError('otpStatus', {
-        type: 'manual',
-        message: sentOtp.message,
-      });
+      return;
+    }
+
+    setIsSendOtpLoading(true);
+    clearErrors();
+
+    try {
+      const res = await sendOtpNew(mobileNo);
+
+      if (res.success) {
+        setShowOtpBtn(true);
+        setIsDisabled(true);
+
+        setTimer(120);        // ⏱ start timer
+        setIsOtpExpired(false);
+
+        setError("otpSuccess", { type: "manual", message: res.message });
+      } else {
+        setError("otpStatus", { type: "manual", message: res.message });
+      }
+    } finally {
+      setIsSendOtpLoading(false);
     }
   };
+
+  // const handleVerifyOtp = async () => {
+  //   const otpValue = getValues('otp');
+  //   setBtnIsDisabled(true);
+  //   const verifyOtpResponse = await verifyOtpNew(mobileNo, otpValue);
+  //   if (verifyOtpResponse.success) {
+  //     handleFinalSubmit();
+  //   } else {
+  //     setError('otp', {
+  //       type: 'manual',
+  //       message: verifyOtpResponse.error,
+  //     });
+  //     setBtnIsDisabled(false);
+  //   }
+  // };
   const handleVerifyOtp = async () => {
-    const otpValue = getValues('otp');
-    setBtnIsDisabled(true);
-    const verifyOtpResponse = await verifyOtpNew(mobileNo, otpValue);
-    if (verifyOtpResponse.success) {
-      handleFinalSubmit();
-    } else {
-      setError('otp', {
-        type: 'manual',
-        message: verifyOtpResponse.error,
+    if (isOtpExpired) {
+      setError("otp", {
+        type: "manual",
+        message: "OTP expired. Please resend OTP.",
       });
+      return;
+    }
+
+    const otpValue = getValues("otp");
+    setBtnIsDisabled(true);
+
+    const res = await verifyOtpNew(mobileNo, otpValue);
+
+    if (res.success) {
+      setIsProcessing(true);
+      setTimer(0);
+      setShowOtpBtn(false);
+
+      await handleFinalSubmit();
+    } else {
+      setError("otp", { type: "manual", message: res.error });
       setBtnIsDisabled(false);
     }
   };
+
+  // const handleReSendOtp = async () => {
+  //   clearErrors('otpSuccess');
+  //   const sentOtp = await sendOtpNew(mobileNo);
+  //   setShowOtpBtn(true);
+  //   if (sentOtp) {
+  //     setError('otpSuccess', {
+  //       type: 'manual',
+  //       message: `OTP Resent successfully to ****${mobileNo.slice(-4)}`,
+  //     });
+  //   } else {
+  //     setError('otp', {
+  //       type: 'manual',
+  //       message: `Failed to send OTP on ****${mobileNo.slice(-4)}`,
+  //     });
+  //   }
+  // };
   const handleReSendOtp = async () => {
-    clearErrors('otpSuccess');
-    const sentOtp = await sendOtpNew(mobileNo);
-    setShowOtpBtn(true);
-    if (sentOtp) {
-      setError('otpSuccess', {
-        type: 'manual',
-        message: `OTP Resent successfully to ****${mobileNo.slice(-4)}`,
+    clearErrors();
+
+    const res = await sendOtpNew(mobileNo);
+
+    if (res.success) {
+      setTimer(120);
+      setIsOtpExpired(false);
+
+      setError("otpSuccess", {
+        type: "manual",
+        message: `OTP resent to ****${mobileNo.slice(-4)}`,
       });
     } else {
-      setError('otp', {
-        type: 'manual',
-        message: `Failed to send OTP on ****${mobileNo.slice(-4)}`,
-      });
+      setError("otp", { type: "manual", message: res.message });
     }
   };
 
+
+  // const handleFinalSubmit = async () => {
+  //   try {
+  //     const formValue = formDataValue;
+  //     const formData = new FormData();
+
+  //     Object.keys(formValue).forEach(key => {
+  //       if (formValue[key] instanceof FileList) {
+  //         if (formValue[key].length > 0) {
+  //           formData.append(key, formValue[key][0]);
+  //         }
+  //       } else {
+  //         formData.append(key, formValue[key]);
+  //       }
+  //     });
+  //     const { data } = await axios.post(
+  //       `${HT_LOAD_CHANGE_BASE}/commissioning-permission/`,
+  //       formData,
+  //       {
+  //         headers: {
+  //           // 'Content-Type': 'application/json',
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //     const { data: apiData, ...rest } = data;
+  //     alert('Commissioning submitted successfully ✅');
+  //     navigate(`/dashboard/respones/${apiData.application}`, { state: apiData, rest });
+  //     const updatedFlags = await handleOfficerFlagCount();
+  //     dispatch(setOfficerData(updatedFlags));
+  //   } catch (error) {
+  //     if (handleTokenExpiry(error, navigate)) return;
+  //     console.error('API Error:', error);
+  //     alert('Something went wrong ❌');
+  //   } finally {
+  //     setBtnIsDisabled(false);
+  //   }
+  // };
   const handleFinalSubmit = async () => {
     try {
-      const formValue = formDataValue;
+      const formValue = getValues();   // ⭐ FIXED (no stale formDataValue)
       const formData = new FormData();
 
-      Object.keys(formValue).forEach(key => {
-        if (formValue[key] instanceof FileList) {
-          if (formValue[key].length > 0) {
-            formData.append(key, formValue[key][0]);
-          }
-        } else {
-          formData.append(key, formValue[key]);
+      Object.entries(formValue).forEach(([key, value]) => {
+        if (value instanceof FileList && value.length > 0) {
+          formData.append(key, value[0]);
+          return;
+        }
+        if (value !== undefined && value !== null && value !== "") {
+          formData.append(key, value);
         }
       });
+
       const { data } = await axios.post(
         `${HT_LOAD_CHANGE_BASE}/commissioning-permission/`,
         formData,
-        {
-          headers: {
-            // 'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      const { data: apiData, ...rest } = data;
-      alert('Commissioning submitted successfully ✅');
-      navigate(`/dashboard/respones/${apiData.application}`, { state: apiData, rest });
+
+      alert("Commissioning submitted successfully ✅");
+
+      navigate(`/dashboard/respones/${data.data.application}`, {
+        state: data.data,
+      });
+
+      const updatedFlags = await handleOfficerFlagCount();
+      dispatch(setOfficerData(updatedFlags));
     } catch (error) {
-      console.error('API Error:', error);
-      alert('Something went wrong ❌');
+      if (handleTokenExpiry(error, navigate)) return;
+
+      console.error("API Error:", error);
+      alert("Something went wrong ❌");
     } finally {
       setBtnIsDisabled(false);
     }
   };
+
   return (
     <>
       <div>
@@ -176,13 +335,22 @@ const LoadCommissioningPermission = () => {
                     />
                     {commissioning_permission_response === 'Accepted' && (
                       <>
-                        <InputTag
+                        {/* <InputTag
                           LName="Upload Commissioning Permission letter"
                           type="file"
                           {...register('commissioning_permission_letter', {
                             required: 'Commissioning Permission letter is required',
                           })}
                           errorMsg={errors.commissioning_permission_letter?.message}
+                          disabled={isDisabled}
+                        /> */}
+                        <InputTag
+                          LName="Accept Remark"
+                          placeholder="Please Enter Accept Remark"
+                          {...register("accept_remark", {
+                            required: "Accept Remark is required",
+                          })}
+                          errorMsg={errors.accept_remark?.message}
                           disabled={isDisabled}
                         />
                       </>
@@ -223,7 +391,7 @@ const LoadCommissioningPermission = () => {
                           errorMsg={errors.revert_remark?.message}
                           disabled={isDisabled}
                         />
-                        <InputTag
+                        {/* <InputTag
                           LName="Upload Revert Docs"
                           type="file"
                           {...register('upload_revert_docs', {
@@ -231,13 +399,13 @@ const LoadCommissioningPermission = () => {
                           })}
                           errorMsg={errors.upload_revert_docs?.message}
                           disabled={isDisabled}
-                        />
+                        /> */}
                       </>
                     )}
                   </div>
                   <div className="mt-10 flex flex-col justify-center items-center">
                     <div className="flex space-x-2 space-y-2 flex-wrap justify-center items-baseline">
-                      {!showOtpBtn ? (
+                      {/* {!showOtpBtn ? (
                         <>
                           <button
                             type="reset"
@@ -248,8 +416,8 @@ const LoadCommissioningPermission = () => {
                           <button
                             type="submit" // ✅ Yeh important hai, warna handleSendOtp call nahi hota
                             className={`px-4 py-2 rounded text-white ${isDisabled
-                                ? 'bg-gray-400 cursor-not-allowed'
-                                : 'bg-green-500 hover:bg-purple-800'
+                              ? 'bg-gray-400 cursor-not-allowed'
+                              : 'bg-green-500 hover:bg-purple-800'
                               }`}
                             disabled={isDisabled}
                           >
@@ -270,8 +438,8 @@ const LoadCommissioningPermission = () => {
                             type="button"
                             onClick={handleVerifyOtp}
                             className={`px-4 py-2 rounded text-white ${isBtnDisabled
-                                ? 'bg-gray-400 cursor-not-allowed'
-                                : 'bg-green-600 hover:bg-purple-800'
+                              ? 'bg-gray-400 cursor-not-allowed'
+                              : 'bg-green-600 hover:bg-purple-800'
                               }`}
                             disabled={isBtnDisabled}
                           >
@@ -285,7 +453,68 @@ const LoadCommissioningPermission = () => {
                             Resend OTP
                           </button>
                         </>
+                      )} */}
+                      {!showOtpBtn ? (
+                        <>
+                          <button type="reset" className="px-4 py-2 bg-blue-500 text-white rounded-lg">
+                            Reset
+                          </button>
+
+                          <button
+                            type="submit"
+                            disabled={isSendOtpLoading || isBtnDisabled}
+                            className={`px-4 py-2 rounded text-white ${isSendOtpLoading || isBtnDisabled
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-green-500 hover:bg-purple-800"
+                              }`}
+                          >
+                            {isSendOtpLoading
+                              ? "Please wait..."
+                              : commissioning_permission_response === "Reverted"
+                                ? "Revert For Survey"
+                                : "Send for Commissioning"}
+                          </button>
+                        </>
+                      ) : showOtpBtn && !isProcessing ? (
+                        <>
+                          <InputTag
+                            placeholder="Enter OTP"
+                            {...register("otp", { required: "Otp is required" })}
+                            errorMsg={errors.otp?.message}
+                          />
+
+                          <p className="text-red-600 font-semibold text-sm mt-1">
+                            {timer > 0
+                              ? `OTP expires in ${formatTime(timer)}`
+                              : "OTP expired. Please resend OTP."}
+                          </p>
+
+                          <button
+                            type="button"
+                            onClick={handleVerifyOtp}
+                            disabled={isBtnDisabled || isOtpExpired}
+                            className={`px-4 py-2 rounded text-white ${isBtnDisabled || isOtpExpired
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-green-600 hover:bg-purple-800"
+                              }`}
+                          >
+                            {isBtnDisabled ? "Verifying..." : "Verify OTP"}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={handleReSendOtp}
+                            className="px-4 py-2 bg-emerald-600 text-white rounded"
+                          >
+                            Resend OTP
+                          </button>
+                        </>
+                      ) : (
+                        <p className="text-blue-700 font-semibold mt-2 animate-pulse">
+                          Processing... Please wait
+                        </p>
                       )}
+
                     </div>
                     {/* Error & Success messages */}
                     {errors?.otpSuccess && (

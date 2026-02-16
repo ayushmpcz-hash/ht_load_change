@@ -461,6 +461,7 @@ const LoadChangePay = () => {
   let registrationFeeCharges = 16800;
   const transcoCharges = new_supply_voltage === "11 KV" && lc_type === "Load_Enhancement_without_Voltage_Change" ? 0 : 1100
   const discomCharges = new_supply_voltage === "11 KV" && lc_type === "Load_Enhancement_without_Voltage_Change" ? 1260 : 160
+  
   if (type_of_change === 'Load_Reduction') {
     registrationFeeCharges = 25;
   }
@@ -570,7 +571,7 @@ const LoadChangePay = () => {
       const fetchCharges = async () => {
         const supplyVoltageLabel = supplyVoltageMap[new_supply_voltage] || '';
         let new_connection_category = connection_category.slice(0, -1) + supplyVoltageLabel;
-
+        console.log(new_connection_category,'new_connection_category')
         try {
           // console.log(HT_NSC_BASE,"HT_NSC_BASE")
           // console.log(NGB_UAT_BASE,"HT_NSC_BASE")
@@ -582,11 +583,11 @@ const LoadChangePay = () => {
           const chargeRes = await handleGetApi(
             `${NGB_UAT_BASE}/api/masters/getHtSdCalculationDetail/${new_connection_category}`
           );
-
+          console.log(contract_demand_difference,'contract demand difference in charges fetched')
           const monthlyFixedCharge = chargeRes?.list?.[0]?.monthlyFixedCharge || 0;
           const energyRate = (chargeRes?.list?.[0]?.energyChargeUptoFiftyPer || 0) / 100;
           const dutyPercentage = dutyRes?.duty_percentages?.[0] || 0;
-          // console.log(dutyPercentage,'%%%%%%%%%%%%%')
+          console.log(dutyPercentage,'%%%%%%%%%%%%%')
           const fixedAmount = contract_demand_difference * monthlyFixedCharge;
           const energyAmount = Math.round(contract_demand_difference * unitPerKva * energyRate);
           const fppasAmount = Math.round(energyAmount * fppasRateNew);

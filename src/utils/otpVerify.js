@@ -31,83 +31,77 @@ export const verifyOtp = async (mobileNo, otp) => {
 };
 
 
-// verifyOtp.js using this
-export const verifyOtpNew = async (mobileNo, otp) => {
-  try {
-    if (!otp) {
-      return { success: false, error: "Please enter OTP" };
-    }
-
-    const data = {
-      source: "HT SANYOJAN PORTAL",
-      mobileNo,
-      otp,
-    };
-
-    const response = await fetch(
-      `https://resourceutils.mpcz.in:8888/MPCZ_OTP/api/otp/verifyOtpAll`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      }
-    );
-
-
-const result = await response.json();
-console.log(result.message); // "Invalid OTP"
-console.log(result.code);
-    if (result.message =="Success" && result.code =="200" ) {
-      return { success: true };
-    } else {
-      return { success: false, error: "Invalid OTP ❌" };
-    }
-  } catch (error) {
-    console.error("Error verifying OTP:", error);
-    return { success: false, error: "Something went wrong, please try again!" };
-  }
-};
-
+// // verifyOtp.js using this
 // export const verifyOtpNew = async (mobileNo, otp) => {
 //   try {
 //     if (!otp) {
-//       return { success: false, type: "EMPTY_OTP", error: "Please enter OTP" };
+//       return { success: false, error: "Please enter OTP" };
 //     }
+
+//     const data = {
+//       source: "HT SANYOJAN PORTAL",
+//       mobileNo,
+//       otp,
+//     };
 
 //     const response = await fetch(
 //       `https://resourceutils.mpcz.in:8888/MPCZ_OTP/api/otp/verifyOtpAll`,
 //       {
 //         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({
-//           source: "HT SANYOJAN PORTAL",
-//           mobileNo,
-//           otp,
-//         }),
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify(data),
 //       }
 //     );
 
-//     const result = await response.json();
 
-//     if (result.code === "200" && result.message === "Success") {
+// const result = await response.json();
+// console.log(result.message); // "Invalid OTP"
+// console.log(result.code);
+//     if (result.message =="Success" && result.code =="200" ) {
 //       return { success: true };
+//     } else {
+//       return { success: false, error: "Invalid OTP ❌" };
 //     }
-
-//     return {
-//       success: false,
-//       type: "INVALID_OTP",
-//       error: "Invalid OTP. Please check and try again."
-//     };
-
 //   } catch (error) {
-//     return {
-//       success: false,
-//       type: "OTP_SERVICE_DOWN",
-//       error: "OTP verification service is unavailable."
-//     };
+//     console.error("Error verifying OTP:", error);
+//     return { success: false, error: "Something went wrong, please try again!" };
 //   }
 // };
 
+//new function
+// VERIFY OTP
+export const verifyOtpNew = async (mobileNo, otp) => {
+  try {
+    if (!otp) return { success: false, error: "Please enter OTP" };
+
+    const res = await fetch(
+      "https://resourceutils.mpcz.in:8888/MPCZ_OTP/api/otp/verifyOtpAll",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          source: "HT SANYOJAN PORTAL",
+          mobileNo,
+          otp,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.code === "200") return { success: true };
+
+    if (data.code === "609")
+      return { success: false, error: "You entered an incorrect OTP. Please enter the correct OTP and verify again." };
+
+    if (data.code === "640")
+      return { success: false, error: "OTP expired. Please resend OTP." };
+
+    return { success: false, error: data.message };
+  } catch {
+    return { success: false, error: "OTP verification service is currently unavailable. Please try again later. failed. Try again." };
+  }
+};
 

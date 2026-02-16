@@ -38,6 +38,8 @@ import {
 } from "./component/importComponents"
 import PendingForForwardToEDCRA from './component/Dashboard/PendingForForwardToEDCRA';
 import PendingForTranscoApproval from './component/Dashboard/PendingForTranscoApproval';
+import ApplicationRecivedFromTransco from './component/Dashboard/ApplicationRecivedFromTransco';
+import ApplicationRecivedFromCGM from './component/Dashboard/ApplicationRecivedFromCGM';
 import Dummy from './component/Dummy';
 import BayRequiredAccept from './component/Dashboard/BayRequiredAccept';
 
@@ -98,6 +100,8 @@ function App() {
             <Route path="/dashboard/pending_for_demand_note_payment/:id" element={<LoadDemandNotePayment />} />
             <Route path="/dashboard/pending_for_transco_approval/:id" element={<PendingForTranscoApproval />} />
             <Route path="/dashboard/pending_for_forwarding_to_EDCRA/:id" element={<PendingForForwardToEDCRA />} />
+            <Route path="/dashboard/pending_application_received_from_EDCRA/:id" element={<ApplicationRecivedFromTransco />} />
+            <Route path="/dashboard/pending_application_received_from_CGM_after_EDCRA_Approval/:id" element={<ApplicationRecivedFromCGM />} />
             <Route path="/dashboard/pending_for_work_completion_certifying_&_issuing_of_meter/:id" element={<LoadWorkCompletionAndMeterIssuing />} />
             <Route path="/dashboard/pending_for_bay_required/:id" element={<BayRequiredAccept />} />
             <Route path="/dashboard/pending_for_commissioning_permission/:id" element={<LoadCommissioningPermission />} />
