@@ -340,8 +340,8 @@ import { setOfficerData } from "../../redux/slices/userSlice.js";
 
 // status options per backend
 const statusOptions = [
-  { label: "Transco Accept", value: "pending" },
-  { label: "Accepted from CGM", value: "accepted_from_cgm" },
+  { label: "Transco Accept", value: "Transco_accept" },
+  { label: "Under Process", value: "under_process" },
 ];
 
 const PendingForTranscoApproval = () => {
@@ -366,7 +366,7 @@ const PendingForTranscoApproval = () => {
   } = useForm({
     defaultValues: {
       application: items?.id || "",
-      status: items?.status || "pending",
+      status: items?.status || "Transco_accept",
     },
   });
 
@@ -485,7 +485,7 @@ const PendingForTranscoApproval = () => {
     try {
       const fv = getValues();
 
-      if (fv.status === "accepted_from_cgm") {
+      if (fv.status === "under_process") {
         if (!fv.letter_no) return alert("Please enter Letter No.");
         if (!(fv.document && fv.document.length > 0))
           return alert("Please upload document.");
@@ -496,7 +496,7 @@ const PendingForTranscoApproval = () => {
       form.append("status", fv.status);
       form.append(
         "remark",
-        fv.status === "accepted_from_cgm" ? "accepted_from_cgm" : "pending"
+        fv.status === "under_process" ? "under_process" : "Transco_accept"
       );
 
       if (fv.letter_no) form.append("letter_no", fv.letter_no);
@@ -565,7 +565,7 @@ const PendingForTranscoApproval = () => {
                   />
                 </div>
 
-                {(status === "accepted_from_cgm" || status === "pending") && (
+                {(status === "under_process" || status === "Transco_accept") && (
                   <>
                     <div className="sm:col-span-3">
                       <InputTag
@@ -618,8 +618,8 @@ const PendingForTranscoApproval = () => {
                         >
                           {isSendOtpLoading
                             ? "Sending OTP..."
-                            : status === "accepted_from_cgm"
-                              ? "Accept (From CGM)"
+                            : status === "under_process"
+                              ? "Accept (Under Process)"
                               : "Submit"}
                         </button>
                       </>

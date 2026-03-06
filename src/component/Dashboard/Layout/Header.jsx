@@ -218,7 +218,6 @@ const Header = ({ toggleSidebar }) => {
         </div>
       </div>
       {ModalIsOpen && <Modal closeModal={closeModal} />}
-
     </header>
   );
 };

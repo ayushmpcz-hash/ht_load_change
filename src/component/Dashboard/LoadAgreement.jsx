@@ -21,7 +21,7 @@
 
 // const LoadAgreement = () => {
 //   const officerData = useSelector((state) => state.user.officerData);
-  
+
 //   const navigate = useNavigate();
 //   const location = useLocation();
 //   const { items } = location.state || {};
@@ -519,8 +519,8 @@
 // export default LoadAgreement;
 
 //new code
-import React, { useState,useEffect } from "react";
-import { useSelector,useDispatch } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import Cookies from "js-cookie";
@@ -542,15 +542,15 @@ import { handleTokenExpiry } from '../../utils/handleTokenExpiry';
 
 const LoadAgreement = () => {
   const officerData = useSelector((state) => state.user.officerData);
-  
+
   const navigate = useNavigate();
   const location = useLocation();
   const { items } = location.state || {};
   const [mobileNo, setMobileNo] = useState('');
   const [timer, setTimer] = useState(0);
-const [isOtpExpired, setIsOtpExpired] = useState(false);
-const [isProcessing, setIsProcessing] = useState(false);
-const [isSendOtpLoading, setIsSendOtpLoading] = useState(false);
+  const [isOtpExpired, setIsOtpExpired] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSendOtpLoading, setIsSendOtpLoading] = useState(false);
 
   // console.log(items, "items")
   // console.log(HT_LOAD_CHANGE_BASE,'HT_LOAD_CHANGE_BASE in Load Aggrement')
@@ -565,7 +565,7 @@ const [isSendOtpLoading, setIsSendOtpLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isBtnDisabled, setBtnIsDisabled] = useState(false);
 
-  
+
 
   const transactionDateRaw = items?.bank_response?.transaction_date; // "2025-09-24T12:23:38+05:30"
   const transactionDate = transactionDateRaw
@@ -593,29 +593,29 @@ const [isSendOtpLoading, setIsSendOtpLoading] = useState(false);
   const agreement_response = watch("agreement_response");
 
   useEffect(() => {
-  let interval;
+    let interval;
 
-  if (timer > 0 && !isProcessing) {
-    interval = setInterval(() => {
-      setTimer(prev => prev - 1);
-    }, 1000);
-  }
+    if (timer > 0 && !isProcessing) {
+      interval = setInterval(() => {
+        setTimer(prev => prev - 1);
+      }, 1000);
+    }
 
-  if (timer === 0 && showOtpBtn && !isProcessing) {
-    setIsOtpExpired(true);
-  }
+    if (timer === 0 && showOtpBtn && !isProcessing) {
+      setIsOtpExpired(true);
+    }
 
-  return () => clearInterval(interval);
-}, [timer, showOtpBtn, isProcessing]);
+    return () => clearInterval(interval);
+  }, [timer, showOtpBtn, isProcessing]);
 
-const formatTime = sec => {
-  const m = String(Math.floor(sec / 60)).padStart(2, "0");
-  const s = String(sec % 60).padStart(2, "0");
-  return `${m}:${s}`;
-};
+  const formatTime = sec => {
+    const m = String(Math.floor(sec / 60)).padStart(2, "0");
+    const s = String(sec % 60).padStart(2, "0");
+    return `${m}:${s}`;
+  };
 
 
- useEffect(() => {
+  useEffect(() => {
     if (officerData?.employee_detail?.cug_mobile) {
       setMobileNo(officerData.employee_detail.cug_mobile);
     }
@@ -623,36 +623,36 @@ const formatTime = sec => {
 
 
   const handleSendOtp = async () => {
-  if (isSendOtpLoading) return;
+    if (isSendOtpLoading) return;
 
-  if (!mobileNo || mobileNo.length !== 10) {
-    setError("otpStatus", {
-      type: "manual",
-      message: "Mobile number not available. Please reload dashboard.",
-    });
-    return;
-  }
-
-  setIsSendOtpLoading(true);
-  clearErrors();
-
-  try {
-    const res = await sendOtpNew(mobileNo);
-
-    if (res.success) {
-      setShowOtpBtn(true);
-      setIsDisabled(true);
-      setTimer(120);
-      setIsOtpExpired(false);
-
-      setError("otpSuccess", { type: "manual", message: res.message });
-    } else {
-      setError("otpStatus", { type: "manual", message: res.message });
+    if (!mobileNo || mobileNo.length !== 10) {
+      setError("otpStatus", {
+        type: "manual",
+        message: "Mobile number not available. Please reload dashboard.",
+      });
+      return;
     }
-  } finally {
-    setIsSendOtpLoading(false);
-  }
-};
+
+    setIsSendOtpLoading(true);
+    clearErrors();
+
+    try {
+      const res = await sendOtpNew(mobileNo);
+
+      if (res.success) {
+        setShowOtpBtn(true);
+        setIsDisabled(true);
+        setTimer(120);
+        setIsOtpExpired(false);
+
+        setError("otpSuccess", { type: "manual", message: res.message });
+      } else {
+        setError("otpStatus", { type: "manual", message: res.message });
+      }
+    } finally {
+      setIsSendOtpLoading(false);
+    }
+  };
 
 
   // 🔹 Verify OTP
@@ -668,90 +668,90 @@ const formatTime = sec => {
   //     setBtnIsDisabled(false);
   //   }
   // };
- const handleVerifyOtp = async () => {
-  if (isOtpExpired) {
-    setError("otp", {
-      type: "manual",
-      message: "OTP expired. Please resend OTP.",
-    });
-    return;
-  }
+  const handleVerifyOtp = async () => {
+    if (isOtpExpired) {
+      setError("otp", {
+        type: "manual",
+        message: "OTP expired. Please resend OTP.",
+      });
+      return;
+    }
 
-  const otpValue = getValues("otp");
-  setBtnIsDisabled(true);
+    const otpValue = getValues("otp");
+    setBtnIsDisabled(true);
 
-  const res = await verifyOtpNew(mobileNo, otpValue);
+    const res = await verifyOtpNew(mobileNo, otpValue);
 
-  if (res.success) {
-    setIsProcessing(true);
-    setTimer(0);
-    setShowOtpBtn(false);
+    if (res.success) {
+      setIsProcessing(true);
+      setTimer(0);
+      setShowOtpBtn(false);
 
-    await handleFinalSubmit();
-  } else {
-    setError("otp", { type: "manual", message: res.error });
-    setBtnIsDisabled(false);
-  }
-};
+      await handleFinalSubmit();
+    } else {
+      setError("otp", { type: "manual", message: res.error });
+      setBtnIsDisabled(false);
+    }
+  };
 
- const handleReSendOtp = async () => {
-  clearErrors();
+  const handleReSendOtp = async () => {
+    clearErrors();
 
-  const res = await sendOtpNew(mobileNo);
+    const res = await sendOtpNew(mobileNo);
 
-  if (res.success) {
-    setTimer(120);
-    setIsOtpExpired(false);
+    if (res.success) {
+      setTimer(120);
+      setIsOtpExpired(false);
 
-    setError("otpSuccess", {
-      type: "manual",
-      message: `OTP resent to ****${mobileNo.slice(-4)}`,
-    });
-  } else {
-    setError("otp", { type: "manual", message: res.message });
-  }
-};
+      setError("otpSuccess", {
+        type: "manual",
+        message: `OTP resent to ****${mobileNo.slice(-4)}`,
+      });
+    } else {
+      setError("otp", { type: "manual", message: res.message });
+    }
+  };
 
 
   // 🔹 Final Submit API Call
   const handleFinalSubmit = async () => {
-  try {
-    const formValue = getValues();   // ⭐ FIXED
-    const formData = new FormData();
+    try {
+      const formValue = getValues();   // ⭐ FIXED
+      const formData = new FormData();
 
-    Object.entries(formValue).forEach(([key, value]) => {
-      if (value instanceof FileList && value.length > 0) {
-        formData.append(key, value[0]);
-        return;
-      }
-      if (value !== undefined && value !== null && value !== "") {
-        formData.append(key, value);
-      }
-    });
+      Object.entries(formValue).forEach(([key, value]) => {
+        if (value instanceof FileList && value.length > 0) {
+          formData.append(key, value[0]);
+          return;
+        }
+        if (value !== undefined && value !== null && value !== "") {
+          formData.append(key, value);
+        }
+      });
 
-    const { data } = await axios.post(
-      `${HT_LOAD_CHANGE_BASE}/agreement-details/`,
-      formData,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+      const { data } = await axios.post(
+        `${HT_LOAD_CHANGE_BASE}/agreement-details/`,
+        formData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-    alert("Agreement And Work Order submitted successfully ✅");
+      alert("Agreement And Work Order submitted successfully ✅");
 
-    navigate(`/dashboard/respones/${data.data.application}`, {
-      state: data.data,
-    });
+      navigate(`/dashboard/respones/${data.data.application}`, {
+        state: data.data,
+      });
 
-    const updatedFlags = await handleOfficerFlagCount();
-    dispatch(setOfficerData(updatedFlags));
-  } catch (error) {
-    if (handleTokenExpiry(error, navigate)) return;
+      const updatedFlags = await handleOfficerFlagCount();
+      dispatch(setOfficerData(updatedFlags));
+    } catch (error) {
+      if (handleTokenExpiry(error, navigate)) return;
 
-    console.error(error);
-    alert("Something went wrong ❌");
-  } finally {
-    setBtnIsDisabled(false);
-  }
-};
+      console.error(error);
+      alert("Something went wrong ❌");
+    } finally {
+      setBtnIsDisabled(false);
+    }
+  };
 
 
   return (
@@ -866,6 +866,7 @@ const formatTime = sec => {
                           <InputTag
                             LName="Final Agreement pdf"
                             type="file"
+                            acceptPdfOnly={true}
                             {...register("agreement_doc", {
                               required: "Agreement Letter is required",
                             })}
@@ -895,6 +896,7 @@ const formatTime = sec => {
                             <InputTag
                               LName="Extension Work Order Letter"
                               type="file"
+                              acceptPdfOnly={true}
                               {...register("ex_work_order_docs", {
                                 required: " Extension Work Order Letter is required",
                               })}
@@ -938,6 +940,7 @@ const formatTime = sec => {
                             <InputTag
                               LName="ME Meter Work Order Letter"
                               type="file"
+                              acceptPdfOnly={true}
                               {...register("me_meter_work_order_docs", {
                                 required: "ME Meter Work Order Letter is required",
                               })}
@@ -951,6 +954,7 @@ const formatTime = sec => {
                             <InputTag
                               LName="Upload Commissioning Permission letter"
                               type="file"
+                              acceptPdfOnly={true}
                               {...register("commissioning_permission_doc", {
                                 required: "Commissioning Permission letter is required",
                               })}
@@ -988,6 +992,7 @@ const formatTime = sec => {
                           <InputTag
                             LName="Upload Revert Docs"
                             type="file"
+                            acceptPdfOnly={true}
                             {...register("upload_revert_docs", {
                               required: "Revert Docs are required",
                             })}
@@ -1003,79 +1008,77 @@ const formatTime = sec => {
                     <div className="mt-10 flex flex-col justify-center items-center">
                       <div className="flex space-x-2 space-y-2 flex-wrap justify-center items-baseline">
                         {!showOtpBtn ? (
-  <>
-    <button type="reset" className="px-4 py-2 bg-blue-500 text-white rounded-lg">
-      Reset
-    </button>
+                          <>
+                            <button type="reset" className="px-4 py-2 bg-blue-500 text-white rounded-lg">
+                              Reset
+                            </button>
 
-    <button
-      type="submit"
-      disabled={isSendOtpLoading}
-      className={`px-4 py-2 rounded text-white ${
-        isSendOtpLoading || isBtnDisabled
-          ? "bg-gray-400 cursor-not-allowed"
-          : "bg-green-500 hover:bg-purple-800"
-      }`}
-    >
-      {isSendOtpLoading
-        ? "Please wait..."
-        : agreement_response === "Reverted"
-        ? "Revert For Demand note"
-        : agreement_response === "Accepted" && required?.includes("is_me_meter_required")
-        ? "Send for Meter Issue"
-        : agreement_response === "Accepted" &&
-          (items?.load_sanction?.is_required === "is_agreement_required" ||
-            items?.survey?.is_required === "is_agreement_required") &&
-          items?.type_of_change === "Load_Enhancement"
-        ? "Send for BiCall"
-        : agreement_response === "Accepted" &&
-          (items?.load_sanction?.is_required === "is_agreement_required" ||
-            items?.survey?.is_required === "is_agreement_required") &&
-          items?.type_of_change === "Load_Reduction"
-        ? "Send for Completion certifying"
-        : "Send for Completion Certifying"}
-    </button>
-  </>
-) : showOtpBtn && !isProcessing ? (
-  <>
-    <InputTag
-      placeholder="Enter OTP"
-      {...register("otp", { required: "Otp is required" })}
-      errorMsg={errors.otp?.message}
-    />
+                            <button
+                              type="submit"
+                              disabled={isSendOtpLoading}
+                              className={`px-4 py-2 rounded text-white ${isSendOtpLoading || isBtnDisabled
+                                  ? "bg-gray-400 cursor-not-allowed"
+                                  : "bg-green-500 hover:bg-purple-800"
+                                }`}
+                            >
+                              {isSendOtpLoading
+                                ? "Please wait..."
+                                : agreement_response === "Reverted"
+                                  ? "Revert For Demand note"
+                                  : agreement_response === "Accepted" && required?.includes("is_me_meter_required")
+                                    ? "Send for Meter Issue"
+                                    : agreement_response === "Accepted" &&
+                                      (items?.load_sanction?.is_required === "is_agreement_required" ||
+                                        items?.survey?.is_required === "is_agreement_required") &&
+                                      items?.type_of_change === "Load_Enhancement"
+                                      ? "Send for BiCall"
+                                      : agreement_response === "Accepted" &&
+                                        (items?.load_sanction?.is_required === "is_agreement_required" ||
+                                          items?.survey?.is_required === "is_agreement_required") &&
+                                        items?.type_of_change === "Load_Reduction"
+                                        ? "Send for Completion certifying"
+                                        : "Send for Completion Certifying"}
+                            </button>
+                          </>
+                        ) : showOtpBtn && !isProcessing ? (
+                          <>
+                            <InputTag
+                              placeholder="Enter OTP"
+                              {...register("otp", { required: "Otp is required" })}
+                              errorMsg={errors.otp?.message}
+                            />
 
-    <p className="text-red-600 font-semibold text-sm mt-1">
-      {timer > 0
-        ? `OTP expires in ${formatTime(timer)}`
-        : "OTP expired. Please resend OTP."}
-    </p>
+                            <p className="text-red-600 font-semibold text-sm mt-1">
+                              {timer > 0
+                                ? `OTP expires in ${formatTime(timer)}`
+                                : "OTP expired. Please resend OTP."}
+                            </p>
 
-    <button
-      type="button"
-      onClick={handleVerifyOtp}
-      disabled={isBtnDisabled || isOtpExpired}
-      className={`px-4 py-2 rounded text-white ${
-        isBtnDisabled || isOtpExpired
-          ? "bg-gray-400 cursor-not-allowed"
-          : "bg-green-600 hover:bg-purple-800"
-      }`}
-    >
-      {isBtnDisabled ? "Verifying..." : "Verify OTP"}
-    </button>
+                            <button
+                              type="button"
+                              onClick={handleVerifyOtp}
+                              disabled={isBtnDisabled || isOtpExpired}
+                              className={`px-4 py-2 rounded text-white ${isBtnDisabled || isOtpExpired
+                                  ? "bg-gray-400 cursor-not-allowed"
+                                  : "bg-green-600 hover:bg-purple-800"
+                                }`}
+                            >
+                              {isBtnDisabled ? "Verifying..." : "Verify OTP"}
+                            </button>
 
-    <button
-      type="button"
-      onClick={handleReSendOtp}
-      className="px-4 py-2 bg-emerald-600 text-white rounded"
-    >
-      Resend OTP
-    </button>
-  </>
-) : (
-  <p className="text-blue-700 font-semibold mt-2 animate-pulse">
-    Processing... Please wait
-  </p>
-)}
+                            <button
+                              type="button"
+                              onClick={handleReSendOtp}
+                              className="px-4 py-2 bg-emerald-600 text-white rounded"
+                            >
+                              Resend OTP
+                            </button>
+                          </>
+                        ) : (
+                          <p className="text-blue-700 font-semibold mt-2 animate-pulse">
+                            Processing... Please wait
+                          </p>
+                        )}
 
 
 

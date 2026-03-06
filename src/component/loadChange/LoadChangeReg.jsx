@@ -1660,6 +1660,7 @@ function ApplicantReg() {
                         LName="Upload Bank Passbook/Cheque "
                         {...register('bank_docs')}
                         type="file"
+                        acceptPdfOnly={true}
                         errorMsg={errors.bank_docs?.message}
                         disabled={isDisabled}
 
@@ -1716,6 +1717,7 @@ function ApplicantReg() {
                               required: "PAN document is required",
                             })}
                             type="file"
+                            acceptPdfOnly={true}
                             errorMsg={errors.pan_card_doc?.message}
                             disabled={isDisabled}
                           />
@@ -1727,6 +1729,7 @@ function ApplicantReg() {
                         LName="Upload GST Document"
                         {...register('gst_doc')}
                         type="file"
+                        acceptPdfOnly={true}
                         errorMsg={errors.gst_doc?.message}
                         disabled={isDisabled}
 
@@ -1753,7 +1756,7 @@ function ApplicantReg() {
                         LName="Upload Other Document."
                         {...register('upload_file')}
                         type="file"
-
+                        acceptPdfOnly={true}
                         errorMsg={errors.upload_file?.message}
                         disabled={isDisabled}
 

@@ -2408,6 +2408,7 @@ const LoadSurvey = () => {
 
                                 LName="Upload single line diagram including VR Calculation."
                                 type={"file"}
+                                acceptPdfOnly={true}
                                 {...register('upload_single_line_docs', {
                                   required: 'single line diagram is required',
                                 })}
@@ -2471,6 +2472,7 @@ const LoadSurvey = () => {
                               <InputTag
                                 LName=" Signed Check List PDF"
                                 type="file"
+                                acceptPdfOnly={true}
                                 {...register('survey_checklist_pdf', {
                                   required: 'Check List Letter is required',
                                 })}
@@ -2546,6 +2548,7 @@ const LoadSurvey = () => {
                               <InputTag
                                 LName="Upload Revert Docs"
                                 type="file"
+                                acceptPdfOnly={true}
                                 {...register('revert_reson_docs', {
                                   required: 'Upload Upload Revert Docs is required',
                                 })}
@@ -2703,6 +2706,7 @@ const LoadSurvey = () => {
                                         <InputTag
                                           LName="Me Estimate Pdf"
                                           type="file"
+                                          acceptPdfOnly={true}
                                           {...register('ndf_upload_estimate_docs', {
                                             required: 'Me Estimate Letter is required',
                                           })}
@@ -2835,6 +2839,7 @@ const LoadSurvey = () => {
                                         <InputTag
                                           LName="Extension Estimate Pdf"
                                           type="file"
+                                          acceptPdfOnly={true}
                                           {...register('extension_work_estimate_docs', {
                                             required: 'Extension Estimate Letter is required',
                                           })}

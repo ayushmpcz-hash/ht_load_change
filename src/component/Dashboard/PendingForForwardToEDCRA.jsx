@@ -416,9 +416,9 @@ import { setOfficerData } from "../../redux/slices/userSlice.js";
 
 // status options as required
 const statusOptions = [
-  { label: "Self Approval", value: "self_approval" },
+  { label: "Already Approved", value: "Already_approved" },
   { label: "Forward to EDCRA", value: "forward_to_edcra" },
-  { label: "Reverted", value: "reverted" },
+  { label: "Revert", value: "reverted" },
 ];
 
 const PendingForForwardToEDCRA = () => {
@@ -501,7 +501,7 @@ const PendingForForwardToEDCRA = () => {
   if (!status) return;
 
   const map = {
-    self_approval: "self_approval",
+    Already_approved: "Already_approved",
     forward_to_edcra: "forward_to_edcra",
     reverted: "reverted",
   };
@@ -591,8 +591,8 @@ const PendingForForwardToEDCRA = () => {
       fd.append("status", fv.status);
       fd.append("remark", fv.remark);
 
-      if (fv.agreement_no) fd.append("letter_no", fv.agreement_no);
-      if (fv.agreement_doc?.length) fd.append("document", fv.agreement_doc[0]);
+   if (fv.letter_no) fd.append("letter_no", fv.letter_no);
+   if (fv.document?.length) fd.append("document", fv.document[0]);
 
       if (fv.revert_reason) fd.append("revert_reason", fv.revert_reason);
       if (fv.revert_reason_remark) fd.append("revert_reason_remark", fv.revert_reason_remark);
@@ -639,7 +639,7 @@ const PendingForForwardToEDCRA = () => {
         {Number(officerData?.employee_detail?.role) === 19 && (
           <div className="card mt-2 mb-2 bg-white rounded shadow-md ">
             <div className="card-header px-4 py-2 border-b border-gray-300">
-              <h2 className="text-lg font-bold capitalize ">EDCRA Action</h2>
+              <h2 className="text-lg font-bold capitalize ">CGM(Region) Action</h2>
             </div>
 
             <div className="card-body px-4 pb-4">
@@ -661,21 +661,21 @@ const PendingForForwardToEDCRA = () => {
                 </div>
 
                 {/* If Self Approval or Forward to EDCRA -> show Agreement inputs (styled like screenshot) */}
-                {(status === "self_approval" || status === "forward_to_edcra") && (
+                {(status === "Already_approved" || status === "forward_to_edcra") && (
                   <>
                     <div className="sm:col-span-2">
                       <InputTag
                         LName="Agreement No."
                         placeholder="Enter Agreement No."
-                        {...register("agreement_no", {
+                        {...register("letter_no", {
                           required: "Agreement No is required",
                         })}
-                        errorMsg={errors.agreement_no?.message}
+                        errorMsg={errors.letter_no?.message}
                         disabled={isDisabled}
                       />
                     </div>
 
-                    <div className="sm:col-span-2">
+                    {/* <div className="sm:col-span-2">
                       <InputTag
                         LName="Agreement Effective Date"
                         type="date"
@@ -685,7 +685,7 @@ const PendingForForwardToEDCRA = () => {
                         errorMsg={errors.agreement_effective_date?.message}
                         disabled={isDisabled}
                       />
-                    </div>
+                    </div> */}
 
                     {/* <InputTag
                       LName="Accept Remark"
@@ -699,12 +699,12 @@ const PendingForForwardToEDCRA = () => {
 
                     <div className="sm:col-span-2">
                       <InputTag
-                        LName="Final Agreement Letter"
+                        LName="Agreement Letter"
                         type="file"
-                        {...register("agreement_doc", {
+                        {...register("document", {
                           required: "Agreement Letter is required",
                         })}
-                        errorMsg={errors.agreement_doc?.message}
+                        errorMsg={errors.document?.message}
                         disabled={isDisabled}
                       />
                       {/* Show existing document link if present */}
@@ -787,7 +787,7 @@ const PendingForForwardToEDCRA = () => {
                       >
                         {isSendOtpLoading
                           ? "Sending OTP..."
-                          : status === "self_approval"
+                          : status === "Already_approved"
                             ? "Self Approve"
                             : status === "forward_to_edcra"
                               ? "Forward to EDCRA"

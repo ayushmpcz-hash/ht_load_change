@@ -35,8 +35,6 @@ const keyMapping = {
   tariffDes: 'connection_sub_category',
   // sanctionLoad: 'existing_contract_demand',
  cd: 'existing_contract_demand',
-
-
   unit: 'unit',
   // cd: 'cd',
   tempCd: 'temporaryLoad',
@@ -73,7 +71,7 @@ const keyMapping = {
   previousBillId: 'prev_bill_id',
   previousBilledUnits: 'prev_bill_units',
   previousNetBill: 'prev_net_bill_amt',
-  loadEffectiveDate: 'load_effective_date',
+  loadEffectiveDate: 'existing_load_effective_date',
   thirdLastBillMonth: 'third_last_bill_month',
   thirdLastBillId: 'third_last_bill_id',
   thirdLastBilledUnits: 'third_last_bill_units',

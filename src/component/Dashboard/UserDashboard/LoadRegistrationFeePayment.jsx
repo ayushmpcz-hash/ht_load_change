@@ -218,7 +218,7 @@ const LoadRegistrationFeePayment = () => {
                   <div className="mt-6 flex flex-col items-center text-center">
 
                     <p className="text-red-600 font-semibold mb-4">
-                     Application is pending. Generate charges to proceed.
+                     Application is pending. Calculate charges to proceed.
                     </p>
 
 
@@ -227,14 +227,14 @@ const LoadRegistrationFeePayment = () => {
                         dispatch(setUserData(items)); // 🔥 STORE IN REDUX
                         navigate("/ht-load-change/Details", {
                           state: {
-                            data: items,      // 👈 same key jo submit flow me use hoti hai
+                            data: items,  
                             fromDashboard: true
                           }
                         });
                       }}
                       className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-purple-800 cursor-pointer"
                     >
-                      Generate Tariff Charges
+                      Calculate Charges
                     </button>
 
 

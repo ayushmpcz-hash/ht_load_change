@@ -805,9 +805,9 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
     }
 
     // 2. Registration Fee Payment Date
-    if (htConsumers?.bank_response?.transaction_date) {
+    if (htConsumers?.bank_response?.transaction_date && htConsumers?.bank_response?.transaction_error_type === "success") {
       timeline.push({
-        step: 'Registration Fee Payment',
+        step: 'Registration & Sdsac Fee Payment',
         date: formatDateOnly(htConsumers.bank_response.transaction_date),
         rawDate: htConsumers.bank_response.transaction_date,
         status: 'Completed',
@@ -815,10 +815,21 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
       });
     }
 
+    // 2. Registration Fee Payment Date
+    // if (htConsumers?.bank_response?.transaction_date && htConsumers?.bank_response?.transaction_error_type === "success") {
+    //   timeline.push({
+    //     step: 'Payment Mode',
+    //     date: "-----",
+    //     rawDate: "----",
+    //     status: htConsumers?.bank_response?.payment_source || htConsumers?.bank_response?.payment_method_type || "---",
+    //     details: `Amount: ₹${htConsumers.bank_response.amount}`
+    //   });
+    // }
+
     // 3. Load Sanction/Acceptance Date
     if (htConsumers?.load_sanction?.sanction_letter_date) {
       timeline.push({
-        step: 'Load Sanctioned',
+        step: 'Acceptance',
         date: formatDateOnly(htConsumers.load_sanction.sanction_letter_date),
         rawDate: htConsumers.load_sanction.sanction_letter_date,
         status: htConsumers.load_sanction.load_sanction_response || 'Completed',
@@ -829,7 +840,7 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
     // 4. Survey Date (if survey exists)
     if (htConsumers?.survey?.created_at) {
       timeline.push({
-        step: 'Survey Conducted',
+        step: 'Survey & Estimate',
         date: formatDateOnly(htConsumers.survey.accepted_date),
         rawDate: htConsumers.survey.created_at,
         status: htConsumers.survey.survey_response || 'Completed',
@@ -837,12 +848,23 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
       });
     }
 
-    // 5. Demand Note Generation Date
-    if (htConsumers?.demand_note_generation?.created_at) {
+    // 4. ndf Estimate Date (if survey exists)
+    if (htConsumers?.survey?.ndf_estimate_date) {
       timeline.push({
-        step: 'Demand Note Generated',
-        date: formatDateOnly(htConsumers.demand_note_generation.created_at),
-        rawDate: htConsumers.demand_note_generation.created_at,
+        step: 'Estimate Upload Date',
+        date: formatDateOnly(htConsumers.survey.ndf_estimate_date),
+        rawDate: htConsumers.survey.created_at,
+        status: htConsumers.survey.survey_response || 'Completed',
+        details: htConsumers.survey.accept_remark || 'Survey completed'
+      });
+    }
+
+    // 5. Demand Note Generation Date
+    if (htConsumers?.demand_note_generation?.demand_note_accepted_date) {
+      timeline.push({
+        step: 'Estimate Demand Note Generated',
+        date: formatDateOnly(htConsumers.demand_note_generation.demand_note_accepted_date),
+        rawDate: htConsumers.demand_note_generation.demand_note_accepted_date,
         status: htConsumers.demand_note_generation.demand_note_response || 'Generated',
         details: `Amount: ₹${htConsumers.demand_note_generation.total_demand_note_amt || 'N/A'}`
       });
@@ -851,7 +873,7 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
     // 6. Demand Note Payment Date (if paid)
     if (htConsumers?.demand_note_payment?.transaction_date) {
       timeline.push({
-        step: 'Demand Note Payment',
+        step: 'Estimate Demand Note Payment',
         date: formatDateOnly(htConsumers.demand_note_payment.transaction_date),
         rawDate: htConsumers.demand_note_payment.transaction_date,
         status: 'Paid',
@@ -892,11 +914,22 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
       });
     }
 
+    // 9. meter_issuing_work_completion
+    if (htConsumers?.meter_issuing_work_completion?.created_at) {
+      timeline.push({
+        step: 'Meter Issuing and Work Completion',
+        date: formatDateOnly(htConsumers.meter_issuing_work_completion?.created_at),
+        rawDate: htConsumers.agreement_details.ex_work_order_date,
+        status: 'Issued',
+        details: `Order No: ${htConsumers.agreement_details.ex_work_order_no || 'N/A'}`
+      });
+    }
+
     // 10. Bi-Cell Response Date
-    if (htConsumers?.bicell_response?.created_at) {
+    if (htConsumers?.bicell_response?.md_reset_date) {
       timeline.push({
         step: 'Bi-Cell Commissioning',
-        date: formatDateOnly(htConsumers.bicell_response.created_at),
+        date: formatDateOnly(htConsumers.bicell_response.md_reset_date),
         rawDate: htConsumers.bicell_response.created_at,
         status: htConsumers.bicell_response.bi_cell_response || 'Completed',
         details: 'Commissioning readings recorded'
@@ -926,10 +959,25 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
     }
 
     // Sort timeline by date (oldest to newest)
+    const STEP_ORDER = {
+      'Application Submitted': 1,
+      'Registration & Sdsac Fee Payment': 2,
+      'Acceptance': 3,
+      // 'Payment Mode': 2,
+      'Estimate Upload Date': 4,
+      'Survey & Estimate': 5,
+      'Estimate Demand Note Generated': 6,
+      'Estimate Demand Note Payment': 7,
+      'Agreement Executed': 8,
+      'ME Meter Work Order Issued': 9,
+      'Meter Issuing and Work Completion': 10,
+      'Commissioning Permission': 11,
+      'Bi-Cell Commissioning': 12,
+      'Current Status': 13,
+    };
+
     return timeline.sort((a, b) => {
-      if (a.rawDate === 'N/A') return 1;
-      if (b.rawDate === 'N/A') return -1;
-      return new Date(a.rawDate) - new Date(b.rawDate);
+      return (STEP_ORDER[a.step] || 999) - (STEP_ORDER[b.step] || 999);
     });
   };
 
@@ -1066,12 +1114,28 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
           </tr>
         ) : (
           <tr>
-            <TableTrBloack Lable={'Accept Remark'} Value={approval_from_edcra && name.toLowerCase().includes('load') ? (htConsumers?.transco_approval?.remark || acceptRemark) : (acceptRemark || stepObj?.accept_remark || 'N/A')} colSpan={3} />
+            <TableTrBloack Lable={'Accept Remark'} Value={approval_from_edcra && name.toLowerCase().includes('load_sanction_response') ? (htConsumers?.transco_approval?.remark || acceptRemark) : (acceptRemark || stepObj?.accept_remark || 'N/A')} colSpan={3} />
           </tr>
         )}
       </>
     );
   }
+
+  const PairRow = ({ label1, value1, label2, value2 }) => {
+    if (
+      (!value1 && value1 !== 0) &&
+      (!value2 && value2 !== 0)
+    ) return null;
+
+    return (
+      <tr>
+        <TableTrBloack Lable={label1} Value={value1} />
+        <TableTrBloack Lable={label2} Value={value2} />
+      </tr>
+    );
+  };
+
+
 
   const timelineData = getApplicationTimeline();
 
@@ -1092,76 +1156,6 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
           <div style={{ textAlign: 'center', marginBottom: '20px' }}>
             <img src={banner} alt="logo" style={{ width: '100%', height: 'auto' }} />
           </div>
-
-          {/* Application Timeline/Date Chart Section - DATE ONLY */}
-          {timelineData.length > 0 && (
-            <>
-              <div style={{ marginBottom: '30px', border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden' }}>
-                <div style={{ backgroundColor: '#0c0d52', padding: '12px 16px' }}>
-                  <h2 style={{ color: 'white', margin: 0, fontSize: '18px', fontWeight: 'bold' }}>
-                    Application Timeline & Status Tracker
-                  </h2>
-                  {/* <p style={{ color: '#e0e7ff', margin: '4px 0 0 0', fontSize: '14px' }}>
-                    Application Date: {htConsumers?.created_at ? new Date(htConsumers.created_at).toLocaleDateString('en-IN', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric'
-                    }) : 'N/A'}
-                  </p> */}
-                </div>
-                
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr style={{ backgroundColor: '#f3f4f6' }}>
-                        <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'left', fontSize: '14px', fontWeight: '600' }}>S.No.</th>
-                        <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'left', fontSize: '14px', fontWeight: '600' }}>Process Step</th>
-                        <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'left', fontSize: '14px', fontWeight: '600' }}>Date</th>
-                        <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'left', fontSize: '14px', fontWeight: '600' }}>Status</th>
-                        {/* <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'left', fontSize: '14px', fontWeight: '600' }}>Details / Remarks</th> */}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {timelineData.map((item, index) => (
-                        <tr key={index} style={{ backgroundColor: index % 2 === 0 ? 'white' : '#f9fafb' }}>
-                          <td style={{ border: '1px solid #d1d5db', padding: '10px', fontSize: '14px' }}>{index + 1}</td>
-                          <td style={{ border: '1px solid #d1d5db', padding: '10px', fontSize: '14px', fontWeight: '500' }}>{item.step}</td>
-                          <td style={{ border: '1px solid #d1d5db', padding: '10px', fontSize: '14px' }}>{item.date}</td>
-                          <td style={{ border: '1px solid #d1d5db', padding: '10px', fontSize: '14px' }}>
-                            <span style={{
-                              display: 'inline-block',
-                              padding: '4px 12px',
-                              borderRadius: '16px',
-                              fontSize: '12px',
-                              fontWeight: '500',
-                              backgroundColor: item.status?.toLowerCase().includes('accept') || item.status?.toLowerCase().includes('complete') || item.status?.toLowerCase().includes('paid') || item.status?.toLowerCase().includes('success') 
-                                ? '#d1fae5' 
-                                : item.status?.toLowerCase().includes('revert') || item.status?.toLowerCase().includes('pending') 
-                                  ? '#fee2e2' 
-                                  : '#e5e7eb',
-                              color: item.status?.toLowerCase().includes('accept') || item.status?.toLowerCase().includes('complete') || item.status?.toLowerCase().includes('paid') || item.status?.toLowerCase().includes('success')
-                                ? '#065f46'
-                                : item.status?.toLowerCase().includes('revert') || item.status?.toLowerCase().includes('pending')
-                                  ? '#991b1b'
-                                  : '#1f2937'
-                            }}>
-                              {item.status}
-                            </span>
-                          </td>
-                          {/* <td style={{ border: '1px solid #d1d5db', padding: '10px', fontSize: '14px' }}>{item.details}</td> */}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                
-                <div style={{ padding: '12px 16px', backgroundColor: '#f3f4f6', borderTop: '1px solid #d1d5db', fontSize: '13px', color: '#4b5563' }}>
-                  <strong>Note:</strong> Timeline shows all completed steps in the application process. Current status: <span style={{ fontWeight: '600', color: '#0c0d52' }}>{htConsumers?.application_status_text || 'N/A'}</span>
-                </div>
-              </div>
-              <hr style={{ margin: '30px 0', border: '0', borderTop: '2px solid #e5e7eb' }} />
-            </>
-          )}
 
           <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
             <tbody>
@@ -1395,7 +1389,7 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
               )}
 
               {htConsumers?.edcra_approval && renderStepSummary(htConsumers?.edcra_approval, {
-                name: 'EDC/RA Approval',
+                name: 'CGM Approval',
                 statusKey: 'status',
                 acceptKeys: ['remark'],
                 revertKeys: ['revert_remark'],
@@ -1517,7 +1511,7 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
               {/* Agreement Finalization */}
               {htConsumers?.agreement_details && renderStepSummary(htConsumers?.agreement_details, {
                 name: 'Agreement Finalization Details',
-                statusKey: 'agreement_status',
+                statusKey: 'agreement_response',
                 acceptKeys: ['agreement_no'],
                 revertKeys: ['revert_remark'],
                 nextKey: null,
@@ -1542,6 +1536,55 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
                 </>
               )}
 
+              {htConsumers?.meter_issuing_work_completion && (
+                <>
+                  {/* Heading */}
+                  <tr style={{ backgroundColor: "#f9f9f9" }}>
+                    <th colSpan={4} style={{ border: "1px solid #ccc", padding: "8px", textAlign: "center" }}>
+                      <h2>Meter Issuing & Work Completion</h2>
+                    </th>
+                  </tr>
+
+                  {/* -------- Meter + ME Side-by-Side -------- */}
+                  <PairRow
+                    label1="Meter Serial No"
+                    value1={htConsumers?.meter_no}
+                    label2="ME Serial No"
+                    value2={htConsumers?.meter_issuing_work_completion?.me_serial_no}
+                  />
+
+                  <PairRow
+                    label1="Meter Make"
+                    value1={htConsumers?.meter_issuing_work_completion?.meter_make}
+                    label2="ME Make"
+                    value2={htConsumers?.meter_issuing_work_completion?.me_make}
+                  />
+
+                  <PairRow
+                    label1="Meter Model"
+                    value1={htConsumers?.meter_issuing_work_completion?.meter_model}
+                    label2="ME Model"
+                    value2={htConsumers?.meter_issuing_work_completion?.me_model}
+                  />
+
+                  <PairRow
+                    label1="Meter CT Ratio"
+                    value1={htConsumers?.meter_issuing_work_completion?.meter_ct_ratio}
+                    label2="ME CT Ratio"
+                    value2={htConsumers?.meter_issuing_work_completion?.me_ct_ratio}
+                  />
+
+                  <PairRow
+                    label1="Meter PT Ratio"
+                    value1={htConsumers?.meter_issuing_work_completion?.meter_pt_ratio}
+                    label2="ME PT Ratio"
+                    value2={htConsumers?.meter_issuing_work_completion?.me_pt_ratio}
+                  />
+                </>
+              )}
+
+
+
               {/* ---------------- BICELL RESPONSE ---------------- */}
               {htConsumers?.bicell_response &&
                 renderStepSummary(htConsumers?.bicell_response, {
@@ -1553,8 +1596,8 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
                     "import_meter_reading_kwh",
                   ],
                   revertKeys: ["revert_remark", "revert_reason"],
-                  nextKey: null,
-                  nextLabel: "Next Action",
+                  // nextKey: null,
+                  // nextLabel: "Next Action",
                 })}
 
               {htConsumers?.bicell_response?.bi_cell_response === "Accepted" && (
@@ -1581,6 +1624,10 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
                   <tr>
                     <TableTrBloack Lable="Import TOD4" Value={htConsumers?.bicell_response?.import_meter_reading_tod4} />
                     <TableTrBloack Lable="MD Reset Date" Value={htConsumers?.bicell_response?.md_reset_date || "N/A"} />
+                  </tr>
+                  <tr>
+                    <TableTrBloack Lable="Dial Factor" Value={htConsumers?.bicell_response?.dial_factor} />
+                    <TableTrBloack Lable="New MF" Value={htConsumers?.bicell_response?.new_mf || "N/A"} />
                   </tr>
 
                   {/* Export readings if exist */}
@@ -1615,6 +1662,77 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
               {/* Documents area */}
             </tbody>
           </table>
+
+          {/* Application Timeline/Date Chart Section - DATE ONLY */}
+          {timelineData.length > 0 && (
+            <>
+              <div style={{ marginBottom: '30px', border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden' }}>
+                <div style={{ backgroundColor: '#0c0d52', padding: '12px 16px' }}>
+                  <h2 style={{ color: 'white', margin: 0, fontSize: '18px', fontWeight: 'bold' }}>
+                    Application Activity Logs
+                  </h2>
+                  {/* <p style={{ color: '#e0e7ff', margin: '4px 0 0 0', fontSize: '14px' }}>
+                    Application Date: {htConsumers?.created_at ? new Date(htConsumers.created_at).toLocaleDateString('en-IN', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric'
+                    }) : 'N/A'}
+                  </p> */}
+                </div>
+
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#f3f4f6' }}>
+                        <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'left', fontSize: '14px', fontWeight: '600' }}>S.No.</th>
+                        <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'left', fontSize: '14px', fontWeight: '600' }}>Process Step</th>
+                        <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'left', fontSize: '14px', fontWeight: '600' }}>Date</th>
+                        <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'left', fontSize: '14px', fontWeight: '600' }}>Status</th>
+                        {/* <th style={{ border: '1px solid #d1d5db', padding: '12px', textAlign: 'left', fontSize: '14px', fontWeight: '600' }}>Details / Remarks</th> */}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {timelineData.map((item, index) => (
+                        <tr key={index} style={{ backgroundColor: index % 2 === 0 ? 'white' : '#f9fafb' }}>
+                          <td style={{ border: '1px solid #d1d5db', padding: '10px', fontSize: '14px' }}>{index + 1}</td>
+                          <td style={{ border: '1px solid #d1d5db', padding: '10px', fontSize: '14px', fontWeight: '500' }}>{item.step}</td>
+                          <td style={{ border: '1px solid #d1d5db', padding: '10px', fontSize: '14px' }}>{item.date}</td>
+                          <td style={{ border: '1px solid #d1d5db', padding: '10px', fontSize: '14px' }}>
+                            <span style={{
+                              display: 'inline-block',
+                              padding: '4px 12px',
+                              borderRadius: '16px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              backgroundColor: item.status?.toLowerCase().includes('accept') || item.status?.toLowerCase().includes('complete') || item.status?.toLowerCase().includes('paid') || item.status?.toLowerCase().includes('success')
+                                ? '#d1fae5'
+                                : item.status?.toLowerCase().includes('revert') || item.status?.toLowerCase().includes('pending')
+                                  ? '#fee2e2'
+                                  : '#e5e7eb',
+                              color: item.status?.toLowerCase().includes('accept') || item.status?.toLowerCase().includes('complete') || item.status?.toLowerCase().includes('paid') || item.status?.toLowerCase().includes('success')
+                                ? '#065f46'
+                                : item.status?.toLowerCase().includes('revert') || item.status?.toLowerCase().includes('pending')
+                                  ? '#991b1b'
+                                  : '#1f2937'
+                            }}>
+                              {item.status}
+                            </span>
+                          </td>
+                          {/* <td style={{ border: '1px solid #d1d5db', padding: '10px', fontSize: '14px' }}>{item.details}</td> */}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div style={{ padding: '12px 16px', backgroundColor: '#f3f4f6', borderTop: '1px solid #d1d5db', fontSize: '13px', color: '#4b5563' }}>
+                  <strong>Note:</strong> Timeline shows all completed steps in the application process. Current status: <span style={{ fontWeight: '600', color: '#0c0d52' }}>{htConsumers?.application_status_text || 'N/A'}</span>
+                </div>
+              </div>
+              <hr style={{ margin: '30px 0', border: '0', borderTop: '2px solid #e5e7eb' }} />
+            </>
+          )}
+
 
           <div style={{ textAlign: 'center', marginTop: '16px' }}>
             <button type="button" onClick={handlePrint} className="bg-[#3b82f6] text-white text-base p-4 mt-2 mb-2 rounded">
@@ -1658,7 +1776,7 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
                   {htConsumers?.demand_note_generation?.supplement_draft_agreement && <DocumentTrBloack Lable={'View supplement Draft Pdf'} docLink={htConsumers?.demand_note_generation?.supplement_draft_agreement} />}
 
                   {htConsumers?.bicell_response?.agreement_doc && <DocumentTrBloack Lable={'View Commissioning  Pdf'} docLink={htConsumers?.bicell_response?.agreement_doc} />}
-
+                   {htConsumers?.bicell_response?.commissioning_report_upload && <DocumentTrBloack Lable={'View Commissioning Report Pdf'} docLink={htConsumers?.bicell_response?.commissioning_report_upload} />}
                   <GeneratePDF
                     baseUrl={HT_LOAD_CHANGE_BASE}
                     url={"/GenerateDemandNote_Sdsac/"}
@@ -1683,7 +1801,7 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
 
                   {(
                     htConsumers?.survey?.is_required === "is_estimate_required" &&
-                    ["9", "11","31","29","16","19"].includes(String(htConsumers?.application_status))
+                    ["9", "11", "31", "29", "16", "19"].includes(String(htConsumers?.application_status))
                   ) && (
                       <GeneratePDF
                         baseUrl={HT_LOAD_CHANGE_BASE}
@@ -1691,7 +1809,7 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
                         id={htConsumers?.id}
                         Lable="Generated Challan Estimate"
                       />
-                  )}
+                    )}
                   {/* {htConsumers?.survey?.is_required === "is_estimate_required" &&
                     ["8", "9", "11","31","29","16","19"].includes(String(htConsumers?.application_status)) && (
                       String(htConsumers?.application_status) === "8" ? (
@@ -1716,8 +1834,10 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
                       )
                     )} */}
 
-
-                  {htConsumers?.transco_approval?.status === "accepted_from_cgm" && <DocumentTrBloack Lable={'View Transco Approval Letter'} docLink={htConsumers?.transco_approval?.document} />}
+                  {htConsumers?.load_sanction?.gm_upload_pdf && <DocumentTrBloack Lable={'View EDCRA Letter of GM'} docLink={htConsumers?.load_sanction?.gm_upload_pdf} />}
+                  {htConsumers?.transco_approval?.status === "under_process" && <DocumentTrBloack Lable={'View Transco Approval Letter for (Under Process)'} docLink={htConsumers?.transco_approval?.document} />}
+                  {htConsumers?.edcra_approval?.document && <DocumentTrBloack Lable={'View EDCRA Letter Of CGM'} docLink={htConsumers?.edcra_approval?.document} />}
+                  {htConsumers?.transco_approval?.status === "Transco_accept" && <DocumentTrBloack Lable={'View Transco Approval Letter'} docLink={htConsumers?.transco_approval?.document} />}
                 </tbody>
               </table>
             </div>

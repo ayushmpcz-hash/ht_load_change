@@ -57,10 +57,10 @@ export default function ApplicantBasicDetails({ htConsumers ,register ,errors}) 
           <InputTag
             LName="Load Effective Date"
             //  type="date"
-            {...register('load_effective_date')}
+            {...register('existing_load_effective_date')}
            readOnly={true}
-            errorMsg={errors.load_effective_date?.message}
-            placeholder={htConsumers.load_effective_date || "NA"}
+            errorMsg={errors.existing_load_effective_date?.message}
+            placeholder={htConsumers.existing_load_effective_date || "NA"}
           />
           <InputTag
             LName="Last Reduction Date"
@@ -255,7 +255,7 @@ export default function ApplicantBasicDetails({ htConsumers ,register ,errors}) 
             {...register('solar_installation_capacity')}
            readOnly={true}
             errorMsg={errors.solar_installation_capacity?.message}
-             placeholder={htConsumers.solar_installation_capacity || "NA"}
+             placeholder={htConsumers.solar_installation_capacity || "0"}
           />
 
           <InputTag

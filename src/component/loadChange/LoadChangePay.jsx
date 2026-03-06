@@ -34,8 +34,9 @@
 //   const fppasRateNew = 0.0841;
 //   const unitPerKva = 190;
 //   let registrationFeeCharges = 16800;
-//   const transcoCharges =   new_supply_voltage === "11 KV" && lc_type === "Load_Enhancement_without_Voltage_Change" ? 0 : 1100 
-//   const discomCharges = new_supply_voltage === "11 KV" && lc_type === "Load_Enhancement_without_Voltage_Change" ? 1260 : 160 
+//   const transcoCharges = new_supply_voltage === "11 KV" && lc_type === "Load_Enhancement_without_Voltage_Change" ? 0 : 1100
+//   const discomCharges = new_supply_voltage === "11 KV" && lc_type === "Load_Enhancement_without_Voltage_Change" ? 1260 : 160
+
 //   if (type_of_change === 'Load_Reduction') {
 //     registrationFeeCharges = 25;
 //   }
@@ -145,7 +146,7 @@
 //       const fetchCharges = async () => {
 //         const supplyVoltageLabel = supplyVoltageMap[new_supply_voltage] || '';
 //         let new_connection_category = connection_category.slice(0, -1) + supplyVoltageLabel;
-
+//         console.log(new_connection_category,'new_connection_category')
 //         try {
 //           // console.log(HT_NSC_BASE,"HT_NSC_BASE")
 //           // console.log(NGB_UAT_BASE,"HT_NSC_BASE")
@@ -157,11 +158,11 @@
 //           const chargeRes = await handleGetApi(
 //             `${NGB_UAT_BASE}/api/masters/getHtSdCalculationDetail/${new_connection_category}`
 //           );
-
+//           console.log(contract_demand_difference,'contract demand difference in charges fetched')
 //           const monthlyFixedCharge = chargeRes?.list?.[0]?.monthlyFixedCharge || 0;
 //           const energyRate = (chargeRes?.list?.[0]?.energyChargeUptoFiftyPer || 0) / 100;
 //           const dutyPercentage = dutyRes?.duty_percentages?.[0] || 0;
-
+//           console.log(dutyPercentage,'%%%%%%%%%%%%%')
 //           const fixedAmount = contract_demand_difference * monthlyFixedCharge;
 //           const energyAmount = Math.round(contract_demand_difference * unitPerKva * energyRate);
 //           const fppasAmount = Math.round(energyAmount * fppasRateNew);
@@ -208,6 +209,20 @@
 
 //   console.log(charges, 'chargessssssss')
 //   const submitHandler = async () => {
+
+//     // 🚫 SD Mandatory Validation
+//     if (
+//       type_of_change === 'Load_Enhancement' &&
+//       charges.totalSdRequired === 0 &&
+//       (
+//         lc_type === 'Load_Enhancement_without_Voltage_Change' ||
+//         lc_type === 'Load_Enhancement_with_Downgrade_Voltage_Level'
+//       )
+//     ) {
+//      alert('Security Deposit is showing as 0. Please regenerate the Tariff Charges from Applicant Login and try again.');
+//       return; // ❌ STOP API CALL
+//     }
+
 //     const postData = {
 //       application: id || '',
 //       supply_voltage: new_supply_voltage,
@@ -434,6 +449,12 @@ const LoadChangePay = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isDisabled, setIsDisabled] = useState(false);
+
+  const [sdError, setSdError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [sdLoading, setSdLoading] = useState(false);
+  const MAX_RETRY = 2;
+
   const printRef = useRef(null); // ✅ Add print ref
   const locationData = location.state || location.state.data;
 
@@ -461,7 +482,7 @@ const LoadChangePay = () => {
   let registrationFeeCharges = 16800;
   const transcoCharges = new_supply_voltage === "11 KV" && lc_type === "Load_Enhancement_without_Voltage_Change" ? 0 : 1100
   const discomCharges = new_supply_voltage === "11 KV" && lc_type === "Load_Enhancement_without_Voltage_Change" ? 1260 : 160
-  
+
   if (type_of_change === 'Load_Reduction') {
     registrationFeeCharges = 25;
   }
@@ -569,41 +590,77 @@ const LoadChangePay = () => {
 
       // Fetch duty and charges in the same block
       const fetchCharges = async () => {
+        setSdLoading(true);
+        setSdError(false);
+
         const supplyVoltageLabel = supplyVoltageMap[new_supply_voltage] || '';
-        let new_connection_category = connection_category.slice(0, -1) + supplyVoltageLabel;
-        console.log(new_connection_category,'new_connection_category')
+        let new_connection_category =
+          connection_category.slice(0, -1) + supplyVoltageLabel;
+
         try {
-          // console.log(HT_NSC_BASE,"HT_NSC_BASE")
-          // console.log(NGB_UAT_BASE,"HT_NSC_BASE")
-          // console.log(HT_LOAD_CHANGE_BASE,"HT_LOAD_CHANGE_BASE")
-          // console.log(HT_LOAD_CHANGE_BASE,"HT_LOAD_CHANGE_BASE")
+
           const dutyRes = await handleGetApi(
             `${HT_NSC_BASE}/get_duty_percentage_by_purpose_id_ngb/${connection_purpose_id}`
           );
-          const chargeRes = await handleGetApi(
-            `${NGB_UAT_BASE}/api/masters/getHtSdCalculationDetail/${new_connection_category}`
+
+          // const chargeRes = await handleGetApi(
+          //   `${NGB_UAT_BASE}/api/masters/getHtSdCalculationDetail/${new_connection_category}`
+          // );
+           const chargeRes = await handleGetApi(
+            `https://services.mpcz.in/HT-NIC/api/htPublicApis/getHtSdCalculationDetail/${new_connection_category}`
           );
-          console.log(contract_demand_difference,'contract demand difference in charges fetched')
-          const monthlyFixedCharge = chargeRes?.list?.[0]?.monthlyFixedCharge || 0;
-          const energyRate = (chargeRes?.list?.[0]?.energyChargeUptoFiftyPer || 0) / 100;
-          const dutyPercentage = dutyRes?.duty_percentages?.[0] || 0;
-          console.log(dutyPercentage,'%%%%%%%%%%%%%')
-          const fixedAmount = contract_demand_difference * monthlyFixedCharge;
-          const energyAmount = Math.round(contract_demand_difference * unitPerKva * energyRate);
-          const fppasAmount = Math.round(energyAmount * fppasRateNew);
-          const dutyAmount = Math.round(((energyAmount + fppasAmount) * dutyPercentage) / 100);
-          const totalChargesAmount = Math.round(fixedAmount + energyAmount + fppasAmount + dutyAmount);
 
-          const sdDays = [48, 24, 189, 190, 1059, 1060, 1061, 1062, 3, 4, 5, 16, 37, 52, 1063, 1064].includes(Number(connection_purpose_id)) ? 90 : 45;
-          const totalSdDayAmount = Math.ceil((totalChargesAmount * sdDays) / 30);
-          const totalSdRequired = roundUpToNearest100(totalSdDayAmount);
 
-          const totalPayAbleAmount = totalSdRequired + totalSupplyAffording + registrationFeeCharges; // Same block me calculate
 
-          setCharges({
-            totalTranscoCharges,
-            totalDiscomCharges,
-            totalSupplyAffording,
+          if (!dutyRes || !chargeRes) {
+            throw new Error("SD Calculation API Failed");
+          }
+
+          const monthlyFixedCharge =
+            chargeRes?.list?.[0]?.monthlyFixedCharge || 0;
+
+          const energyRate =
+            (chargeRes?.list?.[0]?.energyChargeUptoFiftyPer || 0) / 100;
+
+          const dutyPercentage =
+            dutyRes?.duty_percentages?.[0] || 0;
+
+          const fixedAmount =
+            contract_demand_difference * monthlyFixedCharge;
+
+          const energyAmount =
+            Math.round(contract_demand_difference * unitPerKva * energyRate);
+
+          const fppasAmount =
+            Math.round(energyAmount * fppasRateNew);
+
+          const dutyAmount =
+            Math.round(((energyAmount + fppasAmount) * dutyPercentage) / 100);
+
+          const totalChargesAmount =
+            Math.round(fixedAmount + energyAmount + fppasAmount + dutyAmount);
+
+          const sdDays =
+            [48, 24, 189, 190, 1059, 1060, 1061, 1062, 3, 4, 5, 16, 37, 52, 1063, 1064]
+              .includes(Number(connection_purpose_id))
+              ? 90
+              : 45;
+
+          const totalSdDayAmount =
+            Math.ceil((totalChargesAmount * sdDays) / 30);
+
+          const totalSdRequired =
+            roundUpToNearest100(totalSdDayAmount);
+
+
+          const totalPayAbleAmount =
+            totalSdRequired +
+            totalSupplyAffording +
+            registrationFeeCharges;
+
+
+          setCharges(prev => ({
+            ...prev,
             fixedCharge: monthlyFixedCharge,
             fixedChargeAmount: fixedAmount,
             energyCharge: energyRate,
@@ -616,9 +673,31 @@ const LoadChangePay = () => {
             totalSdDayAmount,
             totalSdRequired,
             totalPayAbleAmount,
-          });
+          }));
+
         } catch (error) {
-          console.error('Charge Calculation Error', error);
+
+          console.error("SD Calculation Failed:", error);
+
+          if (retryCount < MAX_RETRY) {
+
+            setTimeout(() => {
+              setRetryCount(prev => prev + 1);
+            }, 2000);
+
+          } else {
+
+            setSdError(true);
+
+            setCharges(prev => ({
+              ...prev,
+              totalSdRequired: 0,
+              totalPayAbleAmount: prev.totalSupplyAffording + registrationFeeCharges
+            }));
+
+          }
+        } finally {
+          setSdLoading(false);   // ⭐ loader stop
         }
       };
 
@@ -630,6 +709,7 @@ const LoadChangePay = () => {
     new_contact_demand,
     connection_purpose_id,
     connection_category,
+    retryCount
   ]);
 
   console.log(charges, 'chargessssssss')
@@ -644,7 +724,7 @@ const LoadChangePay = () => {
         lc_type === 'Load_Enhancement_with_Downgrade_Voltage_Level'
       )
     ) {
-      alert('SD Required is mandatory. Please ensure Security Deposit is calculated.');
+   alert('Unable to fetch Security Deposit charges. again login  Applicant(Consumer) Portal and regenerate the  charges.');
       return; // ❌ STOP API CALL
     }
 
@@ -806,21 +886,72 @@ const LoadChangePay = () => {
                   <td className="px-6 py-4"> {charges.totalSupplyAffording}</td>
                 </tr> */}
 
-                    <tr>
-                      <th colSpan={6} className=" bg-[#0c0d52] text-white px-6 py-3 text-sm font-medium text-center text-gray-500 uppercase text-white">
-                        Security Deposit Charges (SD)
-                      </th>
-                    </tr>
                     <tr className="transition-all hover:bg-gray-100 hover:shadow-lg">
                       <td className="px-6 py-4">Type of Fee</td>
                       <td className="px-6 py-4">Security Deposit (SD)</td>
                       <td className="px-6 py-4">Account Head</td>
-                      <td className="px-6 py-4">{connection_type === "Permanent" ? 48.151 : 48.400}</td>
-                      <td className="px-6 py-4">Security Deposit Amount</td>
                       <td className="px-6 py-4">
-                        {charges.totalSdRequired}
+                        {connection_type === "Permanent" ? 48.151 : 48.400}
                       </td>
+                      <td className="px-6 py-4">Security Deposit Amount</td>
+
+                      <td className="px-6 py-4">
+
+                        {sdLoading ? (
+
+                          <div className="flex items-center gap-2 text-blue-600 justify-center">
+
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+
+                            <span>Calculating SD...</span>
+
+                          </div>
+
+                        ) : (
+
+                          charges.totalSdRequired
+
+                        )}
+
+                      </td>
+
                     </tr>
+
+
+                    {/* SD Error Row */}
+                    {sdError && (
+
+                      <tr>
+
+                        <td colSpan={6} className="text-center p-4 bg-red-50 border">
+
+                          <p className="text-red-600 font-semibold mb-2">
+
+                            Security Deposit calculation failed. Please regenerate Security Deposit.
+
+                          </p>
+
+                          <button
+                            disabled={sdLoading}
+                            onClick={() => {
+                              setRetryCount(0);
+                              setSdError(false);
+                              setRetryCount(prev => prev + 1);
+                            }}
+                            className={`px-4 py-2 text-white rounded
+                              ${sdLoading ? "bg-gray-400" : "bg-blue-600"}
+                                    `}
+                          >
+
+                            {sdLoading ? "Calculating..." : "Fetch SD"}
+
+                          </button>
+
+                        </td>
+
+                      </tr>
+
+                    )}
                   </>
                 )}
                 <tr className="transition-all hover:bg-gray-100 hover:shadow-lg">
@@ -862,6 +993,12 @@ const LoadChangePay = () => {
 };
 
 export default LoadChangePay;
+
+
+
+
+
+
 
 
 

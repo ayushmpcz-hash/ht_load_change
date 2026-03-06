@@ -2,6 +2,7 @@ import React, { Children } from 'react';
 import { NavLink } from 'react-router-dom';
 // import { HT_HOME_URL } from '../api/api'
 ('use client');
+import { HT_NSC_DASHBOARD_URL } from "../api/api"
 
 import { useState } from 'react';
 import {
@@ -71,7 +72,7 @@ export default function NavBar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
 
-// console.log(HT_HOME_URL,"HT_HOME_URLLLLLLLLl")
+  // console.log(HT_HOME_URL,"HT_HOME_URLLLLLLLLl")
   return (
     <header className="relative w-full bg-[#1B4560] p-1">
       <nav aria-label="Global" className="flex items-start justify-start">
@@ -147,7 +148,7 @@ export default function NavBar() {
             Home
           </NavLink> */}
           <a
-            href={"https://htsanyojan.mpcz.in:8089"}
+            href={`${HT_NSC_DASHBOARD_URL}`}
             className="text-base font-medium text-white capitalize p-4 hover:bg-[#45c4e9]"
           >
             Home
@@ -198,12 +199,12 @@ export default function NavBar() {
 
 
 
-          <NavLink
+          {/* <NavLink
             to="department-login"
             className="text-base font-medium text-white capitalize p-4 hover:bg-[#45c4e9]"
           >
             Department Login
-          </NavLink>
+          </NavLink> */}
           <NavLink
             to="applicant-login"
             className="text-base font-medium text-white capitalize p-4 hover:bg-[#45c4e9]"

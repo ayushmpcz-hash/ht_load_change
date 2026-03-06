@@ -665,7 +665,7 @@ const LoadSanction = () => {
   }, [new_ct_ratio, resetField]);
 
   useEffect(() => {
-    if (HIGH_VOLT && !items?.transco_approval) {
+    if (HIGH_VOLT && !items?.transco_approval && !items?.edcra_approval) {
       setRadioOptions([
         { label: 'EDCRA Required', value: 'is_EDCRA_required' }
       ])
@@ -857,7 +857,7 @@ const LoadSanction = () => {
       setBtnIsDisabled(false);
     }
   };
-
+console.log(items,'items')
 
   return (
     <>
@@ -886,7 +886,7 @@ const LoadSanction = () => {
 
           <div class="card mt-2 mb-2 bg-white rounded shadow-md ">
             <div className="card-header px-4 py-2 border-b border-gray-300">
-              <h2 className="text-lg font-bold capitalize ">{HIGH_VOLT && !items?.transco_approval ? "Forward to CGM Region for Approval" : "Required ME Details.."}</h2>
+              <h2 className="text-lg font-bold capitalize ">{HIGH_VOLT && !items?.transco_approval && !items?.edcra_approval ? "Forward to CGM Region for EDCRA Approval" : "Required ME Details.."}</h2>
             </div>
             <div className="card-body px-4 pb-4">
               {/* <div className=" grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6"> */}
@@ -907,7 +907,7 @@ const LoadSanction = () => {
                     value={officerData?.employee_detail.employee_login_id}
                   ></input>
                   <SelectTag
-                    LName={HIGH_VOLT && !items?.transco_approval ? "Forward to CGM Region for Approval" : "Load Acceptance"}
+                    LName={HIGH_VOLT && !items?.transco_approval && !items?.edcra_approval ? "Forward to CGM Region for EDCRA Approval" : "Load Acceptance"}
                     options={responseOption}
                     {...register('load_sanction_response', {
                       required: 'Please Select Load Acceptance is required',
@@ -921,7 +921,7 @@ const LoadSanction = () => {
                     load_sanction_response === 'Accepted' && (
                       <>
                         {/* HIGH VOLTAGE CASE (>33kV) */}
-                        {HIGH_VOLT && !items?.transco_approval ? (
+                        {HIGH_VOLT && !items?.transco_approval && !items?.edcra_approval? (
                           <>
                             {/* Only one radio button */}
 
@@ -931,6 +931,27 @@ const LoadSanction = () => {
                               errorMsg={errors.is_required?.message}
                               disabled={isDisabled}
                             />
+
+                             <InputTag
+                              LName="Accept Remark"
+                              placeholder="Please Enter Accept Remark"
+                              {...register("accept_remark", {
+                                required: "Accept Remark is required",
+                              })}
+                              errorMsg={errors.accept_remark?.message}
+                              disabled={isDisabled}
+                            />
+
+                               <InputTag
+                                LName="Upload Letter"
+                                type="file"
+                                acceptPdfOnly={true}
+                                {...register("gm_upload_pdf", {
+                                  required: "Upload Letter is required",
+                                })}
+                                errorMsg={errors.draft_agreement_pdf?.message}
+                                disabled={isDisabled}
+                              />
                           </>
                         ) : (
                           <>
@@ -981,6 +1002,7 @@ const LoadSanction = () => {
                               <InputTag
                                 LName="Draft Agreement Letter"
                                 type="file"
+                                acceptPdfOnly={true}
                                 {...register("draft_agreement_pdf", {
                                   required: "Upload Agreement Letter is required",
                                 })}
@@ -1022,6 +1044,7 @@ const LoadSanction = () => {
                         <InputTag
                           LName="Upload Revert Docs"
                           type="file"
+                          acceptPdfOnly={true}
                           {...register("upload_revert_docs", {
                             required: "Upload Upload Revert Docs is required",
                           })}

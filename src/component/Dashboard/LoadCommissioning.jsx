@@ -1,6 +1,6 @@
 // import React, { useEffect, useState } from 'react';
 // import axios from 'axios';
-// import { useSelector,useDispatch } from 'react-redux';
+// import { useSelector, useDispatch } from 'react-redux';
 // import { useNavigate, useLocation, useParams } from 'react-router-dom';
 // import Cookies from 'js-cookie';
 // import { useForm } from 'react-hook-form';
@@ -45,93 +45,240 @@
 //   const [formDataValue, setFormDataValue] = useState(null);
 //   const [isDisabled, setIsDisabled] = useState(false);
 //   const [isBtnDisabled, setBtnIsDisabled] = useState(false);
+
+//   const [timer, setTimer] = useState(0);
+//   const [isOtpExpired, setIsOtpExpired] = useState(false);
+//   const [isProcessing, setIsProcessing] = useState(false);
+//   const [isSendOtpLoading, setIsSendOtpLoading] = useState(false);
+
 //   const bi_cell_response = watch('bi_cell_response');
 
 //   const dispatch = useDispatch()
 
-//     useEffect(() => {
+//   //timer
+//   useEffect(() => {
+//     let interval;
+
+//     if (timer > 0 && !isProcessing) {
+//       interval = setInterval(() => {
+//         setTimer(prev => prev - 1);
+//       }, 1000);
+//     }
+
+//     if (timer === 0 && showOtpBtn && !isProcessing) {
+//       setIsOtpExpired(true);
+//     }
+
+//     return () => clearInterval(interval);
+//   }, [timer, showOtpBtn, isProcessing]);
+
+//   const formatTime = sec => {
+//     const m = String(Math.floor(sec / 60)).padStart(2, "0");
+//     const s = String(sec % 60).padStart(2, "0");
+//     return `${m}:${s}`;
+//   };
+
+
+//   useEffect(() => {
 //     if (officerData?.employee_detail?.cug_mobile) {
 //       setMobileNo(officerData.employee_detail.cug_mobile);
 //     }
 //   }, [officerData]);
 
 //   // 🔹 Send OTP
-//   const handleSendOtp = async formData => {
-//     setFormDataValue(formData);
-//     console.log(mobileNo,'mobile nooooo')
-//     const sentOtp = await sendOtpNew(mobileNo);
-//     if (sentOtp.success) {
-//       setShowOtpBtn(true);
-//       setIsDisabled(true);
-//       setError('otpSuccess', { type: 'manual', message: sentOtp.message });
-//     } else {
-//       setError('otpStatus', { type: 'manual', message: sentOtp.message });
+//   // const handleSendOtp = async formData => {
+//   //   setFormDataValue(formData);
+//   //   console.log(mobileNo, 'mobile nooooo')
+//   //   const sentOtp = await sendOtpNew(mobileNo);
+//   //   if (sentOtp.success) {
+//   //     setShowOtpBtn(true);
+//   //     setIsDisabled(true);
+//   //     setError('otpSuccess', { type: 'manual', message: sentOtp.message });
+//   //   } else {
+//   //     setError('otpStatus', { type: 'manual', message: sentOtp.message });
+//   //   }
+//   // };
+//   const handleSendOtp = async () => {
+//     if (isSendOtpLoading) return;
+
+//     if (!mobileNo || mobileNo.length !== 10) {
+//       setError("otpStatus", {
+//         type: "manual",
+//         message: "Mobile number not available. Please reload dashboard.",
+//       });
+//       return;
+//     }
+
+//     setIsSendOtpLoading(true);
+//     clearErrors();
+
+//     try {
+//       const res = await sendOtpNew(mobileNo);
+
+//       if (res.success) {
+//         setShowOtpBtn(true);
+//         setIsDisabled(true);
+
+//         setTimer(120);
+//         setIsOtpExpired(false);
+
+//         setError("otpSuccess", { type: "manual", message: res.message });
+//       } else {
+//         setError("otpStatus", { type: "manual", message: res.message });
+//       }
+//     } finally {
+//       setIsSendOtpLoading(false);
 //     }
 //   };
 
-//   // 🔹 Verify OTP
-//   const handleVerifyOtp = async () => {
-//     const otpValue = getValues('otp');
-//     setBtnIsDisabled(true);
-//     const verifyOtpResponse = await verifyOtpNew(mobileNo, otpValue);
 
-//     if (verifyOtpResponse.success) {
-//       handleFinalSubmit();
+//   // 🔹 Verify OTP
+//   // const handleVerifyOtp = async () => {
+//   //   const otpValue = getValues('otp');
+//   //   setBtnIsDisabled(true);
+//   //   const verifyOtpResponse = await verifyOtpNew(mobileNo, otpValue);
+
+//   //   if (verifyOtpResponse.success) {
+//   //     handleFinalSubmit();
+//   //   } else {
+//   //     setError('otp', { type: 'manual', message: verifyOtpResponse.error });
+//   //     setBtnIsDisabled(false);
+//   //   }
+//   // };
+//   const handleVerifyOtp = async () => {
+//     if (isOtpExpired) {
+//       setError("otp", {
+//         type: "manual",
+//         message: "OTP expired. Please resend OTP.",
+//       });
+//       return;
+//     }
+
+//     const otpValue = getValues("otp");
+//     setBtnIsDisabled(true);
+
+//     const res = await verifyOtpNew(mobileNo, otpValue);
+
+//     if (res.success) {
+//       setIsProcessing(true);   // ⭐ PROCESSING START
+//       setTimer(0);
+//       setShowOtpBtn(false);
+
+//       await handleFinalSubmit();   // ⭐ IMPORTANT (await)
 //     } else {
-//       setError('otp', { type: 'manual', message: verifyOtpResponse.error });
+//       setError("otp", { type: "manual", message: res.error });
 //       setBtnIsDisabled(false);
 //     }
 //   };
 
-//   // 🔹 Resend OTP
-//   const handleReSendOtp = async () => {
-//     clearErrors('otpSuccess');
-//     const sentOtp = await sendOtpNew(mobileNo);
-//     setShowOtpBtn(true);
 
-//     if (sentOtp.success) {
-//       setError('otpSuccess', {
-//         type: 'manual',
-//         message: `OTP Resent successfully to ****${mobileNo.slice(-4)}`,
+//   // 🔹 Resend OTP
+//   // const handleReSendOtp = async () => {
+//   //   clearErrors('otpSuccess');
+//   //   const sentOtp = await sendOtpNew(mobileNo);
+//   //   setShowOtpBtn(true);
+
+//   //   if (sentOtp.success) {
+//   //     setError('otpSuccess', {
+//   //       type: 'manual',
+//   //       message: `OTP Resent successfully to ****${mobileNo.slice(-4)}`,
+//   //     });
+//   //   } else {
+//   //     setError('otp', {
+//   //       type: 'manual',
+//   //       message: `Failed to send OTP on ****${mobileNo.slice(-4)}`,
+//   //     });
+//   //   }
+//   // };
+//   const handleReSendOtp = async () => {
+//     clearErrors();
+
+//     const res = await sendOtpNew(mobileNo);
+
+//     if (res.success) {
+//       setTimer(120);
+//       setIsOtpExpired(false);
+
+//       setError("otpSuccess", {
+//         type: "manual",
+//         message: `OTP resent to ****${mobileNo.slice(-4)}`,
 //       });
 //     } else {
-//       setError('otp', {
-//         type: 'manual',
-//         message: `Failed to send OTP on ****${mobileNo.slice(-4)}`,
-//       });
+//       setError("otp", { type: "manual", message: res.message });
 //     }
 //   };
 
+
 //   // 🔹 Final Submit API Call
+//   // const handleFinalSubmit = async () => {
+//   //   try {
+//   //     const formValue = formDataValue;
+//   //     const formData = new FormData();
+
+//   //     Object.keys(formValue).forEach(key => {
+//   //       if (formValue[key] instanceof FileList && formValue[key].length > 0) {
+//   //         formData.append(key, formValue[key][0]);
+//   //       } else {
+//   //         formData.append(key, formValue[key]);
+//   //       }
+//   //     });
+
+//   //     const { data } = await axios.post(`${HT_LOAD_CHANGE_BASE}/bicell-response/`, formData, {
+//   //       headers: { Authorization: `Bearer ${token}` },
+//   //     });
+
+//   //     alert('Commissioning Successfully ✅');
+//   //     navigate(`/dashboard/respones/${data.data.application}`, { state: data });
+//   //     const updatedFlags = await handleOfficerFlagCount();
+//   //     dispatch(setOfficerData(updatedFlags));
+//   //   } catch (error) {
+//   //     if (handleTokenExpiry(error, navigate)) return;
+//   //     console.error('API Error:', error);
+//   //     alert('Something went wrong ❌');
+//   //   } finally {
+//   //     setBtnIsDisabled(false);
+//   //   }
+//   // };
 //   const handleFinalSubmit = async () => {
 //     try {
-//       const formValue = formDataValue;
+//       const formValue = getValues();   // ⭐ stale data fix
 //       const formData = new FormData();
 
-//       Object.keys(formValue).forEach(key => {
-//         if (formValue[key] instanceof FileList && formValue[key].length > 0) {
-//           formData.append(key, formValue[key][0]);
-//         } else {
-//           formData.append(key, formValue[key]);
+//       Object.entries(formValue).forEach(([key, value]) => {
+//         if (value instanceof FileList && value.length > 0) {
+//           formData.append(key, value[0]);
+//           return;
+//         }
+//         if (value !== undefined && value !== null && value !== "") {
+//           formData.append(key, value);
 //         }
 //       });
 
-//       const { data } = await axios.post(`${HT_LOAD_CHANGE_BASE}/bicell-response/`, formData, {
-//         headers: { Authorization: `Bearer ${token}` },
+//       const { data } = await axios.post(
+//         `${HT_LOAD_CHANGE_BASE}/bicell-response/`,
+//         formData,
+//         { headers: { Authorization: `Bearer ${token}` } }
+//       );
+
+//       alert("Commissioning Successfully ✅");
+
+//       navigate(`/dashboard/respones/${data.data.application}`, {
+//         state: data.data,
 //       });
 
-//       alert('Commissioning Successfully ✅');
-//       navigate(`/dashboard/respones/${data.data.application}`, { state: data });
 //       const updatedFlags = await handleOfficerFlagCount();
 //       dispatch(setOfficerData(updatedFlags));
 //     } catch (error) {
 //       if (handleTokenExpiry(error, navigate)) return;
-//       console.error('API Error:', error);
-//       alert('Something went wrong ❌');
+
+//       console.error("API Error:", error);
+//       alert("Something went wrong ❌");
 //     } finally {
 //       setBtnIsDisabled(false);
+//       setIsProcessing(false);   // ⭐ stop processing
 //     }
 //   };
+
 //   return (
 //     <>
 //       <div>
@@ -173,6 +320,17 @@
 //                       />
 //                       {bi_cell_response === 'Accepted' && (
 //                         <>
+
+//                           <InputTag
+//                             LName="MD Reading Date"
+//                             type="date"
+//                             {...register("md_reset_date", {
+//                               required: "MD Reading Date is required",
+//                             })}
+//                             errorMsg={errors.md_reading_date?.message}
+//                             disabled={isDisabled}
+//                           />
+
 //                           <InputTag
 //                             LName=" Import  KVA"
 //                             {...register('import_meter_reading_kva', {
@@ -191,7 +349,7 @@
 //                             disabled={isDisabled}
 //                             placeholder={' Enter Import Meter Reading KVAH'}
 //                           />
-//                            <InputTag
+//                           <InputTag
 //                             LName=" Import  KWH"
 //                             {...register('import_meter_reading_kwh', {
 //                               required: 'Import Meter Reading KWH is required',
@@ -256,7 +414,7 @@
 //                                 disabled={isDisabled}
 //                                 placeholder={' Enter Export Meter Reading KVAH'}
 //                               />
-//                                 <InputTag
+//                               <InputTag
 //                                 LName=" Export KWH"
 //                                 {...register('export_meter_reading_kwh', {
 //                                   required: 'Export Meter Reading KWH is required',
@@ -355,7 +513,7 @@
 //                   <div className="border-b border-gray-900/10 pb-12">
 //                     <div className="mt-10 flex flex-col justify-center items-center">
 //                       <div className="flex space-x-2 space-y-2 flex-wrap justify-center items-baseline">
-//                         {!showOtpBtn ? (
+//                         {/* {!showOtpBtn ? (
 //                           <>
 //                             <button
 //                               type="reset"
@@ -366,8 +524,8 @@
 //                             <button
 //                               type="submit" // ✅ Yeh important hai, warna handleSendOtp call nahi hota
 //                               className={`px-4 py-2 rounded text-white ${isDisabled
-//                                   ? 'bg-gray-400 cursor-not-allowed'
-//                                   : 'bg-green-500 hover:bg-purple-800'
+//                                 ? 'bg-gray-400 cursor-not-allowed'
+//                                 : 'bg-green-500 hover:bg-purple-800'
 //                                 }`}
 //                               disabled={isDisabled}
 //                             >
@@ -388,8 +546,8 @@
 //                               type="button"
 //                               onClick={handleVerifyOtp}
 //                               className={`px-4 py-2 rounded text-white ${isBtnDisabled
-//                                   ? 'bg-gray-400 cursor-not-allowed'
-//                                   : 'bg-green-600 hover:bg-purple-800'
+//                                 ? 'bg-gray-400 cursor-not-allowed'
+//                                 : 'bg-green-600 hover:bg-purple-800'
 //                                 }`}
 //                               disabled={isBtnDisabled}
 //                             >
@@ -403,7 +561,68 @@
 //                               Resend OTP
 //                             </button>
 //                           </>
+//                         )} */}
+//                         {!showOtpBtn ? (
+//                           <>
+//                             <button type="reset" className="px-4 py-2 bg-blue-500 text-white rounded-lg">
+//                               Reset
+//                             </button>
+
+//                             <button
+//                               type="submit"
+//                               disabled={isSendOtpLoading || isBtnDisabled}
+//                               className={`px-4 py-2 rounded text-white ${isSendOtpLoading || isBtnDisabled
+//                                   ? "bg-gray-400 cursor-not-allowed"
+//                                   : "bg-green-500 hover:bg-purple-800"
+//                                 }`}
+//                             >
+//                               {isSendOtpLoading
+//                                 ? "Please wait..."
+//                                 : bi_cell_response === "Accepted"
+//                                   ? "Send for Connection Served"
+//                                   : "Send for Commissioning"}
+//                             </button>
+//                           </>
+//                         ) : showOtpBtn && !isProcessing ? (
+//                           <>
+//                             <InputTag
+//                               placeholder="Enter OTP"
+//                               {...register("otp", { required: "Otp is required" })}
+//                               errorMsg={errors.otp?.message}
+//                             />
+
+//                             <p className="text-red-600 font-semibold text-sm mt-1">
+//                               {timer > 0
+//                                 ? `OTP expires in ${formatTime(timer)}`
+//                                 : "OTP expired. Please resend OTP."}
+//                             </p>
+
+//                             <button
+//                               type="button"
+//                               onClick={handleVerifyOtp}
+//                               disabled={isBtnDisabled || isOtpExpired}
+//                               className={`px-4 py-2 rounded text-white ${isBtnDisabled || isOtpExpired
+//                                   ? "bg-gray-400 cursor-not-allowed"
+//                                   : "bg-green-600 hover:bg-purple-800"
+//                                 }`}
+//                             >
+//                               {isBtnDisabled ? "Verifying..." : "Verify OTP"}
+//                             </button>
+
+//                             <button
+//                               type="button"
+//                               onClick={handleReSendOtp}
+//                               className="px-4 py-2 bg-emerald-600 text-white rounded"
+//                             >
+//                               Resend OTP
+//                             </button>
+//                           </>
+//                         ) : (
+//                           <p className="text-blue-700 font-semibold mt-2 animate-pulse">
+//                             Processing... Please wait
+//                           </p>
 //                         )}
+
 //                       </div>
 //                       {/* Error & Success messages */}
 //                       {errors?.otpSuccess && (
@@ -437,7 +656,16 @@ import {
   InputTag,
   sendOtpNew,
   verifyOtpNew,
+  getNgbToken,
+  getFinalUsingDataToken
 } from '../importComponents.js';
+
+import {
+  NGB_PRO_BASE,
+  HT_NGB_ID,
+  HT_NGB_PASSWORD
+} from '../../api/api.js';
+
 import { responseOption, revertOption } from '../newComponents/commonOption.js';
 import { HT_LOAD_CHANGE_BASE } from '../../api/api.js';
 import { handleOfficerFlagCount } from "../../utils/handleOfficerFlagCount.js";
@@ -478,9 +706,210 @@ const LoadCommissioning = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSendOtpLoading, setIsSendOtpLoading] = useState(false);
 
+  // work completion new states
+  const [ngbToken, setNgbToken] = useState("");
+  const [allManufactures, setAllManufactures] = useState([]);
+  const [allMeterModels, setAllMeterModels] = useState([]);
+  const [allMeModels, setAllMeModels] = useState([]);
+  const [allCTRatios, setAllCTRatios] = useState([]);
+  const [allPTRatios, setAllPTRatios] = useState([]);
+
+  const meter_make = watch("meter_make");
+  const me_make = watch("me_make");
+  const meter_ct_ratio = watch("meter_ct_ratio");
+  const meter_pt_ratio = watch("meter_pt_ratio");
+
+  const me_ct_ratio = watch("me_ct_ratio");
+  const me_pt_ratio = watch("me_pt_ratio");
+
+
   const bi_cell_response = watch('bi_cell_response');
 
   const dispatch = useDispatch()
+
+  useEffect(() => {
+
+    const parseRatio = (val) => {
+
+      if (!val) return 0;
+
+      val = val.replace("`", "");
+
+      if (!val.includes("/")) return 0;
+
+      const [a, b] = val.split("/").map(Number);
+
+      if (!b) return 0;
+
+      return a / b;
+
+    };
+
+
+    // ratios live values से लेंगे
+
+    const meterCT = parseRatio(meter_ct_ratio);
+    const meterPT = parseRatio(meter_pt_ratio);
+
+    const meCT = parseRatio(me_ct_ratio);
+    const mePT = parseRatio(me_pt_ratio);
+
+
+    // dial factor consumer से fixed रहेगा
+
+    const dialFactor =
+      Number(items?.dial_factor || 1);
+
+
+    if (meterCT && meterPT && meCT && mePT) {
+
+      const mf =
+        (meCT * mePT) /
+        (meterCT * meterPT)
+        *
+        dialFactor;
+
+
+      setValue(
+        "new_mf",
+        mf.toFixed(2)
+      );
+
+    }
+
+
+  }, [
+    meter_ct_ratio,
+    meter_pt_ratio,
+    me_ct_ratio,
+    me_pt_ratio
+  ]);
+
+
+  useEffect(() => {
+
+    (async () => {
+
+      try {
+
+        const data = {
+          userId: HT_NGB_ID,
+          userPwd: HT_NGB_PASSWORD
+        };
+
+        const url = `${NGB_PRO_BASE}/login/verification`;
+
+        const response = await getNgbToken(data, url);
+
+        const token = response.headers.get("Authorization");
+
+        const cleanToken =
+          token.replace("Bearer ", "");
+
+        setNgbToken(cleanToken);
+
+
+        const manufactures =
+          await getFinalUsingDataToken(
+            `${NGB_PRO_BASE}/masters/getAllManufactures`,
+            cleanToken
+          );
+
+        setAllManufactures(manufactures.list);
+
+
+
+        const CTRatios =
+          await getFinalUsingDataToken(
+            `${NGB_PRO_BASE}/masters/getAllCTRatios`,
+            cleanToken
+          );
+
+        setAllCTRatios(CTRatios.list);
+
+
+
+        const PTRatios =
+          await getFinalUsingDataToken(
+            `${NGB_PRO_BASE}/masters/getAllPTRatios`,
+            cleanToken
+          );
+
+        setAllPTRatios(PTRatios.list);
+
+
+      } catch (err) {
+
+        console.log(err)
+
+      }
+
+    })()
+
+  }, [])
+
+  useEffect(() => {
+
+    if (!meter_make || !ngbToken) return;
+
+    (async () => {
+
+      const models =
+        await getFinalUsingDataToken(
+
+          `${NGB_PRO_BASE}/masters/getAllModelsByMeterManufacturer/${meter_make}`,
+
+          ngbToken
+
+        );
+
+      setAllMeterModels(models.list);
+
+    })();
+
+  }, [meter_make, ngbToken]);
+
+  useEffect(() => {
+
+    if (!me_make || !ngbToken) return;
+
+    (async () => {
+
+      const models =
+        await getFinalUsingDataToken(
+
+          `${NGB_PRO_BASE}/masters/getAllModelsByMeterManufacturer/${me_make}`,
+
+          ngbToken
+
+        );
+
+      setAllMeModels(models.list);
+
+    })();
+
+  }, [me_make, ngbToken]);
+
+
+
+  useEffect(() => {
+
+    if (items?.meter_issuing_work_completion) {
+
+      const wc =
+        items.meter_issuing_work_completion;
+
+      Object.keys(wc).forEach(key => {
+
+        setValue(key, wc[key])
+
+      })
+
+    }
+
+  }, [items]);
+
+
 
   //timer
   useEffect(() => {
@@ -759,6 +1188,62 @@ const LoadCommissioning = () => {
                           />
 
                           <InputTag
+                            LName="ME Serial No."
+                            placeholder="Enter Agreement No."
+                            {...register('me_serial_no', {
+                              required: 'ME Serial No is required',
+                            })}
+                            errorMsg={errors.me_serial_no?.message}
+                            disabled={isDisabled}
+                          />
+
+                          <SelectTag
+                            LName="ME Make"
+                            options={allManufactures}
+                            {...register("me_make")}
+                            labelKey="meterManufacturerName"
+                            valueKey="meterMakeDetailId"
+                          />
+
+                          <SelectTag
+                            LName="ME Model"
+                            options={allMeModels}
+                            {...register("me_model")}
+                            labelKey="meterModelName"
+                            valueKey="meterModelName"
+                          />
+
+                          <SelectTag
+                            LName="ME CT Ratio"
+                            options={allCTRatios}
+                            {...register("me_ct_ratio")}
+                            labelKey="charVal"
+                            valueKey="charVal"
+                          />
+
+                          <SelectTag
+                            LName="ME PT Ratio"
+                            options={allPTRatios}
+                            {...register("me_pt_ratio")}
+                            labelKey="charVal"
+                            valueKey="charVal"
+                          />
+
+                          <InputTag
+                            LName="Dial Factor"
+                            {...register("dial_factor")}
+                            disabled={true}
+                          />
+
+                          {/* new work completion fields added  */}
+                          <InputTag
+                            LName="New MF"
+                            placeholder="Auto Calculated"
+                            {...register("new_mf")}
+                            disabled={true}
+                          />
+
+                          <InputTag
                             LName=" Import  KVA"
                             {...register('import_meter_reading_kva', {
                               required: 'Import Meter Reading KVA is required',
@@ -785,6 +1270,7 @@ const LoadCommissioning = () => {
                             disabled={isDisabled}
                             placeholder={' Enter Import Meter Reading KWH'}
                           />
+
                           <InputTag
                             LName=" Import TOD1"
                             {...register('import_meter_reading_tod1', {
@@ -794,6 +1280,7 @@ const LoadCommissioning = () => {
                             disabled={isDisabled}
                             placeholder={' Enter Import Meter Reading TOD1'}
                           />
+
                           <InputTag
                             LName=" Import  TOD2"
                             {...register('import_meter_reading_tod2', {
@@ -821,6 +1308,40 @@ const LoadCommissioning = () => {
                             disabled={isDisabled}
                             placeholder={' Enter Import Meter Reading TOD4'}
                           />
+
+                          {/* new work completion fields added  */}
+                          {/* <SelectTag
+                            LName="Meter Make"
+                            options={allManufactures}
+                            {...register("meter_make")}
+                            labelKey="meterManufacturerName"
+                            valueKey="meterMakeDetailId"
+                          />
+
+                          <SelectTag
+                            LName="Meter Model"
+                            options={allMeterModels}
+                            {...register("meter_model")}
+                            labelKey="meterModelName"
+                            valueKey="meterModelName"
+                          />
+
+                          <SelectTag
+                            LName="Meter CT Ratio"
+                            options={allCTRatios}
+                            {...register("meter_ct_ratio")}
+                            labelKey="charVal"
+                            valueKey="charVal"
+                          />
+
+                          <SelectTag
+                            LName="Meter PT Ratio"
+                            options={allPTRatios}
+                            {...register("meter_pt_ratio")}
+                            labelKey="charVal"
+                            valueKey="charVal"
+                          /> */}
+
                           {items?.meter_type === 'HT Net Meter' && (
                             <>
                               <InputTag
@@ -887,17 +1408,30 @@ const LoadCommissioning = () => {
                                 placeholder={' Enter Export Meter Reading TOD4'}
                               />
 
-                              <InputTag
+                              {/* <InputTag
                                 LName="Commissioning pdf"
                                 type="file"
+                                acceptPdfOnly={true}
                                 {...register("agreement_doc", {
                                   required: "Agreement Letter is required",
                                 })}
                                 errorMsg={errors.agreement_doc?.message}
                                 disabled={isDisabled}
-                              />
+                              /> */}
                             </>
                           )}
+
+                          {/* -------- COMMISSIONING FILES -------- */}
+                          <InputTag
+                            LName="Commissioning Report Upload"
+                            type="file"
+                            acceptPdfOnly={true}
+                            {...register("commissioning_report_upload", {
+                              required: "Commissioning report is required",
+                            })}
+                            errorMsg={errors.commissioning_report?.message}
+                            disabled={isDisabled}
+                          />
                         </>
                       )}
 
@@ -927,6 +1461,7 @@ const LoadCommissioning = () => {
                           <InputTag
                             LName="Upload Revert Docs"
                             type="file"
+                            acceptPdfOnly={true}
                             {...register('upload_revert_docs', {
                               required: 'Revert Docs are required',
                             })}
@@ -999,8 +1534,8 @@ const LoadCommissioning = () => {
                               type="submit"
                               disabled={isSendOtpLoading || isBtnDisabled}
                               className={`px-4 py-2 rounded text-white ${isSendOtpLoading || isBtnDisabled
-                                  ? "bg-gray-400 cursor-not-allowed"
-                                  : "bg-green-500 hover:bg-purple-800"
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-green-500 hover:bg-purple-800"
                                 }`}
                             >
                               {isSendOtpLoading
@@ -1029,8 +1564,8 @@ const LoadCommissioning = () => {
                               onClick={handleVerifyOtp}
                               disabled={isBtnDisabled || isOtpExpired}
                               className={`px-4 py-2 rounded text-white ${isBtnDisabled || isOtpExpired
-                                  ? "bg-gray-400 cursor-not-allowed"
-                                  : "bg-green-600 hover:bg-purple-800"
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-green-600 hover:bg-purple-800"
                                 }`}
                             >
                               {isBtnDisabled ? "Verifying..." : "Verify OTP"}
@@ -1070,4 +1605,6 @@ const LoadCommissioning = () => {
   );
 };
 export default LoadCommissioning;
+
+
 
