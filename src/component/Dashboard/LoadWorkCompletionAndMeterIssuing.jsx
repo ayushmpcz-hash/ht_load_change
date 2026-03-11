@@ -160,7 +160,7 @@ const LoadWorkCompletionAndMeterIssuing = () => {
         console.error('Error fetching NGB token:', err.message || err);
       }
     })();
-  }, []);
+  }, [ ]);
 
   useEffect(() => {
     (async () => {

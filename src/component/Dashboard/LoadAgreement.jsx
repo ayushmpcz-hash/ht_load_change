@@ -1,5 +1,6 @@
-// import React, { useState,useEffect } from "react";
-// import { useSelector,useDispatch } from "react-redux";
+//old code
+// import React, { useState, useEffect } from "react";
+// import { useSelector, useDispatch } from "react-redux";
 // import { useLocation, useNavigate, Link } from "react-router-dom";
 // import { useForm } from "react-hook-form";
 // import Cookies from "js-cookie";
@@ -26,6 +27,10 @@
 //   const location = useLocation();
 //   const { items } = location.state || {};
 //   const [mobileNo, setMobileNo] = useState('');
+//   const [timer, setTimer] = useState(0);
+//   const [isOtpExpired, setIsOtpExpired] = useState(false);
+//   const [isProcessing, setIsProcessing] = useState(false);
+//   const [isSendOtpLoading, setIsSendOtpLoading] = useState(false);
 
 //   // console.log(items, "items")
 //   // console.log(HT_LOAD_CHANGE_BASE,'HT_LOAD_CHANGE_BASE in Load Aggrement')
@@ -67,121 +72,167 @@
 
 //   const agreement_response = watch("agreement_response");
 
-//  useEffect(() => {
+//   useEffect(() => {
+//     let interval;
+
+//     if (timer > 0 && !isProcessing) {
+//       interval = setInterval(() => {
+//         setTimer(prev => prev - 1);
+//       }, 1000);
+//     }
+
+//     if (timer === 0 && showOtpBtn && !isProcessing) {
+//       setIsOtpExpired(true);
+//     }
+
+//     return () => clearInterval(interval);
+//   }, [timer, showOtpBtn, isProcessing]);
+
+//   const formatTime = sec => {
+//     const m = String(Math.floor(sec / 60)).padStart(2, "0");
+//     const s = String(sec % 60).padStart(2, "0");
+//     return `${m}:${s}`;
+//   };
+
+
+//   useEffect(() => {
 //     if (officerData?.employee_detail?.cug_mobile) {
 //       setMobileNo(officerData.employee_detail.cug_mobile);
 //     }
 //   }, [officerData]);
 
 
-//   // 🔹 Send OTP
-//   // const handleSendOtp = async (formData) => {
-//   //   setFormDataValue(formData);
-//   //   console.log(mobileNo,'mobileNo0000000')
-//   //   const sentOtp = await sendOtpNew(mobileNo);
-//   //   if (sentOtp.success) {
-//   //     setShowOtpBtn(true);
-//   //     setIsDisabled(true);
-//   //     setError("otpSuccess", { type: "manual", message: sentOtp.message });
-//   //   } else {
-//   //     setError("otpStatus", { type: "manual", message: sentOtp.message });
-//   //   }
-//   // };
-//   const handleSendOtp = async (formData) => {
-//   setFormDataValue(formData);
+//   const handleSendOtp = async () => {
+//     if (isSendOtpLoading) return;
 
-//   // 🚨 BLOCK if mobile missing
-//   if (!mobileNo || mobileNo.length !== 10) {
-//     setError("otpStatus", {
-//       type: "manual",
-//       message: "Mobile number not available. Please reload dashboard.",
-//     });
-//     return;
-//   }
+//     if (!mobileNo || mobileNo.length !== 10) {
+//       setError("otpStatus", {
+//         type: "manual",
+//         message: "Mobile number not available. Please reload dashboard.",
+//       });
+//       return;
+//     }
 
-//   console.log("OTP sending to:", mobileNo);
+//     setIsSendOtpLoading(true);
+//     clearErrors();
 
-//   const sentOtp = await sendOtpNew(mobileNo);
+//     try {
+//       const res = await sendOtpNew(mobileNo);
 
-//   if (sentOtp.success) {
-//     setShowOtpBtn(true);
-//     setIsDisabled(true);
-//     setError("otpSuccess", { type: "manual", message: sentOtp.message });
-//   } else {
-//     setError("otpStatus", { type: "manual", message: sentOtp.message });
-//   }
-// };
+//       if (res.success) {
+//         setShowOtpBtn(true);
+//         setIsDisabled(true);
+//         setTimer(120);
+//         setIsOtpExpired(false);
+
+//         setError("otpSuccess", { type: "manual", message: res.message });
+//       } else {
+//         setError("otpStatus", { type: "manual", message: res.message });
+//       }
+//     } finally {
+//       setIsSendOtpLoading(false);
+//     }
+//   };
 
 
 //   // 🔹 Verify OTP
+//   // const handleVerifyOtp = async () => {
+//   //   const otpValue = getValues("otp");
+//   //   setBtnIsDisabled(true);
+//   //   const verifyOtpResponse = await verifyOtpNew(mobileNo, otpValue);
+
+//   //   if (verifyOtpResponse.success) {
+//   //     handleFinalSubmit();
+//   //   } else {
+//   //     setError("otp", { type: "manual", message: verifyOtpResponse.error });
+//   //     setBtnIsDisabled(false);
+//   //   }
+//   // };
 //   const handleVerifyOtp = async () => {
+//     if (isOtpExpired) {
+//       setError("otp", {
+//         type: "manual",
+//         message: "OTP expired. Please resend OTP.",
+//       });
+//       return;
+//     }
+
 //     const otpValue = getValues("otp");
 //     setBtnIsDisabled(true);
-//     const verifyOtpResponse = await verifyOtpNew(mobileNo, otpValue);
 
-//     if (verifyOtpResponse.success) {
-//       handleFinalSubmit();
+//     const res = await verifyOtpNew(mobileNo, otpValue);
+
+//     if (res.success) {
+//       setIsProcessing(true);
+//       setTimer(0);
+//       setShowOtpBtn(false);
+
+//       await handleFinalSubmit();
 //     } else {
-//       setError("otp", { type: "manual", message: verifyOtpResponse.error });
+//       setError("otp", { type: "manual", message: res.error });
 //       setBtnIsDisabled(false);
 //     }
 //   };
 
-//   // 🔹 Resend OTP
 //   const handleReSendOtp = async () => {
-//     clearErrors("otpSuccess");
-//     const sentOtp = await sendOtpNew(mobileNo);
-//     setShowOtpBtn(true);
+//     clearErrors();
 
-//     if (sentOtp.success) {
+//     const res = await sendOtpNew(mobileNo);
+
+//     if (res.success) {
+//       setTimer(120);
+//       setIsOtpExpired(false);
+
 //       setError("otpSuccess", {
 //         type: "manual",
-//         message: `OTP Resent successfully to ****${mobileNo.slice(-4)}`,
+//         message: `OTP resent to ****${mobileNo.slice(-4)}`,
 //       });
 //     } else {
-//       setError("otp", {
-//         type: "manual",
-//         message: `Failed to send OTP on ****${mobileNo.slice(-4)}`,
-//       });
+//       setError("otp", { type: "manual", message: res.message });
 //     }
 //   };
+
 
 //   // 🔹 Final Submit API Call
 //   const handleFinalSubmit = async () => {
 //     try {
-//       const formValue = formDataValue;
+//       const formValue = getValues();   // ⭐ FIXED
 //       const formData = new FormData();
 
-//       Object.keys(formValue).forEach((key) => {
-//         if (formValue[key] instanceof FileList && formValue[key].length > 0) {
-//           formData.append(key, formValue[key][0]);
-//         } else {
-//           formData.append(key, formValue[key]);
+//       Object.entries(formValue).forEach(([key, value]) => {
+//         if (value instanceof FileList && value.length > 0) {
+//           formData.append(key, value[0]);
+//           return;
+//         }
+//         if (value !== undefined && value !== null && value !== "") {
+//           formData.append(key, value);
 //         }
 //       });
-//        console.log(formData,'formData in aggrement')
+
 //       const { data } = await axios.post(
 //         `${HT_LOAD_CHANGE_BASE}/agreement-details/`,
 //         formData,
-//         {
-//           headers: { Authorization: `Bearer ${token}` },
-//         }
+//         { headers: { Authorization: `Bearer ${token}` } }
 //       );
 
 //       alert("Agreement And Work Order submitted successfully ✅");
-//       navigate(`/dashboard/respones/${data.data.application}`, { state: data });
+
+//       navigate(`/dashboard/respones/${data.data.application}`, {
+//         state: data.data,
+//       });
+
 //       const updatedFlags = await handleOfficerFlagCount();
 //       dispatch(setOfficerData(updatedFlags));
 //     } catch (error) {
-//         if (handleTokenExpiry(error, navigate)) return;
+//       if (handleTokenExpiry(error, navigate)) return;
 
-//       // normal error handling
 //       console.error(error);
 //       alert("Something went wrong ❌");
 //     } finally {
 //       setBtnIsDisabled(false);
 //     }
 //   };
+
 
 //   return (
 //     <>
@@ -295,6 +346,7 @@
 //                           <InputTag
 //                             LName="Final Agreement pdf"
 //                             type="file"
+//                             acceptPdfOnly={true}
 //                             {...register("agreement_doc", {
 //                               required: "Agreement Letter is required",
 //                             })}
@@ -302,7 +354,8 @@
 //                             disabled={isDisabled}
 //                           />
 
-//                           {required?.includes('is_extension_work_required') && (<>
+//                           {required?.includes('is_extension_work_required') && (
+//                             <>
 //                             <InputTag
 //                               LName="Extension Work Order No."
 //                               placeholder="Enter Extension Work Order No."
@@ -324,6 +377,7 @@
 //                             <InputTag
 //                               LName="Extension Work Order Letter"
 //                               type="file"
+//                               acceptPdfOnly={true}
 //                               {...register("ex_work_order_docs", {
 //                                 required: " Extension Work Order Letter is required",
 //                               })}
@@ -367,6 +421,7 @@
 //                             <InputTag
 //                               LName="ME Meter Work Order Letter"
 //                               type="file"
+//                               acceptPdfOnly={true}
 //                               {...register("me_meter_work_order_docs", {
 //                                 required: "ME Meter Work Order Letter is required",
 //                               })}
@@ -380,6 +435,7 @@
 //                             <InputTag
 //                               LName="Upload Commissioning Permission letter"
 //                               type="file"
+//                               acceptPdfOnly={true}
 //                               {...register("commissioning_permission_doc", {
 //                                 required: "Commissioning Permission letter is required",
 //                               })}
@@ -417,6 +473,7 @@
 //                           <InputTag
 //                             LName="Upload Revert Docs"
 //                             type="file"
+//                             acceptPdfOnly={true}
 //                             {...register("upload_revert_docs", {
 //                               required: "Revert Docs are required",
 //                             })}
@@ -436,19 +493,20 @@
 //                             <button type="reset" className="px-4 py-2 bg-blue-500 text-white rounded-lg">
 //                               Reset
 //                             </button>
+
 //                             <button
-//                               type="submit" // ✅ Yeh important hai, warna handleSendOtp call nahi hota
-//                               className={`px-4 py-2 rounded text-white ${isDisabled
-//                                 ? "bg-gray-400 cursor-not-allowed"
-//                                 : "bg-green-500 hover:bg-purple-800"
+//                               type="submit"
+//                               disabled={isSendOtpLoading}
+//                               className={`px-4 py-2 rounded text-white ${isSendOtpLoading || isBtnDisabled
+//                                   ? "bg-gray-400 cursor-not-allowed"
+//                                   : "bg-green-500 hover:bg-purple-800"
 //                                 }`}
-//                               disabled={isDisabled}
 //                             >
-//                               {
-//                                 agreement_response === "Reverted"
+//                               {isSendOtpLoading
+//                                 ? "Please wait..."
+//                                 : agreement_response === "Reverted"
 //                                   ? "Revert For Demand note"
-//                                   : agreement_response === "Accepted" &&
-//                                     required?.includes("is_me_meter_required")
+//                                   : agreement_response === "Accepted" && required?.includes("is_me_meter_required")
 //                                     ? "Send for Meter Issue"
 //                                     : agreement_response === "Accepted" &&
 //                                       (items?.load_sanction?.is_required === "is_agreement_required" ||
@@ -460,30 +518,35 @@
 //                                           items?.survey?.is_required === "is_agreement_required") &&
 //                                         items?.type_of_change === "Load_Reduction"
 //                                         ? "Send for Completion certifying"
-//                                         : "Send for Completion Certifying"
-//                               }
-
+//                                         : "Send for Completion Certifying"}
 //                             </button>
 //                           </>
-//                         ) : (
+//                         ) : showOtpBtn && !isProcessing ? (
 //                           <>
 //                             <InputTag
-//                               LName=""
 //                               placeholder="Enter OTP"
 //                               {...register("otp", { required: "Otp is required" })}
 //                               errorMsg={errors.otp?.message}
 //                             />
+
+//                             <p className="text-red-600 font-semibold text-sm mt-1">
+//                               {timer > 0
+//                                 ? `OTP expires in ${formatTime(timer)}`
+//                                 : "OTP expired. Please resend OTP."}
+//                             </p>
+
 //                             <button
 //                               type="button"
 //                               onClick={handleVerifyOtp}
-//                               className={`px-4 py-2 rounded text-white ${isBtnDisabled
-//                                 ? "bg-gray-400 cursor-not-allowed"
-//                                 : "bg-green-600 hover:bg-purple-800"
+//                               disabled={isBtnDisabled || isOtpExpired}
+//                               className={`px-4 py-2 rounded text-white ${isBtnDisabled || isOtpExpired
+//                                   ? "bg-gray-400 cursor-not-allowed"
+//                                   : "bg-green-600 hover:bg-purple-800"
 //                                 }`}
-//                               disabled={isBtnDisabled}
 //                             >
-//                               {isBtnDisabled ? "Please wait..." : "Verify OTP"}
+//                               {isBtnDisabled ? "Verifying..." : "Verify OTP"}
 //                             </button>
+
 //                             <button
 //                               type="button"
 //                               onClick={handleReSendOtp}
@@ -492,7 +555,12 @@
 //                               Resend OTP
 //                             </button>
 //                           </>
+//                         ) : (
+//                           <p className="text-blue-700 font-semibold mt-2 animate-pulse">
+//                             Processing... Please wait
+//                           </p>
 //                         )}
+
 
 
 //                       </div>
@@ -518,7 +586,6 @@
 
 // export default LoadAgreement;
 
-//new code
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useLocation, useNavigate, Link } from "react-router-dom";
@@ -552,6 +619,10 @@ const LoadAgreement = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSendOtpLoading, setIsSendOtpLoading] = useState(false);
 
+  const [contractorCategory, setContractorCategory] = useState([]);
+  const [contractorList, setContractorList] = useState([]);
+  const [selectedContractor, setSelectedContractor] = useState(null);
+
   // console.log(items, "items")
   // console.log(HT_LOAD_CHANGE_BASE,'HT_LOAD_CHANGE_BASE in Load Aggrement')
   const required = items?.survey?.is_estimate_required?.split(',') || [];
@@ -583,6 +654,7 @@ const LoadAgreement = () => {
     handleSubmit,
     watch,
     getValues,
+    setValue,
     setError,
     clearErrors,
     formState: { errors },
@@ -753,6 +825,135 @@ const LoadAgreement = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchContractorCategory = async () => {
+      try {
+        const res = await axios.get(
+          "https://qcportal.mpcz.in/tkc/get_tkc_category"
+        );
+
+        if (res.data.status) {
+          setContractorCategory(res.data.data);
+        }
+      } catch (err) {
+        console.error("Category API Error", err);
+      }
+    };
+
+    fetchContractorCategory();
+  }, []);
+
+  // const handleCategoryChange = async (e) => {
+  //   const oyt = e.target.value;
+
+  //   try {
+  //     const res = await axios.get(
+  //       `https://qcportal.mpcz.in/tkc/get_tkc_by_oyt/${oyt}`
+  //     );
+
+  //     if (res.data.status) {
+  //       setContractorList(res.data.contractor_details);
+  //     }
+  //   } catch (err) {
+  //     console.error("Contractor list error", err);
+  //   }
+  // };
+  const handleCategoryChange = async (e) => {
+
+  const category = e.target.value;
+
+  const selected = contractorCategory.find(
+    (cat) => cat.Category === category
+  );
+
+  const oyt = selected?.Original_Oyt;
+
+  try {
+
+    const res = await axios.get(
+      `https://qcportal.mpcz.in/tkc/get_tkc_by_oyt/${oyt}`
+    );
+
+    if (res.data.status) {
+      setContractorList(res.data.contractor_details);
+    }
+
+  } catch (err) {
+    console.error("Contractor list error", err);
+  }
+
+};
+
+  // const handleContractorChange = async (e) => {
+  //   const userId = e.target.value;
+
+  //   const contractor = contractorList.find(
+  //     (c) => c.user_id_id.User_Id == userId
+  //   );
+
+  //   if (contractor) {
+  //     setSelectedContractor(contractor);
+
+  //     setValue("contractor_mobile", contractor.user_id_id.ContactNo);
+  //     setValue("contractor_company", contractor.CompanyName_E);
+  //     setValue("authentication_id", contractor.user_id_id.Authentication_id);
+
+  //     const regRes = await axios.get(
+  //       `https://qcportal.mpcz.in/tkc/get_reg_date/${userId}`
+  //     );
+
+  //     if (regRes.data.status) {
+  //       setValue("registration_date", regRes.data.data.reg_date);
+  //     }
+  //   }
+  // };
+   const handleContractorChange = async (e) => {
+
+  const contractorName = e.target.value;
+
+  const contractor = contractorList.find(
+    (c) => c.user_id_id.Authorised_person_E === contractorName
+  );
+
+  if (contractor) {
+
+    setSelectedContractor(contractor);
+
+    setValue("contractor_mobile", contractor.user_id_id.ContactNo);
+    setValue("contractor_company", contractor.CompanyName_E);
+    setValue("authentication_id", contractor.user_id_id.Authentication_id);
+
+    const regRes = await axios.get(
+      `https://qcportal.mpcz.in/tkc/get_reg_date/${contractor.user_id_id.User_Id}`
+    );
+
+    if (regRes.data.status) {
+      setValue("registration_date", regRes.data.data.reg_date);
+    }
+  }
+};
+
+  const getVoltageValue = (voltage) => {
+    if (!voltage) return 0;
+    return parseInt(voltage.replace(" KV", ""));
+  };
+
+  const newVoltage = getVoltageValue(items?.new_supply_voltage);
+
+  const filteredCategory = contractorCategory.filter((cat) => {
+
+    const voltage = getVoltageValue(items?.new_supply_voltage);
+
+    if (voltage === 33) {
+      return ["A4", "A5"].includes(cat.Category);
+    }
+
+    if (voltage === 11) {
+      return true;
+    }
+
+    return true;
+  });
 
   return (
     <>
@@ -874,49 +1075,18 @@ const LoadAgreement = () => {
                             disabled={isDisabled}
                           />
 
-                          {required?.includes('is_extension_work_required') && (<>
-                            <InputTag
-                              LName="Extension Work Order No."
-                              placeholder="Enter Extension Work Order No."
-                              {...register("ex_work_order_no", {
-                                required: " Extension Work Order No is required",
-                              })}
-                              errorMsg={errors.ex_work_order_no?.message}
-                              disabled={isDisabled}
-                            />
-                            <InputTag
-                              LName=" Extension Work Order Date"
-                              type="date"
-                              {...register("ex_work_order_date", {
-                                required: " Extension Work Order Date is required",
-                              })}
-                              errorMsg={errors.ex_work_order_date?.message}
-                              disabled={isDisabled}
-                            />
-                            <InputTag
-                              LName="Extension Work Order Letter"
-                              type="file"
-                              acceptPdfOnly={true}
-                              {...register("ex_work_order_docs", {
-                                required: " Extension Work Order Letter is required",
-                              })}
-                              errorMsg={errors.ex_work_order_docs?.message}
-                              disabled={isDisabled}
-                            />
-
-                          </>
-                          )}
-                          {required.includes('is_me_meter_required') && (<>
-                            <InputTag
-                              LName="ME Meter Work Order No."
-                              placeholder="Enter ME Meter Work Order No."
-                              {...register("me_meter_work_order_no", {
-                                required: "ME Meter Work Order No is required",
-                              })}
-                              errorMsg={errors.me_meter_work_order_no?.message}
-                              disabled={isDisabled}
-                            />
-                            {/* <InputTag
+                          {required.includes('is_me_meter_required') && (
+                            <>
+                              <InputTag
+                                LName="ME Meter Work Order No."
+                                placeholder="Enter ME Meter Work Order No."
+                                {...register("me_meter_work_order_no", {
+                                  required: "ME Meter Work Order No is required",
+                                })}
+                                errorMsg={errors.me_meter_work_order_no?.message}
+                                disabled={isDisabled}
+                              />
+                              {/* <InputTag
                               LName="ME Meter Work Order Date"
                               type="date"
                               {...register("me_meter_work_order_date", {
@@ -925,29 +1095,145 @@ const LoadAgreement = () => {
                               errorMsg={errors.me_meter_work_order_date?.message}
                               disabled={isDisabled}
                             /> */}
-                            <InputTag
-                              LName="ME Meter Work Order Date"
-                              type="date"
-                              {...register("me_meter_work_order_date", {
-                                required: "ME Meter Work Order Date is required",
-                              })}
-                              min={transactionDate}   // ❌ payment se pehle ki date disable
-                              max={todayDate}         // ❌ future date disable
-                              errorMsg={errors.me_meter_work_order_date?.message}
-                              disabled={isDisabled}
-                            />
+                              <InputTag
+                                LName="ME Meter Work Order Date"
+                                type="date"
+                                {...register("me_meter_work_order_date", {
+                                  required: "ME Meter Work Order Date is required",
+                                })}
+                                min={transactionDate}   // ❌ payment se pehle ki date disable
+                                max={todayDate}         // ❌ future date disable
+                                errorMsg={errors.me_meter_work_order_date?.message}
+                                disabled={isDisabled}
+                              />
 
-                            <InputTag
-                              LName="ME Meter Work Order Letter"
-                              type="file"
-                              acceptPdfOnly={true}
-                              {...register("me_meter_work_order_docs", {
-                                required: "ME Meter Work Order Letter is required",
-                              })}
-                              errorMsg={errors.me_meter_work_order_docs?.message}
-                              disabled={isDisabled}
-                            />
-                          </>
+                              <InputTag
+                                LName="ME Meter Work Order Letter"
+                                type="file"
+                                acceptPdfOnly={true}
+                                {...register("me_meter_work_order_docs", {
+                                  required: "ME Meter Work Order Letter is required",
+                                })}
+                                errorMsg={errors.me_meter_work_order_docs?.message}
+                                disabled={isDisabled}
+                              />
+                            </>
+                          )}
+
+                          {items?.survey?.scheme_name === "SCCW" &&
+                            required?.includes("is_extension_work_required") &&
+                            items?.lc_type === "Load_Enhancement_with_Voltage_Change" &&
+                            newVoltage < 132 && (
+
+                              <>
+                                <h3 className="col-span-8 font-bold text-lg border-b pb-2">
+                                  Work Execution
+                                </h3>
+
+                                <h4 className="col-span-8 font-bold text-lg text-red-500">Select contractor details as requested by the H.T. Consumer.</h4>
+
+                                {/* <SelectTag
+                                  LName="Contractor Category"
+                                  options={filteredCategory}
+                                  {...register("contractor_category", {
+                                    required: "Contractor Category is required",
+                                  })}
+                                  errorMsg={errors.contractor_category?.message}
+                                  labelKey="Category"
+                                  valueKey="Original_Oyt"
+                                  onChange={handleCategoryChange}
+                                /> */}
+                                <SelectTag
+                                  LName="Contractor Category"
+                                  options={filteredCategory}
+                                  {...register("contractor_category", {
+                                    required: "Contractor Category is required",
+                                  })}
+                                  errorMsg={errors.contractor_category?.message}
+                                  labelKey="Category"
+                                  valueKey="Category"
+                                  onChange={handleCategoryChange}
+                                />
+
+                                <SelectTag
+                                  LName="Contractor Name"
+                                  // options={contractorList.map((con) => ({
+                                  //   label: con.user_id_id.Authorised_person_E,
+                                  //   value: con.user_id_id.User_Id
+                                  // }))}
+                                  options={contractorList.map((con) => ({
+                                    label: con.user_id_id.Authorised_person_E,
+                                    value: con.user_id_id.Authorised_person_E
+                                  }))}
+                                  {...register("contractor_name", {
+                                    required: "Contractor Name is required",
+                                  })}
+                                  errorMsg={errors.contractor_name?.message}
+                                  labelKey="label"
+                                  valueKey="value"
+                                  onChange={handleContractorChange}
+                                />
+
+                                <InputTag
+                                  LName="Contractor Company Name"
+                                  {...register("contractor_company")}
+                                  disabled
+                                />
+
+                                <InputTag
+                                  LName="Contractor Mobile No"
+                                  {...register("contractor_mobile")}
+                                  disabled
+                                />
+
+                                <InputTag
+                                  LName="Authentication Id"
+                                  {...register("authentication_id")}
+                                  disabled
+                                />
+
+                                <InputTag
+                                  LName="Registration Date"
+                                  type="date"
+                                  {...register("registration_date")}
+                                  disabled
+                                />
+
+                              </>
+                            )}
+
+                          {required?.includes('is_extension_work_required') && (
+                            <>
+                              <InputTag
+                                LName="Extension Work Order No."
+                                placeholder="Enter Extension Work Order No."
+                                {...register("ex_work_order_no", {
+                                  required: " Extension Work Order No is required",
+                                })}
+                                errorMsg={errors.ex_work_order_no?.message}
+                                disabled={isDisabled}
+                              />
+                              <InputTag
+                                LName=" Extension Work Order Date"
+                                type="date"
+                                {...register("ex_work_order_date", {
+                                  required: " Extension Work Order Date is required",
+                                })}
+                                errorMsg={errors.ex_work_order_date?.message}
+                                disabled={isDisabled}
+                              />
+                              <InputTag
+                                LName="Extension Work Order Letter"
+                                type="file"
+                                acceptPdfOnly={true}
+                                {...register("ex_work_order_docs", {
+                                  required: " Extension Work Order Letter is required",
+                                })}
+                                errorMsg={errors.ex_work_order_docs?.message}
+                                disabled={isDisabled}
+                              />
+
+                            </>
                           )}
 
                           {(items?.load_sanction?.is_required === "is_agreement_required" || items?.survey?.is_required === "is_agreement_required") && items?.type_of_change === "Load_Enhancement" && (
@@ -1013,12 +1299,12 @@ const LoadAgreement = () => {
                               Reset
                             </button>
 
-                            <button
+                            {/* <button
                               type="submit"
                               disabled={isSendOtpLoading}
                               className={`px-4 py-2 rounded text-white ${isSendOtpLoading || isBtnDisabled
-                                  ? "bg-gray-400 cursor-not-allowed"
-                                  : "bg-green-500 hover:bg-purple-800"
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-green-500 hover:bg-purple-800"
                                 }`}
                             >
                               {isSendOtpLoading
@@ -1038,6 +1324,44 @@ const LoadAgreement = () => {
                                         items?.type_of_change === "Load_Reduction"
                                         ? "Send for Completion certifying"
                                         : "Send for Completion Certifying"}
+                            </button> */}
+                            <button
+                              type="submit"
+                              disabled={isSendOtpLoading}
+                              className={`px-4 py-2 rounded text-white ${isSendOtpLoading || isBtnDisabled
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-green-500 hover:bg-purple-800"
+                                }`}
+                            >
+                              {isSendOtpLoading
+                                ? "Please wait..."
+                                : agreement_response === "Reverted"
+                                  ? "Revert For Demand note"
+
+                                  // ⭐ Extension Work Required
+                                  : agreement_response === "Accepted" &&
+                                    required?.includes("is_extension_work_required")
+                                    ? "Send for Upload & Charging Permission"
+
+                                    // ⭐ Only ME Meter Required
+                                    : agreement_response === "Accepted" &&
+                                      required?.includes("is_me_meter_required") &&
+                                      !required?.includes("is_extension_work_required")
+                                      ? "Send for Issue Meter"
+
+                                      : agreement_response === "Accepted" &&
+                                        (items?.load_sanction?.is_required === "is_agreement_required" ||
+                                          items?.survey?.is_required === "is_agreement_required") &&
+                                        items?.type_of_change === "Load_Enhancement"
+                                        ? "Send for BiCall"
+
+                                        : agreement_response === "Accepted" &&
+                                          (items?.load_sanction?.is_required === "is_agreement_required" ||
+                                            items?.survey?.is_required === "is_agreement_required") &&
+                                          items?.type_of_change === "Load_Reduction"
+                                          ? "Send for Completion certifying"
+
+                                          : "Send for Completion Certifying"}
                             </button>
                           </>
                         ) : showOtpBtn && !isProcessing ? (
@@ -1059,8 +1383,8 @@ const LoadAgreement = () => {
                               onClick={handleVerifyOtp}
                               disabled={isBtnDisabled || isOtpExpired}
                               className={`px-4 py-2 rounded text-white ${isBtnDisabled || isOtpExpired
-                                  ? "bg-gray-400 cursor-not-allowed"
-                                  : "bg-green-600 hover:bg-purple-800"
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-green-600 hover:bg-purple-800"
                                 }`}
                             >
                               {isBtnDisabled ? "Verifying..." : "Verify OTP"}

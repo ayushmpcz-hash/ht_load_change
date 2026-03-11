@@ -172,7 +172,8 @@ const ApplicationRecivedFromTransco = () => {
             form.append("remark", fv.remark);
 
             const resp = await axios.post(
-                `${HT_LOAD_CHANGE_BASE}/received-edcra/`,
+                // `${HT_LOAD_CHANGE_BASE}/received-edcra/`,
+                 `${HT_LOAD_CHANGE_BASE}/received-cgm-after-edcra/`,
                 form,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -241,13 +242,13 @@ const ApplicationRecivedFromTransco = () => {
                             {/* OPEN ONLY AFTER ACCEPT */}
                             {response === "Accepted" && (
                                 <>
-                                    {/* <InputTag
+                                    <InputTag
                     LName="Letter No"
                     placeholder="Enter Letter No"
                     {...register("letter_no", { required: "Letter No required" })}
                     errorMsg={errors.letter_no?.message}
                     disabled={isDisabled}
-                  /> */}
+                  />
 
                                     <InputTag
                                         LName="Upload  Document"

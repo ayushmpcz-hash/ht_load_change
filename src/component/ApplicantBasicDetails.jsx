@@ -1139,6 +1139,14 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
 
   const timelineData = getApplicationTimeline();
 
+  const formatDateOnly = (dateString) => {
+    if (!dateString) return "";
+
+    const date = new Date(dateString);
+
+    return date.toISOString().slice(0, 10);
+  };
+
   /* ---------- Main render ---------- */
   return (
     <>
@@ -1432,8 +1440,9 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
                   </tr>
 
                   <tr>
+                    <TableTrBloack Lable={"ERP NO.(ME METER)"} Value={htConsumers?.survey?.ndf_erp_no} />
                     <TableTrBloack Lable={"ME METER Approved By"} Value={htConsumers?.survey?.ndf_approved_by_name} />
-                    <TableTrBloack Lable={"ME METER Circle Name"} Value={htConsumers?.survey?.ndf_circle_name} />
+
                   </tr>
                   <tr>
                     <TableTrBloack Lable={"ME METER Division Name"} Value={htConsumers?.survey?.ndf_division_name} />
@@ -1451,6 +1460,10 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
                     <TableTrBloack Lable={"ME METER Status"} Value={htConsumers?.survey?.ndf_status} />
                     <TableTrBloack Lable={"ME METER Total Amount"} Value={htConsumers?.survey?.ndf_total_amt} />
                   </tr>
+                  <tr>
+                    <TableTrBloack Lable={"ME METER Circle Name"} Value={htConsumers?.survey?.ndf_circle_name} />
+                    {/* <TableTrBloack Lable={"ME METER Circle Name"} Value={htConsumers?.survey?.ndf_circle_name} /> */}
+                  </tr>
                 </>
               )}
 
@@ -1464,7 +1477,7 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
                   </tr>
                   <tr>
                     <TableTrBloack Lable={"ERP No"} Value={htConsumers?.survey?.erp_no} />
-                    <TableTrBloack Lable={"Estimate Date"} Value={htConsumers?.survey?.estimate_date} />
+                    <TableTrBloack Lable={"Estimate Date"} Value={formatDateOnly(htConsumers?.survey?.estimate_date)} />
                   </tr>
                   <tr>
                     <TableTrBloack Lable={"Long Name"} Value={htConsumers?.survey?.long_name} />
@@ -1532,6 +1545,49 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
                   <tr>
                     {htConsumers?.agreement_details?.ex_work_order_no && <TableTrBloack Lable={'Extension Work Order No'} Value={htConsumers?.agreement_details?.ex_work_order_no} />}
                     {htConsumers?.agreement_details?.ex_work_order_date && <TableTrBloack Lable={'Extension Work Order Date'} Value={htConsumers?.agreement_details?.ex_work_order_date} />}
+                  </tr>
+                </>
+              )}
+
+              {required.includes('is_extension_work_required') && htConsumers?.agreement_details && (
+                <>
+                  <tr style={{ backgroundColor: '#f9f9f9ff' }}>
+                    <th colSpan={4} style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>
+                      <h2>Contractor Details</h2>
+                    </th>
+                  </tr>
+
+                  <tr>
+                    <TableTrBloack
+                      Lable={'Contractor Category'}
+                      Value={htConsumers?.agreement_details?.contractor_category}
+                    />
+                    <TableTrBloack
+                      Lable={'Contractor Name'}
+                      Value={htConsumers?.agreement_details?.contractor_name}
+                    />
+                  </tr>
+
+                  <tr>
+                    <TableTrBloack
+                      Lable={'Contractor Company Name'}
+                      Value={htConsumers?.agreement_details?.contractor_company}
+                    />
+                    <TableTrBloack
+                      Lable={'Contractor Mobile No'}
+                      Value={htConsumers?.agreement_details?.contractor_mobile}
+                    />
+                  </tr>
+
+                  <tr>
+                    <TableTrBloack
+                      Lable={'Authentication ID'}
+                      Value={htConsumers?.agreement_details?.authentication_id}
+                    />
+                    <TableTrBloack
+                      Lable={'Registration Date'}
+                      Value={htConsumers?.agreement_details?.registration_date}
+                    />
                   </tr>
                 </>
               )}
@@ -1774,9 +1830,14 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors })
                   {htConsumers?.agreement_details?.ex_work_order_docs && <DocumentTrBloack Lable={'View Extension Work'} docLink={htConsumers?.agreement_details?.ex_work_order_docs} />}
                   {htConsumers?.commissioning_permission?.commissioning_permission_letter && <DocumentTrBloack Lable={'View Commissioning Permission Letter'} docLink={htConsumers?.commissioning_permission?.commissioning_permission_letter} />}
                   {htConsumers?.demand_note_generation?.supplement_draft_agreement && <DocumentTrBloack Lable={'View supplement Draft Pdf'} docLink={htConsumers?.demand_note_generation?.supplement_draft_agreement} />}
+                  {htConsumers?.agreement_details?.signed_docs &&
+                    <DocumentTrBloack Lable={'Signed Letter of Work Completion'} docLink={htConsumers?.agreement_details?.signed_docs} />}
+
+                  {htConsumers?.agreement_details?.clearance_certificate_docs &&
+                    <DocumentTrBloack Lable={'Electrical Inspector Clearance Certificate'} docLink={htConsumers?.agreement_details?.clearance_certificate_docs} />}
 
                   {htConsumers?.bicell_response?.agreement_doc && <DocumentTrBloack Lable={'View Commissioning  Pdf'} docLink={htConsumers?.bicell_response?.agreement_doc} />}
-                   {htConsumers?.bicell_response?.commissioning_report_upload && <DocumentTrBloack Lable={'View Commissioning Report Pdf'} docLink={htConsumers?.bicell_response?.commissioning_report_upload} />}
+                  {htConsumers?.bicell_response?.commissioning_report_upload && <DocumentTrBloack Lable={'View Commissioning Report Pdf'} docLink={htConsumers?.bicell_response?.commissioning_report_upload} />}
                   <GeneratePDF
                     baseUrl={HT_LOAD_CHANGE_BASE}
                     url={"/GenerateDemandNote_Sdsac/"}

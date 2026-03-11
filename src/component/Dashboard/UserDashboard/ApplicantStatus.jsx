@@ -569,7 +569,8 @@ const ApplicantStatus = () => {
 
                   {(items?.application_status === 1 ||
                     items?.application_status === 2 ||
-                    items?.application_status === 9) ? (
+                    items?.application_status === 9 ||
+                    items?.application_status === 30 ) ? (
 
                     <NavLink
                       to={`/user-dashboard/${statusUrl}/${items?.id}`}

@@ -187,7 +187,7 @@ import BayRequiredAccept from './component/Dashboard/BayRequiredAccept';
 import UnderProcess from './component/Dashboard/UnderProcess';
 import DownloadAllPdf from "./component/Dashboard/SearchApplicantDetailsPDF";
 import ApplicationView from './component/Dashboard/UserDashboard/ApplicationView';
-
+import LoadWorkCompletionChargingPermission from './component/Dashboard/UserDashboard/LoadWorkCompletionChargingPermission'
 
 
 function App() {
@@ -250,6 +250,7 @@ function App() {
             <Route path="/dashboard/pending_application_received_from_CGM_after_EDCRA_Approval/:id" element={<ApplicationRecivedFromCGM />} />
             <Route path="/dashboard/Pending_for_Under_Process_in_EDCRA/:id" element={<UnderProcess />} />
             <Route path="/dashboard/pending_for_work_completion_certifying_&_issuing_of_meter/:id" element={<LoadWorkCompletionAndMeterIssuing />} />
+             <Route path="/dashboard/pending_for_work_completion_&_upload_charging_permission/:id" element={<LoadWorkCompletionChargingPermission />} />
             <Route path="/dashboard/pending_for_bay_required/:id" element={<BayRequiredAccept />} />
             <Route path="/dashboard/pending_for_commissioning_permission/:id" element={<LoadCommissioningPermission />} />
             <Route path="/dashboard/pending_for_commissioning/:id" element={<LoadCommissioning />} />
@@ -272,6 +273,7 @@ function App() {
             <Route path="/user-dashboard/pending_for_registration_fee_payment/:id" element={<LoadRegistrationFeePayment />} />
             <Route path="/user-dashboard/pending_for_application_resubmission/:id" element={<LoadResubmission />} />
             <Route path="/user-dashboard/pending_for_demand_note_payment/:id" element={<LoadDemandNotePayment />} />
+            <Route path="/user-dashboard/pending_for_work_completion_&_upload_charging_permission/:id" element={<LoadWorkCompletionChargingPermission />} />
             {/* <Route path="/user-dashboard/pending_for_agreement_finalization/:id" element={<LoadAgreementFinalize />} /> */}
             <Route
               path="/user-dashboard/application-view/:id"

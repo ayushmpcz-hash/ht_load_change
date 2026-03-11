@@ -26,6 +26,7 @@
 //   checkLoadReductionDate,
 //   validateContractDemand,
 // } from '../../utils/handleLogicLoad.js';
+// import { saveAppAuth } from "../../utils/Storage/Storage.js";
 
 // function ApplicantReg() {
 //   const { consumerId, application_no } = useParams();
@@ -42,6 +43,7 @@
 
 //   const [otpSent, setOtpSent] = useState(false);
 //   const [isBtnDisabled, setBtnDisabled] = useState(false);
+//   const [isSendingOtp, setIsSendingOtp] = useState(false);
 
 //   const reduxUserData = useSelector(state => state.user.userData);
 //   const data = location.state?.data || reduxUserData;
@@ -54,7 +56,7 @@
 //   const [modalAction, setModalAction] = useState(() => () => { });
 //   const [isButton, setIsButton] = useState(false);
 
-//   const isUpdatePage = location.pathname.includes("/update/");
+//   // const isUpdatePage = location.pathname.includes("/update/");
 
 //   const showModal = (message, action = () => { }) => {
 //     setModalMessage(message);
@@ -86,7 +88,7 @@
 //   const SupplyVoltage = watch('new_supply_voltage');
 //   const ContractDemand = watch('new_contact_demand');
 
-//   console.log(htConsumers,'htconsumer details')
+//   // console.log(htConsumers, 'htconsumer details')
 
 //   // useEffect(() => {
 //   //   if (Object.keys(data).length) {
@@ -97,19 +99,19 @@
 //   //   }
 //   // }, [data]);
 //   useEffect(() => {
-//   if (data && Object.keys(data).length) {
-//     setHtConsumer(data);
-//   }
-// }, [data, reset]);
-
-
-
-//   useEffect(() => {
-//     if (isUpdatePage) {
-//       setShowButton(true);
-//       setIsDisabled(false);
+//     if (data && Object.keys(data).length) {
+//       setHtConsumer(data);
 //     }
-//   }, [isUpdatePage]);
+//   }, [data, reset]);
+
+//   console.log(htConsumers, 'ht consumer cdddddddd')
+
+//   // useEffect(() => {
+//   //   if (isUpdatePage) {
+//   //     setShowButton(true);
+//   //     setIsDisabled(false);
+//   //   }
+//   // }, [isUpdatePage]);
 
 //   useEffect(() => {
 //     setTimeout(() => {
@@ -117,7 +119,6 @@
 //       setValue("new_supply_voltage", data?.new_supply_voltage)
 //       setValue('contract_demand_difference', data?.contract_demand_difference)
 //       setValue('contract_demand_difference', data?.contract_demand_difference)
-
 //     }, 1000);
 //   }, [application_no]);
 
@@ -154,11 +155,11 @@
 //       // clearErrors("new_contact_demand");
 //       if (SubTypeOfChange === "Only_Voltage_Upgrade") {
 //         setValue("contract_demand_difference", 0);
-//         // setValue("new_contact_demand", htConsumers?.existing_contract_demand);
-//         setValue("new_contact_demand", htConsumers?.cd);
+//         setValue("new_contact_demand", htConsumers?.existing_contract_demand);
+//         // setValue("new_contact_demand", htConsumers?.cd);
 //         setIsLocked(true)
-//         // const contract_demand = contractDemandRange(SupplyVoltage, htConsumers?.existing_contract_demand);
-//          const contract_demand = contractDemandRange(SupplyVoltage, htConsumers?.cd);
+//         const contract_demand = contractDemandRange(SupplyVoltage, htConsumers?.existing_contract_demand);
+//         // const contract_demand = contractDemandRange(SupplyVoltage, htConsumers?.cd);
 //         if (contract_demand) {
 //           setValue("new_contact_demand", "");
 //           setValue("contract_demand_difference", "");
@@ -243,9 +244,9 @@
 //   // }, [ContractDemand]);
 
 //   const normalizedHtConsumer = {
-//   ...htConsumers,
-//   existing_contract_demand: htConsumers?.cd,
-// };
+//     ...htConsumers,
+//     existing_contract_demand: htConsumers?.existing_contract_demand,
+//   };
 
 //   useEffect(() => {
 //     let timeoutId;
@@ -265,8 +266,8 @@
 //         );
 
 //         let contractDiff = Math.abs(
-//           // ContractDemand - Number(htConsumers.existing_contract_demand)
-//             ContractDemand - Number(htConsumers.cd)
+//           ContractDemand - Number(htConsumers.existing_contract_demand)
+//           // ContractDemand - Number(htConsumers.cd)
 //         );
 //         setValue("contract_demand_difference", contractDiff);
 
@@ -298,12 +299,8 @@
 
 //   // 🧩 Submit or Update handler
 //   const onSubmithandler = async (data) => {
-//     if (isUpdatePage) {
-//       // 🧠 When Update page → first send OTP instead of direct update
-//       await handleSendOtp(data);
-//     } else {
-//       await handleSubmitNewApplication(data);
-//     }
+//     await handleSendOtp(data);
+//     // await handleSubmitNewApplication(data);
 //   };
 
 //   const handleSubmitNewApplication = async (data) => {
@@ -311,7 +308,7 @@
 //       dispatch(setLoading(true));
 //       setIsDisabled(true);
 //       const formData = toFormData(data);
-
+//       console.log(formData,'formDataaa')
 //       const apiUrl = `${HT_LOAD_CHANGE_BASE}/submit-load-change-application/`;
 //       const response = await axios.post(apiUrl, formData, {
 //         headers: { "Content-Type": "multipart/form-data" },
@@ -319,10 +316,20 @@
 //       const result = response?.data;
 //       if (!result) throw new Error("No response from server");
 
+//       // 🔐 SAVE application_no + password (MOST IMPORTANT)
+//       if (result.application_no && result.password) {
+//         saveAppAuth({
+//           application_no: result.application_no,
+//           password: result.password,
+//           consumer_name: result.data?.consumer_name,
+//           consumer_id: result.data?.consumer_id,
+//         });
+//       }
+
 //       if (result.data) dispatch(setUserData(result.data));
 
 //       if (result.application_no) {
-//         navigate(`/ht-load-change/update/${result.application_no}`, {
+//         navigate(`/ht-load-change/Details`, {
 //           state: { data: result.data },
 //         });
 //       }
@@ -337,6 +344,8 @@
 //   const handleSendOtp = async (formDataValues) => {
 //     try {
 //       dispatch(setLoading(true));
+//       setIsSendingOtp(true); // ✅ Disable Save button when OTP is being sent
+//       setIsDisabled(true);
 //       // const rawMobile = htConsumers?.mobile || "";
 //       const rawMobile = String(9754548330)
 //       const mobileNo = String(rawMobile);
@@ -354,18 +363,47 @@
 //           type: 'manual',
 //           message: otpResp.message,
 //         })
+//         setIsSendingOtp(false); // ✅ Enable button if OTP fails
+//         setIsDisabled(false);
 //       }
 //     } catch (err) {
 //       setError('otpStatus', {
 //         type: 'manual',
 //         message: sentOtp.message,
 //       });
+//       setIsSendingOtp(false); // ✅ Enable button on error
+//       setIsDisabled(false);   // ✅ Enable form fields on error
 //     } finally {
 //       dispatch(setLoading(false));
 //     }
 //   };
 
 //   // 🟢 Verify OTP
+//   // const handleVerifyOtp = async () => {
+//   //   const otpValue = getValues("otp");
+//   //   // const mobileNo = htConsumers?.mobile;
+//   //   const mobileNo = 9754548330;
+
+//   //   try {
+//   //     setBtnDisabled(true);
+//   //     const verifyResp = await verifyOtpNew(mobileNo, otpValue);
+
+//   //     if (verifyResp.success) {
+//   //       // setOtpMessage("✅ OTP verified successfully!");
+//   //       await handleSubmitNewApplication(); // proceed to final API hit
+//   //     } else setError('otp', {
+//   //       type: 'manual',
+//   //       message: verifyResp.error,
+//   //     });
+//   //   } catch (err) {
+//   //     setError('otpStatus', {
+//   //       type: 'manual',
+//   //       message: verifyResp.message,
+//   //     });
+//   //   } finally {
+//   //     setBtnDisabled(false);
+//   //   }
+//   // };
 //   const handleVerifyOtp = async () => {
 //     const otpValue = getValues("otp");
 //     // const mobileNo = htConsumers?.mobile;
@@ -376,62 +414,90 @@
 //       const verifyResp = await verifyOtpNew(mobileNo, otpValue);
 
 //       if (verifyResp.success) {
-//         // setOtpMessage("✅ OTP verified successfully!");
-//         await handleFinalUpdateSubmit(); // proceed to final API hit
-//       } else setError('otp', {
-//         type: 'manual',
-//         message: verifyResp.error,
-//       });
+//         // ✅ PURE FORM DATA PASS KARO
+//         const formData = getValues();
+//         console.log(formData,'form dataaaaa')
+//         await handleSubmitNewApplication(formData);
+//       } else {
+//         setError("otp", {
+//           type: "manual",
+//           message: verifyResp.error,
+//         });
+//       }
 //     } catch (err) {
-//       setError('otpStatus', {
-//         type: 'manual',
-//         message: verifyResp.message,
+//       setError("otpStatus", {
+//         type: "manual",
+//         message: err?.message || "OTP verification failed",
 //       });
 //     } finally {
 //       setBtnDisabled(false);
 //     }
 //   };
 
-//   const handleFinalUpdateSubmit = async () => {
-//     try {
-//       dispatch(setLoading(true));
-//       const allFormData = getValues();
-//       const formData = toFormData(allFormData);
 
-//       const apiUrl = `${HT_LOAD_CHANGE_BASE}/update-load-change-application/?application_no=${application_no}`;
-//       const response = await axios.put(apiUrl, formData, {
-//         headers: { "Content-Type": "multipart/form-data" },
-//       });
-//       const result = response?.data;
+//   // const handleFinalUpdateSubmit = async () => {
+//   //   try {
+//   //     dispatch(setLoading(true));
+//   //     const allFormData = getValues();
+//   //     const formData = toFormData(allFormData);
 
-//       if (result?.data) dispatch(setUserData(result.data));
+//   //     const apiUrl = `${HT_LOAD_CHANGE_BASE}/update-load-change-application/?application_no=${application_no}`;
+//   //     const response = await axios.put(apiUrl, formData, {
+//   //       headers: { "Content-Type": "multipart/form-data" },
+//   //     });
+//   //     const result = response?.data;
 
-//       // ✅ Navigate to details page after OTP verification
-//       navigate(`/ht-load-change/Details`,{
-//          state: { data: result.data },
-//       });
-//     } catch (err) {
-//       alert(err?.response?.data?.message || "Update failed!");
-//     } finally {
-//       dispatch(setLoading(false));
-//       setIsDisabled(false);
-//       setOtpSent(false);
-//     }
-//   };
+//   //     if (result?.data) dispatch(setUserData(result.data));
+
+//   //     // ✅ Navigate to details page after OTP verification
+//   //     navigate(`/ht-load-change/Details`, {
+//   //       state: { data: result.data },
+//   //     });
+//   //   } catch (err) {
+//   //     alert(err?.response?.data?.message || "Update failed!");
+//   //   } finally {
+//   //     dispatch(setLoading(false));
+//   //     setIsDisabled(false);
+//   //     setOtpSent(false);
+//   //   }
+//   // };
 
 //   // 🔄 Resend OTP
+//   // const handleReSendOtp = async () => {
+//   //   const rawMobile = htConsumers?.mobile || "";
+//   //   const mobileNo = String(rawMobile);
+//   //   clearErrors("otp");
+//   //   const otpResp = await sendOtpNew(mobileNo);
+//   //   if (otpResp.success) {
+//   //     setError('otpSuccess', {
+//   //       type: 'manual',
+//   //       message: `OTP Resent successfully to ****${mobileNo.slice(-4)}`,
+//   //     });
+//   //   } else {
+//   //     alert("Failed to resend OTP.");
+//   //   }
+//   // };
 //   const handleReSendOtp = async () => {
 //     const rawMobile = htConsumers?.mobile || "";
 //     const mobileNo = String(rawMobile);
 //     clearErrors("otp");
-//     const otpResp = await sendOtpNew(mobileNo);
-//     if (otpResp.success) {
-//       setError('otpSuccess', {
-//         type: 'manual',
-//         message: `OTP Resent successfully to ****${mobileNo.slice(-4)}`,
-//       });
-//     } else {
+
+//     try {
+//       setBtnDisabled(true); // ✅ Disable Resend button
+//       const otpResp = await sendOtpNew(mobileNo);
+
+//       if (otpResp.success) {
+//         setError('otpSuccess', {
+//           type: 'manual',
+//           message: `OTP Resent successfully to ****${mobileNo.slice(-4)}`,
+//         });
+//       } else {
+//         alert("Failed to resend OTP.");
+//       }
+//     } catch (err) {
 //       alert("Failed to resend OTP.");
+//     } finally {
+//       setBtnDisabled(false); // ✅ Enable Resend button
 //     }
 //   };
 
@@ -462,13 +528,11 @@
 //               <div className="border-b border-gray-900/10 pb-12">
 //                 <div className="block mb-2 border-b-2 p-2 ">
 //                   <h2 className="text-base font-semibold text-gray-900 bg-gray-300 p-3 rounded-md border-gray shadow-md">
-//                     {isUpdatePage
-//                       ? "HT NSC Load Change Application (Preview / Update)"
-//                       : "HT NSC Load Change Application"}
+//                     HT NSC Load Change Application
 //                   </h2>
 //                 </div>
 //                 <div className="body p-4">
-//                   <ApplicantFillDetails htConsumers={htConsumers} register={register} errors={errors} isUpdatePage={isUpdatePage} />
+//                   <ApplicantFillDetails htConsumers={htConsumers} register={register} errors={errors} />
 //                   <div className="border-b border-gray-900/10 pb-12">
 //                     <h2 className="text-base/7 font-semibold text-gray-900 bg-gray-300 p-3 rounded-md border-gray shadow-md">
 //                       Required Load Details
@@ -656,6 +720,7 @@
 //                         LName="Upload Bank Passbook/Cheque "
 //                         {...register('bank_docs')}
 //                         type="file"
+//                         acceptPdfOnly={true}
 //                         errorMsg={errors.bank_docs?.message}
 //                         disabled={isDisabled}
 
@@ -712,6 +777,7 @@
 //                               required: "PAN document is required",
 //                             })}
 //                             type="file"
+//                             acceptPdfOnly={true}
 //                             errorMsg={errors.pan_card_doc?.message}
 //                             disabled={isDisabled}
 //                           />
@@ -723,6 +789,7 @@
 //                         LName="Upload GST Document"
 //                         {...register('gst_doc')}
 //                         type="file"
+//                         acceptPdfOnly={true}
 //                         errorMsg={errors.gst_doc?.message}
 //                         disabled={isDisabled}
 
@@ -749,7 +816,7 @@
 //                         LName="Upload Other Document."
 //                         {...register('upload_file')}
 //                         type="file"
-
+//                         acceptPdfOnly={true}
 //                         errorMsg={errors.upload_file?.message}
 //                         disabled={isDisabled}
 
@@ -762,104 +829,123 @@
 
 //                   </div>
 
-//                   {isUpdatePage && (
-//                     <div className="border-b border-gray-900/10 pb-12">
-//                       {/* <h2 className="text-base/7 font-semibold text-gray-900 bg-gray-300 p-3 rounded-md border-gray shadow-md">
+//                   {/* 🔴 IMPORTANT NOTE (ENGLISH + HINDI) */}
+//                   <div className="mt-4 p-4 border-l-4 border-red-500 bg-red-50 rounded">
+//                     <p className="text-sm text-red-700 font-semibold">
+//                       Important Note:
+//                     </p>
+//                     <p className="text-sm text-red-600 mt-1">
+//                       If the payment has been deducted against the online application, DO
+//                       NOT make same payment further until the deducted amount is refunded.
+//                     </p>
+
+//                     <p className="text-sm text-red-700 font-semibold mt-3">
+//                       महत्वपूर्ण टीप:
+//                     </p>
+//                     <p className="text-sm text-red-600 mt-1">
+//                       यदि ऑनलाइन आवेदन के विरुद्ध भुगतान काट लिया गया है, तो कटे हुए
+//                       राशि के वापस मिलने तक उसी भुगतान को फिर से न करें।
+//                     </p>
+//                   </div>
+
+
+//                   <div className="border-b border-gray-900/10 pb-12">
+//                     {/* <h2 className="text-base/7 font-semibold text-gray-900 bg-gray-300 p-3 rounded-md border-gray shadow-md">
 //                   Firm Document Details..
 //                 </h2> */}
-//                       <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-0">
-//                         <div className="col-span-8">
-//                           <div className="p-4 border rounded-lg shadow-sm bg-white">
-//                             {/* Checkbox with Declaration Heading */}
-//                             <div className="flex items-start space-x-2">
-//                               <input
-//                                 type="checkbox"
-//                                 name="agreeBtn"
-//                                 {...register("agreeBtn", { required: "कृपया शर्तों से सहमत हों" })}
-//                                 className="mt-1"
-//                               />
-//                               <label htmlFor="agreeBtn" className="font-semibold">
-//                                 मैं यह घोषणा करता हूँ कि
-//                               </label>
+//                     <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-0">
+//                       <div className="col-span-8">
+//                         <div className="p-4 border rounded-lg shadow-sm bg-white">
+//                           {/* Checkbox with Declaration Heading */}
+//                           <div className="flex items-start space-x-2">
+//                             <input
+//                               type="checkbox"
+//                               name="agreeBtn"
+//                               {...register("agreeBtn", { required: "कृपया शर्तों से सहमत हों" })}
+//                               className="mt-1"
+//                             />
+//                             <label htmlFor="agreeBtn" className="font-semibold">
+//                               मैं यह घोषणा करता हूँ कि
+//                             </label>
+//                           </div>
+//                           {errors.agreeBtn && (
+//                             <p className="text-red-600 text-sm mt-1">{errors.agreeBtn.message}</p>
+//                           )}
+
+//                           {/* Instructions */}
+//                           <div className="mt-4 space-y-3 text-sm leading-6">
+//                             <div>
+//                               <span className="font-medium">1.</span> मेरे द्वारा आवेदन करते समय सभी जानकारियाँ सही प्रदान की गई हैं।
+//                               <div className="text-gray-600">
+//                                 (All the information provided by me while applying is correct.)
+//                               </div>
 //                             </div>
-//                             {errors.agreeBtn && (
-//                               <p className="text-red-600 text-sm mt-1">{errors.agreeBtn.message}</p>
-//                             )}
 
-//                             {/* Instructions */}
-//                             <div className="mt-4 space-y-3 text-sm leading-6">
-//                               <div>
-//                                 <span className="font-medium">1.</span> मेरे द्वारा आवेदन करते समय सभी जानकारियाँ सही प्रदान की गई हैं।
-//                                 <div className="text-gray-600">
-//                                   (All the information provided by me while applying is correct.)
-//                                 </div>
+//                             <div>
+//                               <span className="font-medium">2.</span>मैंने वर्तमान में लागू मध्य प्रदेश विद्युत आपूर्ति संहिता और उसके संशोधन को पढ़ लिया है और उसमें उल्लिखित
+//                               शर्तों का पालन करने के लिए सहमत हूँ।
+//                               <div className="text-gray-600">
+//                                 (I have read the Madhya Pradesh Electricity Supply Code and amendment thereof and agree to abide by the
+//                                 condition mentioned therein.)
 //                               </div>
-
-//                               <div>
-//                                 <span className="font-medium">2.</span>मैंने वर्तमान में लागू मध्य प्रदेश विद्युत आपूर्ति संहिता और उसके संशोधन को पढ़ लिया है और उसमें उल्लिखित
-//                                 शर्तों का पालन करने के लिए सहमत हूँ।
-//                                 <div className="text-gray-600">
-//                                   (I have read the Madhya Pradesh Electricity Supply Code and amendment thereof and agree to abide by the
-//                                   condition mentioned therein.)
-//                                 </div>
-//                               </div>
-
-//                               <div>
-//                                 <span className="font-medium">3.</span> आवेदन करते समय जो जानकारियाँ मेरे द्वारा प्रदान की गई है, अगर इनमें से कोई भी जानकारी सत्यापन के
-//                                 दौरान गलत / असत्य पाई जाती है तो मैं इसके लिये स्वयं जिम्मेदार रहूँगा ।
-//                                 <div className="text-gray-600">
-//                                   (The information provided by me is very correct and while applying; if any of the information is found
-//                                   incorrect/false during verification then I will be responsible for it.)
-//                                 </div>
-//                               </div>
-
-//                               <div>
-//                                 <span className="font-medium">4.</span> मेरे द्वारा आवेदन करते समय सभी आवश्यक दस्तावेज को स्पष्ट व सही तरीके से अपलोड किया गया है।
-//                                 <div className="text-gray-600">
-//                                   (While applying, all the necessary documents have been uploaded clearly and correctly by me.)
-//                                 </div>
-//                               </div>
-
-//                               <div>
-//                                 <span className="font-medium">5.</span>मेरे किसी भी विद्युत संयोजन पर पहले से कोई बकाया राशि नहीं है।
-//                                 <div className="text-gray-600">
-//                                   (I do not have any outstanding dues on any of my electricity connections.)
-//                                 </div>
-//                               </div>
-
-//                               <div>
-//                                 <span className="font-medium">6.</span>म.प्र.क्षे.वि.वि.कं.लि.भार परिवर्तन के अंतर्गत संदर्भ में जो भी सेवाएँ व शर्तें लागू होती हैं, मैं उनका पूर्ण
-//                                 रूप से पालन करूँगा।
-//                                 <div className="text-gray-600">
-//                                   (I will fully comply with whatever services and conditions are applicable in the context under MPMKVVCL
-//                                   “Load Change”.)
-//                                 </div>
-//                               </div>
-
-//                               <div>
-//                                 <span className="font-medium">7.</span>यदि लोड और कनेक्शन के उद्देश्य में कोई परिवर्तन होता है, तो मैं अपनी नई आवश्यकता के अनुसार नया
-//                                 आवेदन प्रस्तुत करूंगा। डिस्कॉम के पास पिछले आवेदन को रद्द करने और आवेदन के साथ जमा किए गए
-//                                 पंजीकरण शुल्क को जब्त करने का अधिकार है।
-//                                 <div className="text-gray-600">
-//                                   (If there is any changes in the Load and purpose of connection, I will submit the new application as per my
-//                                   new requirement. The Discom has rights to cancel the previous application and forfeit the registration
-//                                   charges submitted with the application.)
-//                                 </div>
-//                               </div>
-
-//                               <div>
-//                                 <span className="font-medium">8.</span>ऊर्जा की बचत किये जाने हेतु, मैं बिजली का व्यर्थ उपयोग नहीं करूँगा ।
-//                                 <div className="text-gray-600">
-//                                   (To save energy, I will not use electricity unnecessarily.)
-//                                 </div>
-//                               </div>
-
 //                             </div>
+
+//                             <div>
+//                               <span className="font-medium">3.</span> आवेदन करते समय जो जानकारियाँ मेरे द्वारा प्रदान की गई है, अगर इनमें से कोई भी जानकारी सत्यापन के
+//                               दौरान गलत / असत्य पाई जाती है तो मैं इसके लिये स्वयं जिम्मेदार रहूँगा ।
+//                               <div className="text-gray-600">
+//                                 (The information provided by me is very correct and while applying; if any of the information is found
+//                                 incorrect/false during verification then I will be responsible for it.)
+//                               </div>
+//                             </div>
+
+//                             <div>
+//                               <span className="font-medium">4.</span> मेरे द्वारा आवेदन करते समय सभी आवश्यक दस्तावेज को स्पष्ट व सही तरीके से अपलोड किया गया है।
+//                               <div className="text-gray-600">
+//                                 (While applying, all the necessary documents have been uploaded clearly and correctly by me.)
+//                               </div>
+//                             </div>
+
+//                             <div>
+//                               <span className="font-medium">5.</span>मेरे किसी भी विद्युत संयोजन पर पहले से कोई बकाया राशि नहीं है।
+//                               <div className="text-gray-600">
+//                                 (I do not have any outstanding dues on any of my electricity connections.)
+//                               </div>
+//                             </div>
+
+//                             <div>
+//                               <span className="font-medium">6.</span>म.प्र.क्षे.वि.वि.कं.लि.भार परिवर्तन के अंतर्गत संदर्भ में जो भी सेवाएँ व शर्तें लागू होती हैं, मैं उनका पूर्ण
+//                               रूप से पालन करूँगा।
+//                               <div className="text-gray-600">
+//                                 (I will fully comply with whatever services and conditions are applicable in the context under MPMKVVCL
+//                                 “Load Change”.)
+//                               </div>
+//                             </div>
+
+//                             <div>
+//                               <span className="font-medium">7.</span>यदि लोड और कनेक्शन के उद्देश्य में कोई परिवर्तन होता है, तो मैं अपनी नई आवश्यकता के अनुसार नया
+//                               आवेदन प्रस्तुत करूंगा। डिस्कॉम के पास पिछले आवेदन को रद्द करने और आवेदन के साथ जमा किए गए
+//                               पंजीकरण शुल्क को जब्त करने का अधिकार है।
+//                               <div className="text-gray-600">
+//                                 (If there is any changes in the Load and purpose of connection, I will submit the new application as per my
+//                                 new requirement. The Discom has rights to cancel the previous application and forfeit the registration
+//                                 charges submitted with the application.)
+//                               </div>
+//                             </div>
+
+//                             <div>
+//                               <span className="font-medium">8.</span>ऊर्जा की बचत किये जाने हेतु, मैं बिजली का व्यर्थ उपयोग नहीं करूँगा ।
+//                               <div className="text-gray-600">
+//                                 (To save energy, I will not use electricity unnecessarily.)
+//                               </div>
+//                             </div>
+
 //                           </div>
 //                         </div>
 //                       </div>
 //                     </div>
-//                   )}
+//                   </div>
+
 
 //                   {/* --- OTP Verification Section --- */}
 //                   {otpSent ? (
@@ -874,7 +960,7 @@
 //                           errorMsg={errors.otp?.message}
 //                         />
 //                         <div className="flex space-x-3 mt-3">
-//                           <button
+//                           {/* <button
 //                             type="button"
 //                             onClick={handleVerifyOtp}
 //                             disabled={isBtnDisabled}
@@ -884,13 +970,31 @@
 //                               }`}
 //                           >
 //                             {isBtnDisabled ? "Verifying..." : "Verify OTP"}
-//                           </button>
+//                           </button> */}
 //                           <button
+//                             type="button"
+//                             onClick={handleVerifyOtp}
+//                             disabled={isBtnDisabled}
+//                             className={`px-4 py-2 rounded text-white ${isBtnDisabled
+//                               ? "bg-gray-400 cursor-not-allowed"
+//                               : "bg-green-600 hover:bg-green-700"}`}
+//                           >
+//                             {isBtnDisabled ? "Verifying..." : "Verify OTP"}
+//                           </button>
+//                           {/* <button
 //                             type="button"
 //                             onClick={handleReSendOtp}
 //                             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
 //                           >
 //                             Resend OTP
+//                           </button> */}
+//                           <button
+//                             type="button"
+//                             onClick={handleReSendOtp}
+//                             disabled={isBtnDisabled}
+//                             className={`px-4 py-2 rounded text-white ${isBtnDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"}`}
+//                           >
+//                             {isBtnDisabled ? "Resending..." : "Resend OTP"}
 //                           </button>
 //                         </div>
 //                         {errors?.otpSuccess && (
@@ -907,19 +1011,19 @@
 //                         <button type='reset' className="rounded-lg px-4 py-2 bg-blue-500 text-blue-100 hover:bg-red-600 duration-300" onClick={() => reset()}>
 //                           Reset
 //                         </button>
-//                         <button
+//                         {/* <button
 //                           type="submit"
 //                           disabled={isDisabled}
-//                           className={`text-white px-4 py-2 rounded ${isDisabled
-//                             ? "bg-gray-400 cursor-not-allowed"
-//                             : "bg-orange-500 hover:bg-purple-800"
-//                             }`}
+//                           className="bg-orange-500 text-white px-4 py-2 rounded"
 //                         >
-//                           {isDisabled
-//                             ? "Please wait..."
-//                             : isUpdatePage
-//                               ? "Update"
-//                               : "Submit"}
+//                           Save
+//                         </button> */}
+//                         <button
+//                           type="submit"
+//                           disabled={isDisabled || isSendingOtp} // ✅ Disable when sending OTP
+//                           className={`bg-orange-500 text-white px-4 py-2 rounded ${isSendingOtp ? 'opacity-50 cursor-not-allowed' : 'hover:bg-orange-600'}`}
+//                         >
+//                           {isSendingOtp ? 'Sending OTP...' : 'Save'} {/* ✅ Show loading text */}
 //                         </button>
 //                       </div>
 //                     </div>
@@ -1072,17 +1176,17 @@ function ApplicantReg() {
         );
       }
     } else if (typeOfChange === 'Load_Reduction') {
-      setSubTypeOfChange(TypeOfValue.reductionOptions);
-      let Load_Reduction_apply = checkLoadReductionDate(htConsumers);
 
-      if (Load_Reduction_apply?.Load_Reduction) {
-        setLoadReductionApply(Load_Reduction_apply)
-
+      if (htConsumers?.existing_supply_voltage === "33 KV") {
+        setSubTypeOfChange(TypeOfValue.reductionOptions);
       } else {
-        showModal(
-          ' You are not allowed for load reduction as per the clause 7.12 or 7.13 of supply code  2021.'
+        setSubTypeOfChange(
+          TypeOfValue.reductionOptions.filter(
+            opt => opt.value !== 'Load_Reduction_with_Voltage_Downgrade'
+          )
         );
       }
+
     } else {
       setSubTypeOfChange([]);
     }
@@ -1139,49 +1243,6 @@ function ApplicantReg() {
     return () => clearTimeout(timer);
   }, [SubTypeOfChange, htConsumers?.existing_supply_voltage]);
 
-
-  // useEffect(() => {
-  //   if (ContractDemand && typeOfChange && SubTypeOfChange && SupplyVoltage) {
-  //     const handler = setTimeout(() => {
-  //       const contract_demand = contractDemandRange(SupplyVoltage, ContractDemand);
-  //       const demandError = validateContractDemand(
-  //         typeOfChange,
-  //         ContractDemand,
-  //         SubTypeOfChange,
-  //         htConsumers,
-  //         totalYearConn,
-  //         loadReductionApply
-  //       );
-  //       let contractDeffres = Math.abs(
-  //         ContractDemand - Number(htConsumers.existing_contract_demand)
-  //       );
-  //       setValue("contract_demand_difference", contractDeffres);
-
-  //       if (contract_demand) {
-  //         setError("new_contact_demand", {
-  //           type: "manual",
-  //           message: contract_demand,
-  //         });
-  //         setValue("contract_demand_difference", "");
-  //         setValue("new_contact_demand", "");
-  //       } else if (demandError) {
-  //         setError("new_contact_demand", {
-  //           type: "manual",
-  //           message: demandError,
-  //         });
-  //         setValue("contract_demand_difference", "");
-  //         setValue("new_contact_demand", "");
-  //       } else {
-  //         clearErrors("new_contact_demand");
-  //       }
-  //     }, 600);
-
-  //     return () => clearTimeout(handler);
-  //   } else {
-  //     setValue("new_contact_demand", "");
-
-  //   }
-  // }, [ContractDemand]);
 
   const normalizedHtConsumer = {
     ...htConsumers,
@@ -1248,7 +1309,7 @@ function ApplicantReg() {
       dispatch(setLoading(true));
       setIsDisabled(true);
       const formData = toFormData(data);
-      console.log(formData,'formDataaa')
+      console.log(formData, 'formDataaa')
       const apiUrl = `${HT_LOAD_CHANGE_BASE}/submit-load-change-application/`;
       const response = await axios.post(apiUrl, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -1356,7 +1417,7 @@ function ApplicantReg() {
       if (verifyResp.success) {
         // ✅ PURE FORM DATA PASS KARO
         const formData = getValues();
-        console.log(formData,'form dataaaaa')
+        console.log(formData, 'form dataaaaa')
         await handleSubmitNewApplication(formData);
       } else {
         setError("otp", {
@@ -1673,34 +1734,12 @@ function ApplicantReg() {
                       Firm Document Details..
                     </h2>
                     <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8">
-
-                      {/* {htConsumers.pan_card_no === "" || htConsumers.pan_card_no == "NA" && (
-                        <>
-                          <InputTag
-                            LName="Pan No"
-                            {...register('pan_no')}
-                            errorMsg={errors.pan_no?.message}
-                            placeholder="Enter Pan No.  "
-                            disabled={isDisabled}
-
-                          />
-
-                          <InputTag
-                            LName="Upload Pan No"
-                            {...register('pan_card_doc')}
-                            type="file"
-                            errorMsg={errors.pan_card_doc?.message}
-                            disabled={isDisabled}
-
-                          />
-                        </>
-                      )} */}
                       {(htConsumers.pan_card_no === "" || htConsumers.pan_card_no === "NA") && (
                         <>
-                          <InputTag
+                          {/* <InputTag
                             LName="Pan No"
                             {...register("pan_no", {
-                              required: "PAN No is required",
+                              // required: "PAN No is required",
                               pattern: {
                                 value: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
                                 message: "PAN must be 10 characters (e.g. ABCDE1234F)",
@@ -1714,8 +1753,32 @@ function ApplicantReg() {
                           <InputTag
                             LName="Upload PAN Card"
                             {...register("pan_card_doc", {
-                              required: "PAN document is required",
+                              // required: "PAN document is required",
                             })}
+                            type="file"
+                            acceptPdfOnly={true}
+                            errorMsg={errors.pan_card_doc?.message}
+                            disabled={isDisabled}
+                          /> */}
+                          <InputTag
+                            LName="PAN / TAN No"
+                            maxLength={10}
+                            {...register("pan_no", {
+                              pattern: {
+                                value: /^[A-Za-z0-9]{10}$/,
+                                message: "PAN / TAN must be exactly 10 characters",
+                              },
+                              onChange: (e) => {
+                                e.target.value = e.target.value.toUpperCase();
+                              },
+                            })}
+                            errorMsg={errors.pan_no?.message}
+                            placeholder="Enter PAN or TAN No."
+                            disabled={isDisabled}
+                          />
+                          <InputTag
+                            LName="Upload PAN / TAN Document"
+                            {...register("pan_card_doc")}
                             type="file"
                             acceptPdfOnly={true}
                             errorMsg={errors.pan_card_doc?.message}
@@ -1981,4 +2044,6 @@ function ApplicantReg() {
 }
 
 export default ApplicantReg;
+
+
 

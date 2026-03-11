@@ -106,7 +106,8 @@ const UnderProcess = () => {
         }
       });
       const { data } = await axios.post(
-        `${HT_LOAD_CHANGE_BASE}/received-cgm-after-edcra/`,
+        // `${HT_LOAD_CHANGE_BASE}/received-cgm-after-edcra/`,
+         `${HT_LOAD_CHANGE_BASE}/received-edcra/`,
         formData,
         {
           headers: {

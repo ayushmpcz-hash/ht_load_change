@@ -18,6 +18,7 @@ const TypeOfValue = {
   ],
   reductionOptions: [
     { label: 'Load Reduction without Voltage Change', value: 'Load_Reduction_without_Voltage_Change' },
+    { label: 'Load Reduction with Voltage Downgrade', value: 'Load_Reduction_with_Voltage_Downgrade' },
     // { label: 'Load Reduction with Voltage Change', value: 'Load_Reduction_with_Voltage_Change' },
     // { label: 'Load Reduction with Upgrade Voltage Level', value: 'Load_Reduction_with_Upgrade_Voltage_Level' },
     // { label: 'Only Voltage Downgrade', value: 'Only_Voltage_Downgrade' },
