@@ -321,6 +321,13 @@ const LoadCommissioningPermission = () => {
                 </div>
                 <div className="card-body px-4 pb-4">
                   <input type="hidden" {...register('application')} value={items?.id}></input>
+                  <input
+                    type="hidden"
+                    name="employee_id"
+                    {...register('employee_id')}
+                    value={officerData?.employee_detail.employee_login_id}
+                  ></input>
+                  
                   <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                     <SelectTag
                       LName="Acceptance"
@@ -464,8 +471,8 @@ const LoadCommissioningPermission = () => {
                             type="submit"
                             disabled={isSendOtpLoading || isBtnDisabled}
                             className={`px-4 py-2 rounded text-white ${isSendOtpLoading || isBtnDisabled
-                                ? "bg-gray-400 cursor-not-allowed"
-                                : "bg-green-500 hover:bg-purple-800"
+                              ? "bg-gray-400 cursor-not-allowed"
+                              : "bg-green-500 hover:bg-purple-800"
                               }`}
                           >
                             {isSendOtpLoading
@@ -494,8 +501,8 @@ const LoadCommissioningPermission = () => {
                             onClick={handleVerifyOtp}
                             disabled={isBtnDisabled || isOtpExpired}
                             className={`px-4 py-2 rounded text-white ${isBtnDisabled || isOtpExpired
-                                ? "bg-gray-400 cursor-not-allowed"
-                                : "bg-green-600 hover:bg-purple-800"
+                              ? "bg-gray-400 cursor-not-allowed"
+                              : "bg-green-600 hover:bg-purple-800"
                               }`}
                           >
                             {isBtnDisabled ? "Verifying..." : "Verify OTP"}

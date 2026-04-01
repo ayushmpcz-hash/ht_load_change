@@ -153,6 +153,12 @@ const TranscoApproval = () => {
                 </div>
                 <div className="card-body px-4 pb-4">
                   <input type="hidden" {...register('application')} value={items?.id}></input>
+                  <input
+                    type="hidden"
+                    name="employee_id"
+                    {...register('employee_id')}
+                    value={officerData?.employee_detail.employee_login_id}
+                  ></input>
                   <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                     <SelectTag
                       LName="Acceptance"
@@ -226,11 +232,10 @@ const TranscoApproval = () => {
                           </button>
                           <button
                             type="submit" // ✅ Yeh important hai, warna handleSendOtp call nahi hota
-                            className={`px-4 py-2 rounded text-white ${
-                              isDisabled
+                            className={`px-4 py-2 rounded text-white ${isDisabled
                                 ? 'bg-gray-400 cursor-not-allowed'
                                 : 'bg-green-500 hover:bg-purple-800'
-                            }`}
+                              }`}
                             disabled={isDisabled}
                           >
                             {commissioning_permission_response === 'Reverted'
@@ -249,11 +254,10 @@ const TranscoApproval = () => {
                           <button
                             type="button"
                             onClick={handleVerifyOtp}
-                            className={`px-4 py-2 rounded text-white ${
-                              isBtnDisabled
+                            className={`px-4 py-2 rounded text-white ${isBtnDisabled
                                 ? 'bg-gray-400 cursor-not-allowed'
                                 : 'bg-green-600 hover:bg-purple-800'
-                            }`}
+                              }`}
                             disabled={isBtnDisabled}
                           >
                             {isBtnDisabled ? 'Please wait...' : 'Verify OTP'}

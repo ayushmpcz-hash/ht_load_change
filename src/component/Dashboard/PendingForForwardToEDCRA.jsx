@@ -498,19 +498,19 @@ const PendingForForwardToEDCRA = () => {
   //   }
   // }, [status, setValue]);
   useEffect(() => {
-  if (!status) return;
+    if (!status) return;
 
-  const map = {
-    Already_approved: "Already_approved",
-    forward_to_edcra: "forward_to_edcra",
-    reverted: "reverted",
-  };
+    const map = {
+      Already_approved: "Already_approved",
+      forward_to_edcra: "forward_to_edcra",
+      reverted: "reverted",
+    };
 
-  setValue("remark", map[status] || "", {
-    shouldValidate: true,
-    shouldDirty: true,
-  });
-}, [status, setValue]);
+    setValue("remark", map[status] || "", {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  }, [status, setValue]);
 
 
   /* ---------------- SEND OTP ---------------- */
@@ -591,8 +591,8 @@ const PendingForForwardToEDCRA = () => {
       fd.append("status", fv.status);
       fd.append("remark", fv.remark);
 
-   if (fv.letter_no) fd.append("letter_no", fv.letter_no);
-   if (fv.document?.length) fd.append("document", fv.document[0]);
+      if (fv.letter_no) fd.append("letter_no", fv.letter_no);
+      if (fv.document?.length) fd.append("document", fv.document[0]);
 
       if (fv.revert_reason) fd.append("revert_reason", fv.revert_reason);
       if (fv.revert_reason_remark) fd.append("revert_reason_remark", fv.revert_reason_remark);
@@ -645,7 +645,12 @@ const PendingForForwardToEDCRA = () => {
             <div className="card-body px-4 pb-4">
               <input type="hidden" {...register("application")} value={items?.id || ""} />
               <input type="hidden" {...register("remark")} />
-
+              <input
+                type="hidden"
+                name="employee_id"
+                {...register('employee_id')}
+                value={officerData?.employee_detail.employee_login_id}
+              ></input>
               <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8">
                 {/* Acceptance / Status */}
                 <div className="sm:col-span-2">

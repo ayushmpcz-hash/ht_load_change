@@ -551,7 +551,12 @@ const PendingForTranscoApproval = () => {
 
             <div className="card-body px-4 pb-4">
               <input type="hidden" {...register("application")} value={items?.id || ""} />
-
+              <input
+                type="hidden"
+                name="employee_id"
+                {...register('employee_id')}
+                value={officerData?.employee_detail.employee_login_id}
+              ></input>
               <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8">
                 <div className="sm:col-span-2">
                   <SelectTag

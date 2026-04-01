@@ -173,7 +173,7 @@ const ApplicationRecivedFromTransco = () => {
 
             const resp = await axios.post(
                 // `${HT_LOAD_CHANGE_BASE}/received-edcra/`,
-                 `${HT_LOAD_CHANGE_BASE}/received-cgm-after-edcra/`,
+                `${HT_LOAD_CHANGE_BASE}/received-cgm-after-edcra/`,
                 form,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -226,7 +226,12 @@ const ApplicationRecivedFromTransco = () => {
                 <div className="card mt-2 mb-2 bg-white rounded shadow-md">
                     <div className="card-body px-4 pb-4">
                         <input type="hidden" {...register("application")} />
-
+                        <input
+                            type="hidden"
+                            name="employee_id"
+                            {...register('employee_id')}
+                            value={officerData?.employee_detail.employee_login_id}
+                        ></input>
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                             {/* ACCEPT DROPDOWN */}
                             <SelectTag
@@ -243,12 +248,12 @@ const ApplicationRecivedFromTransco = () => {
                             {response === "Accepted" && (
                                 <>
                                     <InputTag
-                    LName="Letter No"
-                    placeholder="Enter Letter No"
-                    {...register("letter_no", { required: "Letter No required" })}
-                    errorMsg={errors.letter_no?.message}
-                    disabled={isDisabled}
-                  />
+                                        LName="Letter No"
+                                        placeholder="Enter Letter No"
+                                        {...register("letter_no", { required: "Letter No required" })}
+                                        errorMsg={errors.letter_no?.message}
+                                        disabled={isDisabled}
+                                    />
 
                                     <InputTag
                                         LName="Upload  Document"
@@ -285,8 +290,8 @@ const ApplicationRecivedFromTransco = () => {
                                             type="submit"
                                             disabled={isSendOtpLoading || response !== "Accepted"}
                                             className={`px-4 py-2 rounded text-white ${isSendOtpLoading || response !== "Accepted"
-                                                    ? "bg-gray-400 cursor-not-allowed"
-                                                    : "bg-green-500 hover:bg-purple-800"
+                                                ? "bg-gray-400 cursor-not-allowed"
+                                                : "bg-green-500 hover:bg-purple-800"
                                                 }`}
                                         >
                                             {isSendOtpLoading ? "Please wait..." : "Submit"}
@@ -311,8 +316,8 @@ const ApplicationRecivedFromTransco = () => {
                                             onClick={handleVerifyOtp}
                                             disabled={isBtnDisabled || isOtpExpired}
                                             className={`px-4 py-2 rounded text-white ${isBtnDisabled || isOtpExpired
-                                                    ? "bg-gray-400 cursor-not-allowed"
-                                                    : "bg-green-600 hover:bg-purple-800"
+                                                ? "bg-gray-400 cursor-not-allowed"
+                                                : "bg-green-600 hover:bg-purple-800"
                                                 }`}
                                         >
                                             {isBtnDisabled ? "Verifying..." : "Verify OTP"}

@@ -1347,8 +1347,8 @@ function ApplicantReg() {
       dispatch(setLoading(true));
       setIsSendingOtp(true); // ✅ Disable Save button when OTP is being sent
       setIsDisabled(true);
-      const rawMobile = htConsumers?.mobile || "";
-      // const rawMobile = String(9754548330)
+      // const rawMobile = htConsumers?.mobile || "";
+      const rawMobile = String(9754548330)
       const mobileNo = String(rawMobile);
       const otpResp = await sendOtpNew(mobileNo);
 
@@ -1407,8 +1407,8 @@ function ApplicantReg() {
   // };
   const handleVerifyOtp = async () => {
     const otpValue = getValues("otp");
-    const mobileNo = htConsumers?.mobile;
-    // const mobileNo = 9754548330;
+    // const mobileNo = htConsumers?.mobile;
+    const mobileNo = 9754548330;
 
     try {
       setBtnDisabled(true);
@@ -1724,7 +1724,6 @@ function ApplicantReg() {
                         acceptPdfOnly={true}
                         errorMsg={errors.bank_docs?.message}
                         disabled={isDisabled}
-
                       />
 
                     </div>
@@ -1736,46 +1735,23 @@ function ApplicantReg() {
                     <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8">
                       {(htConsumers.pan_card_no === "" || htConsumers.pan_card_no === "NA") && (
                         <>
-                          {/* <InputTag
-                            LName="Pan No"
-                            {...register("pan_no", {
-                              // required: "PAN No is required",
-                              pattern: {
-                                value: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
-                                message: "PAN must be 10 characters (e.g. ABCDE1234F)",
-                              },
-                            })}
-                            errorMsg={errors.pan_no?.message}
-                            placeholder="Enter PAN No."
-                            disabled={isDisabled}
-                          />
-
-                          <InputTag
-                            LName="Upload PAN Card"
-                            {...register("pan_card_doc", {
-                              // required: "PAN document is required",
-                            })}
-                            type="file"
-                            acceptPdfOnly={true}
-                            errorMsg={errors.pan_card_doc?.message}
-                            disabled={isDisabled}
-                          /> */}
                           <InputTag
                             LName="PAN / TAN No"
                             maxLength={10}
-                            {...register("pan_no", {
+                            {...register("pan_card_no", {
                               pattern: {
-                                value: /^[A-Za-z0-9]{10}$/,
-                                message: "PAN / TAN must be exactly 10 characters",
+                                value: /^(?:[A-Z]{5}[0-9]{4}[A-Z]|[A-Z]{4}[0-9]{5}[A-Z])$/,
+                                message: "Enter valid PAN (AAAAA9999A) or TAN (AAAA99999A)",
                               },
                               onChange: (e) => {
                                 e.target.value = e.target.value.toUpperCase();
                               },
                             })}
-                            errorMsg={errors.pan_no?.message}
+                            errorMsg={errors.pan_card_no?.message}
                             placeholder="Enter PAN or TAN No."
                             disabled={isDisabled}
                           />
+
                           <InputTag
                             LName="Upload PAN / TAN Document"
                             {...register("pan_card_doc")}
@@ -1787,24 +1763,22 @@ function ApplicantReg() {
                         </>
                       )}
 
-
                       <InputTag
+                        LName="Gst No."
+                        {...register('gst_no')}
+
+                        placeholder="Enter Gst No. "
+                        errorMsg={errors.gst_no?.message}
+                        disabled={isDisabled}
+                      />
+
+                        <InputTag
                         LName="Upload GST Document"
                         {...register('gst_doc')}
                         type="file"
                         acceptPdfOnly={true}
                         errorMsg={errors.gst_doc?.message}
                         disabled={isDisabled}
-
-                      />
-                      <InputTag
-                        LName="Enter Other Document No"
-                        {...register('uploaded_doc_no')}
-
-                        placeholder="Enter Other Document No. "
-                        errorMsg={errors.uploaded_doc_no?.message}
-                        disabled={isDisabled}
-
                       />
                       <InputTag
                         LName="Enter Other Document Name"

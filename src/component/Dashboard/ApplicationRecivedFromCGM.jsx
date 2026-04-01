@@ -18,8 +18,8 @@ import { handleOfficerFlagCount } from "../../utils/handleOfficerFlagCount.js";
 import { setOfficerData } from "../../redux/slices/userSlice.js";
 
 const statusOptions = [
-  { label: "Accepted", value: "accepted" },   // ✅ lowercase
-  { label: "Reverted", value: "reverted" },   // ✅ lowercase
+    { label: "Accepted", value: "accepted" },   // ✅ lowercase
+    { label: "Reverted", value: "reverted" },   // ✅ lowercase
 ];
 
 
@@ -27,7 +27,7 @@ const ApplicationRecivedFromCGM = () => {
     const officerData = useSelector((s) => s.user.officerData);
     const location = useLocation();
     const navigate = useNavigate();
-     const dispatch = useDispatch();
+    const dispatch = useDispatch();
     const items = location.state?.items || location.state?.data || null;
     const token = Cookies.get("accessToken");
 
@@ -165,96 +165,96 @@ const ApplicationRecivedFromCGM = () => {
     };
 
     // ---------------- FINAL SUBMIT ----------------
-   const handleFinalSubmit = async () => {
-  try {
-    const fv = getValues();
+    const handleFinalSubmit = async () => {
+        try {
+            const fv = getValues();
 
-    const form = new FormData();
-    form.append("application", fv.application);
-    form.append("status", fv.status);
+            const form = new FormData();
+            form.append("application", fv.application);
+            form.append("status", fv.status);
 
-    // Only send optional fields when needed
+            // Only send optional fields when needed
 
-    if (fv.status === "accepted") {
-      if (fv.document?.length) {
-        form.append("document", fv.document[0]);
-      }
+            if (fv.status === "accepted") {
+                if (fv.document?.length) {
+                    form.append("document", fv.document[0]);
+                }
 
-      if (fv.letter_no) {
-        form.append("letter_no", fv.letter_no);
-      }
+                if (fv.letter_no) {
+                    form.append("letter_no", fv.letter_no);
+                }
 
-      // remark OPTIONAL (DB already has default)
-      // form.append("remark", "Application received from CGM after EDCRA approval");
-    }
+                // remark OPTIONAL (DB already has default)
+                // form.append("remark", "Application received from CGM after EDCRA approval");
+            }
 
-    if (fv.status === "reverted") {
-      form.append("revert_reason", fv.revert_reason);
-      form.append("revert_remark", fv.revert_remark);
+            if (fv.status === "reverted") {
+                form.append("revert_reason", fv.revert_reason);
+                form.append("revert_remark", fv.revert_remark);
 
-      if (fv.document?.length) {
-        form.append("document", fv.document[0]);
-      }
+                if (fv.document?.length) {
+                    form.append("document", fv.document[0]);
+                }
 
-      form.append("remark", "Reverted by CGM after EDCRA approval");
-    }
+                form.append("remark", "Reverted by CGM after EDCRA approval");
+            }
 
-    const resp = await axios.post(
-      `${HT_LOAD_CHANGE_BASE}/received-cgm-after-edcra/`,
-      form,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+            const resp = await axios.post(
+                `${HT_LOAD_CHANGE_BASE}/received-cgm-after-edcra/`,
+                form,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
 
-    const result = resp.data;
+            const result = resp.data;
 
-    if (result?.status === "success") {
-      alert(result.message);
-      navigate(`/dashboard/respones/${result.data.application}`, {
-        state: result.data,
-      });
-     const updatedFlags = await handleOfficerFlagCount();
-     dispatch(setOfficerData(updatedFlags));
-    } else {
-      alert(result.message || "Submission failed");
-    }
-  } catch (err) {
-  if (handleTokenExpiry(err, navigate)) return;
+            if (result?.status === "success") {
+                alert(result.message);
+                navigate(`/dashboard/respones/${result.data.application}`, {
+                    state: result.data,
+                });
+                const updatedFlags = await handleOfficerFlagCount();
+                dispatch(setOfficerData(updatedFlags));
+            } else {
+                alert(result.message || "Submission failed");
+            }
+        } catch (err) {
+            if (handleTokenExpiry(err, navigate)) return;
 
-  let backendMessage = "";
+            let backendMessage = "";
 
-  const data = err?.response?.data;
+            const data = err?.response?.data;
 
-  // 1️⃣ If backend sends simple message
-  if (typeof data === "string") {
-    backendMessage = data;
-  }
+            // 1️⃣ If backend sends simple message
+            if (typeof data === "string") {
+                backendMessage = data;
+            }
 
-  // 2️⃣ If backend sends { message: "" }
-  else if (data?.message) {
-    backendMessage = data.message;
-  }
+            // 2️⃣ If backend sends { message: "" }
+            else if (data?.message) {
+                backendMessage = data.message;
+            }
 
-  // 3️⃣ If Django validation object { field: ["msg"] }
-  else if (typeof data === "object" && data !== null) {
-    const firstKey = Object.keys(data)[0];
+            // 3️⃣ If Django validation object { field: ["msg"] }
+            else if (typeof data === "object" && data !== null) {
+                const firstKey = Object.keys(data)[0];
 
-    if (Array.isArray(data[firstKey])) {
-      backendMessage = data[firstKey][0]; // ⭐ MAIN FIX
-    }
-  }
+                if (Array.isArray(data[firstKey])) {
+                    backendMessage = data[firstKey][0]; // ⭐ MAIN FIX
+                }
+            }
 
-  // 4️⃣ Final fallback
-  if (!backendMessage) {
-    backendMessage = "Unable to submit. Please try again.";
-  }
+            // 4️⃣ Final fallback
+            if (!backendMessage) {
+                backendMessage = "Unable to submit. Please try again.";
+            }
 
-  alert(backendMessage);
-}
- finally {
-    setBtnIsDisabled(false);
-    setIsProcessing(false);
-  }
-};
+            alert(backendMessage);
+        }
+        finally {
+            setBtnIsDisabled(false);
+            setIsProcessing(false);
+        }
+    };
 
 
     // ---------------- UI ----------------
@@ -284,7 +284,12 @@ const ApplicationRecivedFromCGM = () => {
 
                         <div className="card-body px-4 pb-4">
                             <input type="hidden" {...register("application")} />
-
+                            <input
+                                type="hidden"
+                                name="employee_id"
+                                {...register('employee_id')}
+                                value={officerData?.employee_detail.employee_login_id}
+                            ></input>
                             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                                 <SelectTag
                                     LName="Acceptance"
@@ -360,8 +365,8 @@ const ApplicationRecivedFromCGM = () => {
                                                 type="submit"
                                                 disabled={isSendOtpLoading || !status}
                                                 className={`px-4 py-2 rounded text-white ${isSendOtpLoading || !status
-                                                        ? "bg-gray-400 cursor-not-allowed"
-                                                        : "bg-green-500 hover:bg-purple-800"
+                                                    ? "bg-gray-400 cursor-not-allowed"
+                                                    : "bg-green-500 hover:bg-purple-800"
                                                     }`}
                                             >
                                                 {isSendOtpLoading
@@ -391,8 +396,8 @@ const ApplicationRecivedFromCGM = () => {
                                                 onClick={handleVerifyOtp}
                                                 disabled={isBtnDisabled || isOtpExpired}
                                                 className={`px-4 py-2 rounded text-white ${isBtnDisabled || isOtpExpired
-                                                        ? "bg-gray-400"
-                                                        : "bg-green-600"
+                                                    ? "bg-gray-400"
+                                                    : "bg-green-600"
                                                     }`}
                                             >
                                                 {isBtnDisabled ? "Verifying..." : "Verify OTP"}

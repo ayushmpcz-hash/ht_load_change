@@ -41,7 +41,7 @@ export default function ApplicantBasicDetails({ htConsumers ,register ,errors}) 
          <InputTag LName="Address" {...register('address')}
            errorMsg={errors.address?.message}  readOnly={true} />
           <InputTag
-            LName="pan_card_no"
+            LName="Pan Number"
             {...register('pan_card_no')}
            readOnly={true}
             errorMsg={errors.pan_card_no?.message}

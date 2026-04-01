@@ -36,7 +36,15 @@ export default function LoadChangeInstruction() {
       if (result?.list?.length > 0) {
         let current_month_outstandin_amt = Number(result.list[0].netBill) - Number(result.list[0].paidAmt)
         const transformedData = transformDataKeys(result.list[0]);
-        console.log(transformedData,'transformedData')
+
+        // ✅ CHECK CONNECTION TYPE
+        if (transformedData.connection_type !== "Permanent") {
+          setError({ Consumer_id: "Load Change is allowed only for Permanent Connection" });
+          // setMessage("Only Permanent connection consumers can apply for Load Change.");
+          setIsDisabled(false);
+          return;
+        }
+        console.log(transformedData, 'transformedData')
         transformedData.current_month_outstandin_amt = current_month_outstandin_amt;
         transformedData.current_bill_units = result?.list?.[0]?.billedUnits
           ? Math.round(result.list[0].billedUnits)

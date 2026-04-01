@@ -312,7 +312,6 @@
 
 // export default LoadChangePay;
 
-
 import React, { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Button } from "../importComponents";
@@ -324,9 +323,9 @@ const LoadChangePay = () => {
   const [appData, setAppData] = useState(null);
   const [isPayDisabled, setIsPayDisabled] = useState(false);
 
-    const auth = getAppAuth();
-     const applicationNo = auth?.application_no;
-     const password = auth?.password;
+  const auth = getAppAuth();
+  const applicationNo = auth?.application_no;
+  const password = auth?.password;
 
   const location = useLocation();
   const { result, locationData } = location.state || {};
@@ -340,43 +339,56 @@ const LoadChangePay = () => {
   const [isGeneratingDemandNote, setIsGeneratingDemandNote] = useState(false);
   const [demandNoteData, setDemandNoteData] = useState(null);
 
+  const sdFromResult =
+    result?.data?.total_sd_required ||   // 🔥 MOST IMPORTANT
+    result?.tariff_charges?.total_sd_required ||
+    appData?.tariff_charges?.total_sd_required;
+
+  const isLoadEnhancement =
+    result?.type_of_change === "Load_Enhancement" ||
+    locationData?.data?.type_of_change === "Load_Enhancement" ||
+    appData?.type_of_change === "Load_Enhancement";
+
+  const isSdZero =
+    isLoadEnhancement && (!sdFromResult || sdFromResult === 0);
+
   //   const {
   //     consumer_name,
   //   application_no,
   // } = useSelector(state => state.user.userData);
 
   const fetchApplicationStatus = async () => {
-  if (!applicationNo || !password) {
-    console.error("Application credentials missing");
-    return;
-  }
-
-  try {
-    const response = await fetch(
-      `${HT_LOAD_CHANGE_BASE}/get-load-change-applications/?application_no=${applicationNo}&password=${password}`,
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-
-    const res = await response.json();
-
-    if (res?.data) {
-      setAppData(res.data);
-
-      if (res.data.is_regfee_submitted_bypg === true) {
-        setIsPayDisabled(true);
-      }
+    if (!applicationNo || !password) {
+      console.error("Application credentials missing");
+      return;
     }
-  } catch (error) {
-    console.error("Failed to fetch application status", error);
-  }
-};
 
-useEffect(() => {
-  fetchApplicationStatus();
-}, []);
+    try {
+      const response = await fetch(
+        `${HT_LOAD_CHANGE_BASE}/get-load-change-applications/?application_no=${applicationNo}&password=${password}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      const res = await response.json();
+
+      if (res?.data) {
+        setAppData(res.data);
+
+        if (res.data.is_regfee_submitted_bypg === true) {
+          setIsPayDisabled(true);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch application status", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchApplicationStatus();
+  }, []);
 
 
 
@@ -443,6 +455,8 @@ useEffect(() => {
     }
   }, [id]);
 
+  console.log(result, 'result')
+  console.log(locationData, 'location dataa')
   return (
     <div className="container mx-auto">
       <div className="card mt-2 mb-2 bg-white rounded shadow-md">
@@ -451,6 +465,11 @@ useEffect(() => {
           <h2><strong>Application No. :- {locationData?.data?.application_no || result?.application_no}</strong></h2>
           <span><strong>Consumer Name :- {locationData?.data?.consumer_name || result?.consumer_name}</strong></span>
         </div>
+        {isSdZero && (
+          <div className="mt-3 text-center text-red-600 font-semibold">
+           Your security deposit amount is zero, so you cannot proceed with payment. Please log in as the Applicant, recalculate the security deposit charges, and try again.
+          </div>
+        )}
 
         <div className="card-body px-4 pb-4">
           <div className="overflow-auto w-full">
@@ -526,7 +545,7 @@ useEffect(() => {
                               isPayDisabled ? "Payment Completed" : "Pay"
                             }
                             className="p-2"
-                            disabled={isPayDisabled}
+                            disabled={isPayDisabled || isSdZero}
                           />
                         </a>
 
@@ -553,7 +572,7 @@ useEffect(() => {
                                   : "Generate Challan"
                               }
                               onClick={generateChallan}
-                              disabled={isGenerating}
+                              disabled={isGenerating || isSdZero}
                               className="p-2"
                             />
                           )}
@@ -592,7 +611,7 @@ useEffect(() => {
                             : "Generate Demand Note"
                         }
                         onClick={generateDemandNote}
-                        disabled={isGeneratingDemandNote}
+                        disabled={isGeneratingDemandNote || isSdZero}
                         className="p-2"
                       />
                     )}
@@ -601,6 +620,7 @@ useEffect(() => {
               </tbody>
             </table>
           </div>
+
           {/* 🔴 IMPORTANT NOTE (ENGLISH + HINDI) */}
           <div className="mt-4 p-4 border-l-4 border-red-500 bg-red-50 rounded">
             <p className="text-sm text-red-700 font-semibold">
@@ -626,6 +646,10 @@ useEffect(() => {
 };
 
 export default LoadChangePay;
+
+
+
+
 
 
 
