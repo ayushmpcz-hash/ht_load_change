@@ -878,7 +878,7 @@ console.log(items,'items')
                     message={modalMessage}
                     onConfirm={modalAction}
                   />
-                  <ApplicantBasicDetails htConsumers={items} register={register} errors={errors} />
+                  <ApplicantBasicDetails htConsumers={items} register={register} errors={errors} officerData={officerData}/>
                 </div>
               </div>
             </div>

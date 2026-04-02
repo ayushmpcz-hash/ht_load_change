@@ -502,6 +502,13 @@ const PendingForTranscoApproval = () => {
       if (fv.letter_no) form.append("letter_no", fv.letter_no);
       if (fv.document?.length) form.append("document", fv.document[0]);
 
+      // ✅ ADD THIS
+      const employeeId = officerData?.employee_detail?.employee_login_id;
+
+      if (employeeId) {
+        form.append("employee_id", employeeId);
+      }
+
       const resp = await axios.post(
         `${HT_LOAD_CHANGE_BASE}/transco_approval/`,
         form,

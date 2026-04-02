@@ -171,6 +171,13 @@ const ApplicationRecivedFromTransco = () => {
             form.append("document", fv.document[0]);
             form.append("remark", fv.remark);
 
+            // ✅ ADD THIS
+            const employeeId = officerData?.employee_detail?.employee_login_id;
+
+            if (employeeId) {
+                form.append("employee_id", employeeId);
+            }
+
             const resp = await axios.post(
                 // `${HT_LOAD_CHANGE_BASE}/received-edcra/`,
                 `${HT_LOAD_CHANGE_BASE}/received-cgm-after-edcra/`,

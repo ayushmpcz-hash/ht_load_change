@@ -199,6 +199,13 @@ const ApplicationRecivedFromCGM = () => {
                 form.append("remark", "Reverted by CGM after EDCRA approval");
             }
 
+            // ✅ ADD THIS
+            const employeeId = officerData?.employee_detail?.employee_login_id;
+
+            if (employeeId) {
+                form.append("employee_id", employeeId);
+            }
+
             const resp = await axios.post(
                 `${HT_LOAD_CHANGE_BASE}/received-cgm-after-edcra/`,
                 form,

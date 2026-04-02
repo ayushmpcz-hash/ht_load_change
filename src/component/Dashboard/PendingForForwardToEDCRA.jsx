@@ -597,7 +597,12 @@ const PendingForForwardToEDCRA = () => {
       if (fv.revert_reason) fd.append("revert_reason", fv.revert_reason);
       if (fv.revert_reason_remark) fd.append("revert_reason_remark", fv.revert_reason_remark);
       if (fv.upload_revert_docs?.length) fd.append("upload_revert_docs", fv.upload_revert_docs[0]);
+      // ✅ ADD THIS
+      const employeeId = officerData?.employee_detail?.employee_login_id;
 
+      if (employeeId) {
+        fd.append("employee_id", employeeId);
+      }
       const resp = await axios.post(
         `${HT_LOAD_CHANGE_BASE}/edcra-approval/`,
         fd,
