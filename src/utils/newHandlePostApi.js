@@ -51,3 +51,20 @@ export const getFinalUsingDataToken = async (url,token) => {
  const result = await response.json();
   return result; 
 };
+
+//new public api
+export const getPublicData = async (url) => {
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! Status: ${response.status}`);
+  }
+
+  const result = await response.json();
+  return result;
+};

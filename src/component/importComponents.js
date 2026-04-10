@@ -5,7 +5,7 @@ import { fetchCtPtData } from '../utils/meRation.js';
 import ApplicantBasicDetails from '../component/ApplicantBasicDetails.jsx';
 import ApplicantFillDetails from '../component/ApplicantFillDetails.jsx';
 import AlertModalBox from '../component/alertModelBox.jsx';
-import { SendDataForToken,getNgbToken,getFinalUsingDataToken } from '../utils/newHandlePostApi.js';
+import { SendDataForToken,getNgbToken,getFinalUsingDataToken,getPublicData } from '../utils/newHandlePostApi.js';
 import { extractFormValues } from '../utils/extractFormValues.js';
 import { toFormData } from '../utils/FormateFormData.js';
 import TrackApplicationStatus from './loadChange/TrackApplicationStatus.jsx';
@@ -51,6 +51,7 @@ export {
   LoadConnectionServed,
   getNgbToken,
   getFinalUsingDataToken,
+  getPublicData,
   LoadWorkCompletionAndMeterIssuing,
   SearchApplicantDetailsPDF,
   Download,

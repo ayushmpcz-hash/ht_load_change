@@ -657,7 +657,8 @@ import {
   sendOtpNew,
   verifyOtpNew,
   getNgbToken,
-  getFinalUsingDataToken
+  getFinalUsingDataToken,
+  getPublicData
 } from '../importComponents.js';
 
 import {
@@ -809,15 +810,20 @@ const LoadCommissioning = () => {
         setNgbToken(cleanToken);
 
 
-        const manufactures =
-          await getFinalUsingDataToken(
-            `${NGB_PRO_BASE}/masters/getAllManufactures`,
-            cleanToken
-          );
+        // const manufactures =
+        //   await getFinalUsingDataToken(
+        //     `${NGB_PRO_BASE}/masters/getAllManufactures`,
+        //     cleanToken
+        //   );
 
+        // setAllManufactures(manufactures.list);
+
+        const manufactures = await getPublicData(
+           `https://services.mpcz.in/HT-NIC/api/htPublicApis/getAllCTManufacturer`
+        );
+
+        // setAllManufactures(manufactures?.data || manufactures);
         setAllManufactures(manufactures.list);
-
-
 
         const CTRatios =
           await getFinalUsingDataToken(
@@ -869,26 +875,44 @@ const LoadCommissioning = () => {
 
   }, [meter_make, ngbToken]);
 
+  // useEffect(() => {
+
+  //   if (!me_make || !ngbToken) return;
+
+  //   (async () => {
+
+  //     const models =
+  //       await getFinalUsingDataToken(
+
+  //         `${NGB_PRO_BASE}/masters/getAllModelsByMeterManufacturer/${me_make}`,
+
+  //         ngbToken
+
+  //       );
+
+  //     setAllMeModels(models.list);
+
+  //   })();
+
+  // }, [me_make, ngbToken]);
+
   useEffect(() => {
-
-    if (!me_make || !ngbToken) return;
-
-    (async () => {
-
-      const models =
-        await getFinalUsingDataToken(
-
-          `${NGB_PRO_BASE}/masters/getAllModelsByMeterManufacturer/${me_make}`,
-
-          ngbToken
-
-        );
-
-      setAllMeModels(models.list);
-
-    })();
-
-  }, [me_make, ngbToken]);
+      if (!me_make) return;
+  
+      (async () => {
+        try {
+          const models = await getPublicData(
+            `https://services.mpcz.in/HT-NIC/api/htPublicApis/getAllCTModelByCTManufacturer/${me_make}`            
+          );
+  
+          console.log(models, 'me models public');
+  
+          setAllMeModels(models?.list || []);
+        } catch (err) {
+          console.error('Error fetching ME models:', err.message || err);
+        }
+      })();
+    }, [me_make]);
 
 
 
@@ -1207,16 +1231,16 @@ const LoadCommissioning = () => {
                             LName="ME Make"
                             options={allManufactures}
                             {...register("me_make")}
-                            labelKey="meterManufacturerName"
-                            valueKey="meterMakeDetailId"
+                            labelKey="ctManufacturerName"
+                            valueKey="ctManufacturerId"
                           />
 
                           <SelectTag
                             LName="ME Model"
                             options={allMeModels}
                             {...register("me_model")}
-                            labelKey="meterModelName"
-                            valueKey="meterModelName"
+                            labelKey="ctModelName"
+                            valueKey="ctModelName"
                           />
 
                           <SelectTag
