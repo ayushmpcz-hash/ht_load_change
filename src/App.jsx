@@ -186,6 +186,7 @@ import Dummy from './component/Dummy';
 import BayRequiredAccept from './component/Dashboard/BayRequiredAccept';
 import UnderProcess from './component/Dashboard/UnderProcess';
 import DownloadAllPdf from "./component/Dashboard/SearchApplicantDetailsPDF";
+// import Reports from "./component/Dashboard/Reports";
 import ApplicationView from './component/Dashboard/UserDashboard/ApplicationView';
 import LoadWorkCompletionChargingPermission from './component/Dashboard/UserDashboard/LoadWorkCompletionChargingPermission'
 
@@ -260,6 +261,7 @@ function App() {
             <Route path="/dashboard/respones/:id" element={<SuccessRespones />} />
             {/* <Route path="/dashboard/download_pdf" element={<SearchApplicantDetailsPDF />} /> */}
             <Route path="/dashboard/download_pdf" element={<DownloadAllPdf />} />
+            {/* <Route path="/dashboard/reports" element={<Reports/>} /> */}
 
             <Route path="/dashboard/download" element={< Download />} />
           </Route>

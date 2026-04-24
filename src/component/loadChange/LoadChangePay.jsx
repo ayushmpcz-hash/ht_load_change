@@ -706,7 +706,7 @@ const LoadChangePay = () => {
     if ([82, 83].includes(numId)) return 82;
     if ([84, 85].includes(numId)) return 84;
     if ([17, 18].includes(numId)) return 17;
-    if ([74, 77, 78].includes(numId)) return 78;
+    if ([74, 77, 75,78,76].includes(numId)) return 78;
 
     return numId; // default same id
   };
@@ -778,7 +778,7 @@ const LoadChangePay = () => {
           const fppasAmount = Math.round(energyAmount * fppasRateNew);
           const dutyAmount = Math.round(((energyAmount + fppasAmount) * dutyPercentage) / 100);
           const totalChargesAmount = Math.round(fixedAmount + energyAmount + fppasAmount + dutyAmount);
-
+           console.log(dutyAmount,'dutyAmountttttttt')
           // Validate energy amount
           if (energyAmount <= 0) {
             setSpecificError(

@@ -485,11 +485,11 @@ const PendingForTranscoApproval = () => {
     try {
       const fv = getValues();
 
-      if (fv.status === "under_process") {
-        if (!fv.letter_no) return alert("Please enter Letter No.");
-        if (!(fv.document && fv.document.length > 0))
-          return alert("Please upload document.");
-      }
+      // if (fv.status === "under_process") {
+      //   if (!fv.letter_no) return alert("Please enter Letter No.");
+      //   if (!(fv.document && fv.document.length > 0))
+      //     return alert("Please upload document.");
+      // }
 
       const form = new FormData();
       form.append("application", fv.application);
@@ -550,7 +550,7 @@ const PendingForTranscoApproval = () => {
         </div>
 
         {/* Show to CGM only — update role id if needed */}
-        {Number(officerData?.employee_detail?.role) === 19 && (
+        {Number(officerData?.employee_detail?.role) === 19 || 40 && (
           <div className="card mt-2 mb-2 bg-white rounded shadow-md ">
             <div className="card-header px-4 py-2 border-b border-gray-300">
               <h2 className="text-lg font-bold capitalize ">Transco Action</h2>
@@ -577,7 +577,7 @@ const PendingForTranscoApproval = () => {
                   />
                 </div>
 
-                {(status === "under_process" || status === "Transco_accept") && (
+                {( status === "Transco_accept") && (
                   <>
                     <div className="sm:col-span-3">
                       <InputTag

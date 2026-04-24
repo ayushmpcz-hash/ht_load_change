@@ -1249,6 +1249,54 @@ function ApplicantReg() {
     existing_contract_demand: htConsumers?.existing_contract_demand,
   };
 
+  const getExpectedContractDemandDifference = (
+    currentType,
+    currentDemand,
+    existingDemand
+  ) => {
+    const parsedNewDemand = Number(currentDemand);
+    const parsedExistingDemand = Number(existingDemand);
+
+    if (Number.isNaN(parsedNewDemand) || Number.isNaN(parsedExistingDemand)) {
+      return null;
+    }
+
+    if (currentType === "Load_Enhancement") {
+      return parsedNewDemand - parsedExistingDemand;
+    }
+
+    if (currentType === "Load_Reduction") {
+      return parsedExistingDemand - parsedNewDemand;
+    }
+
+    return 0;
+  };
+
+  const validateContractDemandDifference = (formData = getValues()) => {
+    const expectedDifference = getExpectedContractDemandDifference(
+      formData?.type_of_change,
+      formData?.new_contact_demand,
+      normalizedHtConsumer?.existing_contract_demand
+    );
+
+    if (expectedDifference === null) {
+      return true;
+    }
+
+    const actualDifference = Number(formData?.contract_demand_difference);
+
+    if (actualDifference !== expectedDifference) {
+      setError("contract_demand_difference", {
+        type: "manual",
+        message: `Contract Demand Difference should be ${expectedDifference} KVA`,
+      });
+      return false;
+    }
+
+    clearErrors("contract_demand_difference");
+    return true;
+  };
+
   useEffect(() => {
     let timeoutId;
 
@@ -1266,9 +1314,10 @@ function ApplicantReg() {
           loadReductionApply
         );
 
-        let contractDiff = Math.abs(
-          ContractDemand - Number(htConsumers.existing_contract_demand)
-          // ContractDemand - Number(htConsumers.cd)
+        const contractDiff = getExpectedContractDemandDifference(
+          typeOfChange,
+          ContractDemand,
+          htConsumers?.existing_contract_demand
         );
         setValue("contract_demand_difference", contractDiff);
 
@@ -1288,6 +1337,7 @@ function ApplicantReg() {
           setValue("new_contact_demand", "");
         } else {
           clearErrors("new_contact_demand");
+          clearErrors("contract_demand_difference");
         }
       }, 1500); // 1.5 seconds delay
 
@@ -1300,6 +1350,9 @@ function ApplicantReg() {
 
   // 🧩 Submit or Update handler
   const onSubmithandler = async (data) => {
+    if (!validateContractDemandDifference(data)) {
+      return;
+    }
     await handleSendOtp(data);
     // await handleSubmitNewApplication(data);
   };
@@ -1347,8 +1400,8 @@ function ApplicantReg() {
       dispatch(setLoading(true));
       setIsSendingOtp(true); // ✅ Disable Save button when OTP is being sent
       setIsDisabled(true);
-      // const rawMobile = htConsumers?.mobile || "";
-      const rawMobile = String(9754548330)
+      const rawMobile = htConsumers?.mobile || "";
+      // const rawMobile = String(9754548330)
       const mobileNo = String(rawMobile);
       const otpResp = await sendOtpNew(mobileNo);
 
@@ -1407,8 +1460,8 @@ function ApplicantReg() {
   // };
   const handleVerifyOtp = async () => {
     const otpValue = getValues("otp");
-    // const mobileNo = htConsumers?.mobile;
-    const mobileNo = 9754548330;
+    const mobileNo = htConsumers?.mobile;
+    // const mobileNo = 9754548330;
 
     try {
       setBtnDisabled(true);
@@ -1417,6 +1470,9 @@ function ApplicantReg() {
       if (verifyResp.success) {
         // ✅ PURE FORM DATA PASS KARO
         const formData = getValues();
+        if (!validateContractDemandDifference(formData)) {
+          return;
+        }
         console.log(formData, 'form dataaaaa')
         await handleSubmitNewApplication(formData);
       } else {
@@ -1603,11 +1659,11 @@ function ApplicantReg() {
                         LName="Contract Demand Difference"
                         type={'number'}
                         {...register('contract_demand_difference', {
-                          required: true,
+                          required: 'Contract Demand Difference is required',
                         })}
                         errorMsg={errors.contract_demand_difference?.message}
                         disabled={isDisabled}
-                        readOnly={isLocked}
+                        readOnly={true}
                       />
                       {/* <InputTag
                         LName="Purpose Of Installation (Optional)"

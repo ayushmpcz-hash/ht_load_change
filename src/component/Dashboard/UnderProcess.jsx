@@ -42,6 +42,7 @@ const UnderProcess = () => {
   const [formDataValue, setFormDataValue] = useState(null);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isBtnDisabled, setBtnIsDisabled] = useState(false);
+  const status = watch('status')
   //   const commissioning_permission_response = watch('commissioning_permission_response');
   const handleSendOtp = async formData => {
     setFormDataValue(formData);
@@ -126,6 +127,7 @@ const UnderProcess = () => {
       setBtnIsDisabled(false);
     }
   };
+  console.log()
   return (
     <>
       <div>
@@ -144,7 +146,7 @@ const UnderProcess = () => {
               </div>
             </div>
           </div>
-          {officerData?.employee_detail.role == 18 && (
+          {officerData?.employee_detail.role == 18 || 40 && (
             <>
               <div class="card mt-2 mb-2 bg-white rounded shadow-md ">
                 <div className="card-header px-4 py-2 border-b border-gray-300">
@@ -167,39 +169,40 @@ const UnderProcess = () => {
                       {...register('status', {
                         required: 'Please Select Acceptance',
                       })}
-                      errorMsg={errors.status?.message}
+                      errorMsg={errors?.status?.message}
                       labelKey="label"
                       valueKey="value"
                       disabled={isDisabled}
                     />
-                    {/* {status === 'Accepted' && (
+                    {status == 'Accepted' && (
                       <>
+                        <div className="sm:col-span-2">
                         <InputTag
-                          LName="Upload Commissioning Permission letter"
+                          LName="Upload Transco letter"
                           type="file"
-                          {...register('commissioning_permission_letter', {
-                            required: 'Commissioning Permission letter is required',
+                          {...register('transco_permission_letter', {
+                            required: 'Transco letter is required',
                           })}
-                          errorMsg={errors.commissioning_permission_letter?.message}
+                          errorMsg={errors.transco_permission_letter?.message}
                           disabled={isDisabled}
                         />
+                        </div>
+
+                        <div className="sm:col-span-2">
+                          <InputTag
+                            LName="Letter No"
+                            {...register("transco_letter_no", { required: "Letter No is required" })}
+                            errorMsg={errors.transco_letter_no?.message}
+                            disabled={isDisabled}
+                          />
+                        </div>
                       </>
-                    )} */}
+                    )}
 
                     {/* Reverted Case */}
-                    {/* {commissioning_permission_response === 'Reverted' && (
+                    {status === 'Reverted' && (
                       <>
-                        <SelectTag
-                          LName="Revert Reason"
-                          options={revertOption}
-                          {...register('revert_reason', {
-                            required: 'Revert Reason is required',
-                          })}
-                          errorMsg={errors.revert_reason?.message}
-                          labelKey="label"
-                          valueKey="value"
-                          disabled={isDisabled}
-                        />
+                        
                         <InputTag
                           LName="Revert Reason Remark"
                           placeholder="Enter Remark"
@@ -219,7 +222,7 @@ const UnderProcess = () => {
                           disabled={isDisabled}
                         />
                       </>
-                    )} */}
+                    )}
                   </div>
                   <div className="mt-10 flex flex-col justify-center items-center">
                     <div className="flex space-x-2 space-y-2 flex-wrap justify-center items-baseline">
@@ -232,16 +235,16 @@ const UnderProcess = () => {
                             Reset
                           </button>
                           <button
-                            type="submit" // ✅ Yeh important hai, warna handleSendOtp call nahi hota
+                            type="submit"
                             className={`px-4 py-2 rounded text-white ${isDisabled
                                 ? 'bg-gray-400 cursor-not-allowed'
                                 : 'bg-green-500 hover:bg-purple-800'
                               }`}
                             disabled={isDisabled}
                           >
-                            {commissioning_permission_response === 'Reverted'
-                              ? 'Revert For Survey'
-                              : 'Send for Commissioning'}
+                            {status === 'Reverted'
+                              ? 'Revert'
+                              : 'Submit'}
                           </button>
                         </>
                       ) : (
@@ -256,8 +259,8 @@ const UnderProcess = () => {
                             type="button"
                             onClick={handleVerifyOtp}
                             className={`px-4 py-2 rounded text-white ${isBtnDisabled
-                                ? 'bg-gray-400 cursor-not-allowed'
-                                : 'bg-green-600 hover:bg-purple-800'
+                              ? 'bg-gray-400 cursor-not-allowed'
+                              : 'bg-green-600 hover:bg-purple-800'
                               }`}
                             disabled={isBtnDisabled}
                           >
