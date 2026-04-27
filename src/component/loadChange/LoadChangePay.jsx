@@ -746,14 +746,14 @@ const LoadChangePay = () => {
 
         const supplyVoltageLabel = supplyVoltageMap[new_supply_voltage] || '';
         let new_connection_category = connection_category.slice(0, -1) + supplyVoltageLabel;
-
+        // let new_connection_category = 'HV-4.1.B'
         try {
           // Fetch duty percentage
           // const dutyRes = await handleGetApi(
           //   `${HT_NSC_BASE}/get_duty_percentage_by_purpose_id_ngb/${connection_purpose_id}`
           // );
           const normalizedPurposeId = normalizePurposeId(connection_purpose_id);
-
+          
           const dutyRes = await handleGetApi(
             `${HT_NSC_BASE}/get_duty_percentage_by_purpose_id_ngb/${normalizedPurposeId}`
           );

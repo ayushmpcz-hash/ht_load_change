@@ -118,7 +118,7 @@ const UnderProcess = () => {
         }
       );
       const { data: apiData, ...rest } = data;
-      alert('Commissioning submitted successfully ✅');
+      alert('EDCRA submitted successfully ✅');
       navigate(`/dashboard/respones/${apiData.application}`, { state: apiData, rest });
     } catch (error) {
       console.error('API Error:', error);
@@ -146,7 +146,7 @@ const UnderProcess = () => {
               </div>
             </div>
           </div>
-          {officerData?.employee_detail.role == 18 || 40 && (
+          {officerData?.employee_detail.role === 40 && (
             <>
               <div class="card mt-2 mb-2 bg-white rounded shadow-md ">
                 <div className="card-header px-4 py-2 border-b border-gray-300">
