@@ -1,4 +1,3 @@
-//with new ui 
 // import React, { useRef, useEffect, useState } from 'react';
 // import { useSelector } from 'react-redux';
 // import { NavLink } from 'react-router-dom';
@@ -84,7 +83,6 @@
 //       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 //         {officerData?.flags?.map((items) => {
 
-//           // -------- Clean status text --------
 //           let statusText = items.application_status || "";
 
 //           if (statusText === "pending for agreement finalization") {
@@ -92,16 +90,28 @@
 //           } else if (statusText === "connection served") {
 //             statusText = "Load Released (Closed)";
 //           } else {
-//             // remove "pending" word globally
 //             statusText = statusText.replace(/pending For/gi, "").trim();
 //           }
+
+
+//           // ✅ DESIGNATION MANIPULATION
+//           let designationText = items.designation || "";
+
+//           if (
+//             items.application_status.includes("pending for transco approval") ||
+//             items.application_status.includes("Pending for Under Process in EDCRA")
+//           ) {
+//             designationText = "TRANSCO COMPANY / Regional CGM";
+//           }
+
 
 //           return (
 //             <div
 //               key={items.id}
 //               className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col h-[210px]"
 //             >
-//               {/* 🔼 TOP → STATUS TEXT */}
+
+//               {/* STATUS */}
 //               <div
 //                 className="h-1/3 flex items-center justify-center px-3 text-center text-white font-semibold text-md capitalize"
 //                 style={{ backgroundColor: "#1f57d8ff" }}
@@ -109,8 +119,10 @@
 //                 {statusText}
 //               </div>
 
-//               {/* 🔽 MIDDLE → COUNT */}
+
+//               {/* COUNT */}
 //               <div className="h-1/3 flex items-center justify-center">
+
 //                 <NavLink
 //                   to="/dashboard/padding_Application"
 //                   state={{
@@ -123,18 +135,21 @@
 //                     {items.count}
 //                   </span>
 //                 </NavLink>
+
 //               </div>
 
-//               {/* 🔽 BOTTOM → DESIGNATION */}
+
+//               {/* DESIGNATION */}
 //               <div
 //                 className="h-1/3 flex items-center justify-center px-3 text-center text-white text-md font-medium"
 //                 style={{ backgroundColor: "#4478f3ff" }}
 //               >
-//                 {items.designation}
+//                 {designationText}
 //               </div>
-//             </div>
 
+//             </div>
 //           );
+
 //         })}
 //       </div>
 
@@ -231,25 +246,36 @@ const ApplicationStatus = () => {
 
           let statusText = items.application_status || "";
 
+          // ✅ STATUS MAPPING
           if (statusText === "pending for agreement finalization") {
             statusText = "Proceed after providing E-stamp by Applicant";
+
           } else if (statusText === "connection served") {
             statusText = "Load Released (Closed)";
+
+          } else if (statusText.toLowerCase().includes("pending for transco approval")) {
+            statusText = "EDCRA APPROVAL";
+          } else if (
+            statusText.toLowerCase().includes("pending application received from edcra")
+          ) {
+            statusText =
+              "Pending for forwarding to GM for processing after received from EDCRA";
+
           } else {
             statusText = statusText.replace(/pending For/gi, "").trim();
           }
 
 
-          // ✅ DESIGNATION MANIPULATION
-          let designationText = items.designation || "";
+          // ✅ DESIGNATION FIX (IMPORTANT)
+          let designationText = items?.designation || "N/A";
 
+          // Custom override
           if (
-            items.application_status.includes("pending for transco approval") ||
-            items.application_status.includes("Pending for Under Process in EDCRA")
+            items?.application_status?.toLowerCase().includes("pending for transco approval") ||
+            items?.application_status?.toLowerCase().includes("under process in edcra")
           ) {
             designationText = "TRANSCO COMPANY / Regional CGM";
           }
-
 
           return (
             <div
@@ -304,6 +330,8 @@ const ApplicationStatus = () => {
 };
 
 export default ApplicationStatus;
+
+
 
 
 

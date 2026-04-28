@@ -1400,8 +1400,8 @@ function ApplicantReg() {
       dispatch(setLoading(true));
       setIsSendingOtp(true); // ✅ Disable Save button when OTP is being sent
       setIsDisabled(true);
-      // const rawMobile = htConsumers?.mobile || "";
-      const rawMobile = String(9754548330)
+      const rawMobile = htConsumers?.mobile || "";
+      // const rawMobile = String(9754548330)
       const mobileNo = String(rawMobile);
       const otpResp = await sendOtpNew(mobileNo);
 
@@ -1460,8 +1460,8 @@ function ApplicantReg() {
   // };
   const handleVerifyOtp = async () => {
     const otpValue = getValues("otp");
-    // const mobileNo = htConsumers?.mobile;
-    const mobileNo = 9754548330;
+    const mobileNo = htConsumers?.mobile;
+    // const mobileNo = 9754548330;
 
     try {
       setBtnDisabled(true);
