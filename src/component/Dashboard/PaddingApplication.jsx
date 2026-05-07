@@ -495,6 +495,8 @@ export default function PaddingApplication() {
   );
 }
 
+
+
 //new ui with installment features
 // import React, { useEffect, useState } from 'react';
 // import { useLocation, NavLink, useParams } from 'react-router-dom';
@@ -544,19 +546,40 @@ export default function PaddingApplication() {
 //   const token = Cookies.get('accessToken');
 //   const user = JSON.parse(Cookies.get('user') || '{}');
 
+//   // Prevent body scroll when drawer is open
+//   useEffect(() => {
+//     if (isOpen) {
+//       document.body.style.overflow = 'hidden';
+//     } else {
+//       document.body.style.overflow = '';
+//     }
+//     return () => {
+//       document.body.style.overflow = '';
+//     };
+//   }, [isOpen]);
+
 //   useEffect(() => {
 //     if (application && application.tariff_charges) {
-//       const sd = application.tariff_charges.sd_amount || 
-//                  application.tariff_charges.security_deposit || 
-//                  application.tariff_charges.total_sd || 0;
+//       // CORRECT KEY: total_sd_required from the backend response
+//       const sd = application.tariff_charges.total_sd_required || 
+//                  application.tariff_charges.total_sd_days_amount || 0;
 //       setSdAmount(sd);
       
-//       const installmentAmount = Math.ceil(sd / 3);
-//       setInstallments([
-//         { id: 1, amount: installmentAmount, type: 'demand_note', date: new Date().toISOString().split('T')[0], status: 'pending' },
-//         { id: 2, amount: installmentAmount, type: 'upcoming_bill', date: '', status: 'pending' },
-//         { id: 3, amount: sd - (installmentAmount * 2), type: 'upcoming_bill', date: '', status: 'pending' }
-//       ]);
+//       if (sd > 0) {
+//         const installmentAmount = Math.ceil(sd / 3);
+//         const lastInstallment = sd - (installmentAmount * 2);
+//         setInstallments([
+//           { id: 1, amount: installmentAmount, type: 'demand_note', date: new Date().toISOString().split('T')[0], status: 'pending' },
+//           { id: 2, amount: installmentAmount, type: 'upcoming_bill', date: '', status: 'pending' },
+//           { id: 3, amount: lastInstallment > 0 ? lastInstallment : 0, type: 'upcoming_bill', date: '', status: 'pending' }
+//         ]);
+//       } else {
+//         setInstallments([
+//           { id: 1, amount: 0, type: 'demand_note', date: new Date().toISOString().split('T')[0], status: 'pending' },
+//           { id: 2, amount: 0, type: 'upcoming_bill', date: '', status: 'pending' },
+//           { id: 3, amount: 0, type: 'upcoming_bill', date: '', status: 'pending' }
+//         ]);
+//       }
 //     }
 //   }, [application]);
 
@@ -644,18 +667,34 @@ export default function PaddingApplication() {
 //   if (!isOpen) return null;
 
 //   return (
-//     <div className="fixed inset-0 z-[9999] overflow-hidden">
-//       {/* Backdrop with lower z-index */}
+//     <>
+//       {/* Backdrop - only covers the main content */}
 //       <div 
-//         className="absolute inset-0 bg-black bg-opacity-50 transition-opacity" 
+//         className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+//         style={{ 
+//           zIndex: 9998,
+//           position: 'fixed',
+//           top: 0,
+//           left: 0,
+//           right: 0,
+//           bottom: 0,
+//           backgroundColor: 'rgba(0, 0, 0, 0.5)'
+//         }}
 //         onClick={onClose}
-//         style={{ zIndex: 9998 }}
 //       />
       
-//       {/* Drawer with higher z-index */}
+//       {/* Drawer */}
 //       <div 
-//         className="absolute right-0 top-0 h-full w-full max-w-2xl bg-white shadow-xl transform transition-transform duration-300 ease-in-out overflow-y-auto"
-//         style={{ zIndex: 9999 }}
+//         className="fixed right-0 top-0 h-full bg-white shadow-xl transform transition-transform duration-300 ease-in-out overflow-y-auto"
+//         style={{ 
+//           zIndex: 9999,
+//           position: 'fixed',
+//           top: 0,
+//           right: 0,
+//           bottom: 0,
+//           width: '100%',
+//           maxWidth: '32rem'
+//         }}
 //       >
 //         <div className="flex flex-col h-full">
 //           {/* Header */}
@@ -820,11 +859,9 @@ export default function PaddingApplication() {
 //           </div>
 //         </div>
 //       </div>
-//     </div>
+//     </>
 //   );
 // };
-
-
 
 // // pending application tables 
 // export default function PaddingApplication() {
@@ -862,7 +899,7 @@ export default function PaddingApplication() {
 //       setMobileNo(officerData.employee_detail.cug_mobile);
 //     }
 //   }, [officerData]);
-// console.log("FLAG NAME:", applicationStatusName?.name);
+
 //   useEffect(() => {
 //     let fetchData = async () => {
 //       setLoading(true);
@@ -911,11 +948,10 @@ export default function PaddingApplication() {
 //     }
 //   }, [emp_id, flag_id, token]);
 
-//   // Check if application has tariff_charges data
+//   // Check if application has tariff_charges data with valid SD amount
 //   const hasTariffCharges = (app) => {
-//     return app.tariff_charges &&
-//       (app.tariff_charges.total_sd_required)
- 
+//     return app.tariff_charges && 
+//            app.tariff_charges.total_sd_required > 0;
 //   };
 
 //   // Get Payment Date - ONLY from bank_response.transaction_date
@@ -1052,7 +1088,6 @@ export default function PaddingApplication() {
 //                                 {items.circle}
 //                               </span>
 //                             </td>
-
 //                             <td className="px-3 py-3 align-middle">
 //                               <Tooltip text={items.division || ''}>
 //                                 <div className="text-sm text-gray-900 truncate max-w-[120px]">
@@ -1060,7 +1095,6 @@ export default function PaddingApplication() {
 //                                 </div>
 //                               </Tooltip>
 //                             </td>
-
 //                             <td className="px-3 py-3 align-middle">
 //                               <Tooltip text={items.application_no || ''}>
 //                                 <div className="text-sm font-semibold text-gray-900 truncate max-w-[120px]">
@@ -1068,7 +1102,6 @@ export default function PaddingApplication() {
 //                                 </div>
 //                               </Tooltip>
 //                             </td>
-
 //                             <td className="px-3 py-3 align-middle">
 //                               <Tooltip text={items.consumer_name || ''}>
 //                                 <div className="text-sm text-gray-900 truncate max-w-[150px]">
@@ -1076,7 +1109,6 @@ export default function PaddingApplication() {
 //                                 </div>
 //                               </Tooltip>
 //                             </td>
-
 //                             {showPaymentColumn && (
 //                               <td className="px-3 py-3 align-middle">
 //                                 {paymentDate ? (
@@ -1086,17 +1118,15 @@ export default function PaddingApplication() {
 //                                 ) : (
 //                                   <span className="text-sm text-gray-400">—</span>
 //                                 )}
-//                               </td>
+//                                </td>
 //                             )}
-
 //                             <td className="px-3 py-3 align-middle">
 //                               <Tooltip text={formatLoadChangeType(items.lc_type) || ''}>
 //                                 <div className="text-sm text-gray-900 truncate max-w-[150px]">
 //                                   {formatLoadChangeType(items.lc_type)}
 //                                 </div>
 //                               </Tooltip>
-//                             </td>
-
+//                              </td>
 //                             <td className="px-3 py-3 align-middle">
 //                               {statusUrl && (
 //                                 <NavLink
@@ -1109,8 +1139,7 @@ export default function PaddingApplication() {
 //                                   </button>
 //                                 </NavLink>
 //                               )}
-//                             </td>
-
+//                              </td>
 //                             {isGM && isRegistrationFeeFlag && (
 //                               <td className="px-3 py-3 align-middle">
 //                                 {hasTariff ? (
@@ -1127,9 +1156,9 @@ export default function PaddingApplication() {
 //                                     </button>
 //                                   </Tooltip>
 //                                 )}
-//                               </td>
+//                                </td>
 //                             )}
-//                           </tr>
+//                            </tr>
 //                         );
 //                       })
 //                     ) : (
@@ -1142,8 +1171,8 @@ export default function PaddingApplication() {
 //                             <p className="text-gray-500 text-lg font-medium">No applications found</p>
 //                             <p className="text-gray-400 mt-1">Try adjusting your search or filter</p>
 //                           </div>
-//                         </td>
-//                       </tr>
+//                          </td>
+//                        </tr>
 //                     )}
 //                   </>
 //                 )}
