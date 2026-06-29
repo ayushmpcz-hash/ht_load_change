@@ -137,7 +137,7 @@ const LoadSurvey = () => {
       setMobileNo(officerData.employee_detail.cug_mobile);
     }
   }, [officerData]);
- console.log(officerData,'officerdataaa afrom survey')
+  console.log(officerData, 'officerdataaa afrom survey')
   const filteredSurveyOptions = React.useMemo(() => {
 
     if (
@@ -312,20 +312,20 @@ const LoadSurvey = () => {
       }
 
       // ✅ NEW VALIDATION: Check if LONG_NAME contains the current application number
-    const longName = type === 'ME' ? projectData.LONG_NAME : projectData.LONG_NAME;
-    const isApplicationNoPresent = longName && longName.includes(currentApplicationNo);
-    
-    if (!isApplicationNoPresent) {
-      setError(erpField, {
-        type: 'manual',
-        message: `Application number ${currentApplicationNo} not found in Long name. Please verify and try again.`,
-      });
-      
-      if (type === 'ME') setIsMeErpFetched(false);
-      if (type === 'EXT') setIsExtErpFetched(false);
-      
-      return;
-    }
+      const longName = type === 'ME' ? projectData.LONG_NAME : projectData.LONG_NAME;
+      const isApplicationNoPresent = longName && longName.includes(currentApplicationNo);
+
+      if (!isApplicationNoPresent) {
+        setError(erpField, {
+          type: 'manual',
+          message: `Application number ${currentApplicationNo} not found in Long name. Please verify and try again.`,
+        });
+
+        if (type === 'ME') setIsMeErpFetched(false);
+        if (type === 'EXT') setIsExtErpFetched(false);
+
+        return;
+      }
 
       // ✅ SUCCESS FLOW
       clearErrors(erpField);
@@ -652,7 +652,13 @@ const LoadSurvey = () => {
 
     try {
       // ✅ TAKE FRESH VALUES (THIS IS THE FIX)
-      const formValue = getValues();   // ⭐⭐⭐ MAIN FIX ⭐⭐⭐
+      const formValue = getValues();
+
+      // ✅ Reverted case me existing survey PDF remove kar do
+      if (formValue.survey_response === "Reverted") {
+        delete formValue.survey_checklist_pdf;
+      }
+      
       const formData = new FormData();
 
       Object.entries(formValue).forEach(([key, value]) => {
@@ -679,12 +685,12 @@ const LoadSurvey = () => {
       });
 
       const employeeId = officerData?.employee_detail?.employee_login_id
-;
-       console.log(employeeId,'employeeId afrom survey')
+        ;
+      console.log(employeeId, 'employeeId afrom survey')
       if (employeeId) {
         formData.append("employee_id", employeeId);
       }
-      
+
       // 🧪 DEBUG (optional – once)
       for (let pair of formData.entries()) {
         console.log(pair[0], pair[1]);

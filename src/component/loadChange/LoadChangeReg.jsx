@@ -132,17 +132,17 @@
 //         );
 //       }
 //     } else if (typeOfChange === 'Load_Reduction') {
-//       setSubTypeOfChange(TypeOfValue.reductionOptions);
-//       let Load_Reduction_apply = checkLoadReductionDate(htConsumers);
 
-//       if (Load_Reduction_apply?.Load_Reduction) {
-//         setLoadReductionApply(Load_Reduction_apply)
-
+//       if (htConsumers?.existing_supply_voltage === "33 KV") {
+//         setSubTypeOfChange(TypeOfValue.reductionOptions);
 //       } else {
-//         showModal(
-//           ' You are not allowed for load reduction as per the clause 7.12 or 7.13 of supply code  2021.'
+//         setSubTypeOfChange(
+//           TypeOfValue.reductionOptions.filter(
+//             opt => opt.value !== 'Load_Reduction_with_Voltage_Downgrade'
+//           )
 //         );
 //       }
+
 //     } else {
 //       setSubTypeOfChange([]);
 //     }
@@ -200,52 +200,57 @@
 //   }, [SubTypeOfChange, htConsumers?.existing_supply_voltage]);
 
 
-//   // useEffect(() => {
-//   //   if (ContractDemand && typeOfChange && SubTypeOfChange && SupplyVoltage) {
-//   //     const handler = setTimeout(() => {
-//   //       const contract_demand = contractDemandRange(SupplyVoltage, ContractDemand);
-//   //       const demandError = validateContractDemand(
-//   //         typeOfChange,
-//   //         ContractDemand,
-//   //         SubTypeOfChange,
-//   //         htConsumers,
-//   //         totalYearConn,
-//   //         loadReductionApply
-//   //       );
-//   //       let contractDeffres = Math.abs(
-//   //         ContractDemand - Number(htConsumers.existing_contract_demand)
-//   //       );
-//   //       setValue("contract_demand_difference", contractDeffres);
-
-//   //       if (contract_demand) {
-//   //         setError("new_contact_demand", {
-//   //           type: "manual",
-//   //           message: contract_demand,
-//   //         });
-//   //         setValue("contract_demand_difference", "");
-//   //         setValue("new_contact_demand", "");
-//   //       } else if (demandError) {
-//   //         setError("new_contact_demand", {
-//   //           type: "manual",
-//   //           message: demandError,
-//   //         });
-//   //         setValue("contract_demand_difference", "");
-//   //         setValue("new_contact_demand", "");
-//   //       } else {
-//   //         clearErrors("new_contact_demand");
-//   //       }
-//   //     }, 600);
-
-//   //     return () => clearTimeout(handler);
-//   //   } else {
-//   //     setValue("new_contact_demand", "");
-
-//   //   }
-//   // }, [ContractDemand]);
-
 //   const normalizedHtConsumer = {
 //     ...htConsumers,
 //     existing_contract_demand: htConsumers?.existing_contract_demand,
+//   };
+
+//   const getExpectedContractDemandDifference = (
+//     currentType,
+//     currentDemand,
+//     existingDemand
+//   ) => {
+//     const parsedNewDemand = Number(currentDemand);
+//     const parsedExistingDemand = Number(existingDemand);
+
+//     if (Number.isNaN(parsedNewDemand) || Number.isNaN(parsedExistingDemand)) {
+//       return null;
+//     }
+
+//     if (currentType === "Load_Enhancement") {
+//       return parsedNewDemand - parsedExistingDemand;
+//     }
+
+//     if (currentType === "Load_Reduction") {
+//       return parsedExistingDemand - parsedNewDemand;
+//     }
+
+//     return 0;
+//   };
+
+//   const validateContractDemandDifference = (formData = getValues()) => {
+//     const expectedDifference = getExpectedContractDemandDifference(
+//       formData?.type_of_change,
+//       formData?.new_contact_demand,
+//       normalizedHtConsumer?.existing_contract_demand
+//     );
+
+//     if (expectedDifference === null) {
+//       return true;
+//     }
+
+//     const actualDifference = Number(formData?.contract_demand_difference);
+
+//     if (actualDifference !== expectedDifference) {
+//       setError("contract_demand_difference", {
+//         type: "manual",
+//         message: `Contract Demand Difference should be ${expectedDifference} KVA`,
+//       });
+//       return false;
+//     }
+
+//     clearErrors("contract_demand_difference");
+//     return true;
 //   };
 
 //   useEffect(() => {
@@ -265,9 +270,10 @@
 //           loadReductionApply
 //         );
 
-//         let contractDiff = Math.abs(
-//           ContractDemand - Number(htConsumers.existing_contract_demand)
-//           // ContractDemand - Number(htConsumers.cd)
+//         const contractDiff = getExpectedContractDemandDifference(
+//           typeOfChange,
+//           ContractDemand,
+//           htConsumers?.existing_contract_demand
 //         );
 //         setValue("contract_demand_difference", contractDiff);
 
@@ -287,6 +293,7 @@
 //           setValue("new_contact_demand", "");
 //         } else {
 //           clearErrors("new_contact_demand");
+//           clearErrors("contract_demand_difference");
 //         }
 //       }, 1500); // 1.5 seconds delay
 
@@ -299,6 +306,9 @@
 
 //   // 🧩 Submit or Update handler
 //   const onSubmithandler = async (data) => {
+//     if (!validateContractDemandDifference(data)) {
+//       return;
+//     }
 //     await handleSendOtp(data);
 //     // await handleSubmitNewApplication(data);
 //   };
@@ -308,7 +318,7 @@
 //       dispatch(setLoading(true));
 //       setIsDisabled(true);
 //       const formData = toFormData(data);
-//       console.log(formData,'formDataaa')
+//       console.log(formData, 'formDataaa')
 //       const apiUrl = `${HT_LOAD_CHANGE_BASE}/submit-load-change-application/`;
 //       const response = await axios.post(apiUrl, formData, {
 //         headers: { "Content-Type": "multipart/form-data" },
@@ -346,8 +356,8 @@
 //       dispatch(setLoading(true));
 //       setIsSendingOtp(true); // ✅ Disable Save button when OTP is being sent
 //       setIsDisabled(true);
-//       // const rawMobile = htConsumers?.mobile || "";
-//       const rawMobile = String(9754548330)
+//       const rawMobile = htConsumers?.mobile || "";
+//       // const rawMobile = String(9754548330)
 //       const mobileNo = String(rawMobile);
 //       const otpResp = await sendOtpNew(mobileNo);
 
@@ -406,8 +416,8 @@
 //   // };
 //   const handleVerifyOtp = async () => {
 //     const otpValue = getValues("otp");
-//     // const mobileNo = htConsumers?.mobile;
-//     const mobileNo = 9754548330;
+//     const mobileNo = htConsumers?.mobile;
+//     // const mobileNo = 9754548330;
 
 //     try {
 //       setBtnDisabled(true);
@@ -416,7 +426,10 @@
 //       if (verifyResp.success) {
 //         // ✅ PURE FORM DATA PASS KARO
 //         const formData = getValues();
-//         console.log(formData,'form dataaaaa')
+//         if (!validateContractDemandDifference(formData)) {
+//           return;
+//         }
+//         console.log(formData, 'form dataaaaa')
 //         await handleSubmitNewApplication(formData);
 //       } else {
 //         setError("otp", {
@@ -602,11 +615,11 @@
 //                         LName="Contract Demand Difference"
 //                         type={'number'}
 //                         {...register('contract_demand_difference', {
-//                           required: true,
+//                           required: 'Contract Demand Difference is required',
 //                         })}
 //                         errorMsg={errors.contract_demand_difference?.message}
 //                         disabled={isDisabled}
-//                         readOnly={isLocked}
+//                         readOnly={true}
 //                       />
 //                       {/* <InputTag
 //                         LName="Purpose Of Installation (Optional)"
@@ -723,7 +736,6 @@
 //                         acceptPdfOnly={true}
 //                         errorMsg={errors.bank_docs?.message}
 //                         disabled={isDisabled}
-
 //                       />
 
 //                     </div>
@@ -733,49 +745,28 @@
 //                       Firm Document Details..
 //                     </h2>
 //                     <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8">
-
-//                       {/* {htConsumers.pan_card_no === "" || htConsumers.pan_card_no == "NA" && (
-//                         <>
-//                           <InputTag
-//                             LName="Pan No"
-//                             {...register('pan_no')}
-//                             errorMsg={errors.pan_no?.message}
-//                             placeholder="Enter Pan No.  "
-//                             disabled={isDisabled}
-
-//                           />
-
-//                           <InputTag
-//                             LName="Upload Pan No"
-//                             {...register('pan_card_doc')}
-//                             type="file"
-//                             errorMsg={errors.pan_card_doc?.message}
-//                             disabled={isDisabled}
-
-//                           />
-//                         </>
-//                       )} */}
 //                       {(htConsumers.pan_card_no === "" || htConsumers.pan_card_no === "NA") && (
 //                         <>
 //                           <InputTag
-//                             LName="Pan No"
-//                             {...register("pan_no", {
-//                               required: "PAN No is required",
+//                             LName="PAN / TAN No"
+//                             maxLength={10}
+//                             {...register("pan_card_no", {
 //                               pattern: {
-//                                 value: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
-//                                 message: "PAN must be 10 characters (e.g. ABCDE1234F)",
+//                                 value: /^(?:[A-Z]{5}[0-9]{4}[A-Z]|[A-Z]{4}[0-9]{5}[A-Z])$/,
+//                                 message: "Enter valid PAN (AAAAA9999A) or TAN (AAAA99999A)",
+//                               },
+//                               onChange: (e) => {
+//                                 e.target.value = e.target.value.toUpperCase();
 //                               },
 //                             })}
-//                             errorMsg={errors.pan_no?.message}
-//                             placeholder="Enter PAN No."
+//                             errorMsg={errors.pan_card_no?.message}
+//                             placeholder="Enter PAN or TAN No."
 //                             disabled={isDisabled}
 //                           />
 
 //                           <InputTag
-//                             LName="Upload PAN Card"
-//                             {...register("pan_card_doc", {
-//                               required: "PAN document is required",
-//                             })}
+//                             LName="Upload PAN / TAN Document"
+//                             {...register("pan_card_doc")}
 //                             type="file"
 //                             acceptPdfOnly={true}
 //                             errorMsg={errors.pan_card_doc?.message}
@@ -784,24 +775,22 @@
 //                         </>
 //                       )}
 
-
 //                       <InputTag
+//                         LName="Gst No."
+//                         {...register('gst_no')}
+
+//                         placeholder="Enter Gst No. "
+//                         errorMsg={errors.gst_no?.message}
+//                         disabled={isDisabled}
+//                       />
+
+//                         <InputTag
 //                         LName="Upload GST Document"
 //                         {...register('gst_doc')}
 //                         type="file"
 //                         acceptPdfOnly={true}
 //                         errorMsg={errors.gst_doc?.message}
 //                         disabled={isDisabled}
-
-//                       />
-//                       <InputTag
-//                         LName="Enter Other Document No"
-//                         {...register('uploaded_doc_no')}
-
-//                         placeholder="Enter Other Document No. "
-//                         errorMsg={errors.uploaded_doc_no?.message}
-//                         disabled={isDisabled}
-
 //                       />
 //                       <InputTag
 //                         LName="Enter Other Document Name"
@@ -1042,6 +1031,8 @@
 
 // export default ApplicantReg;
 
+
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -1177,6 +1168,35 @@ function ApplicantReg() {
       }
     } else if (typeOfChange === 'Load_Reduction') {
 
+      const reductionValidation = checkLoadReductionDate(htConsumers);
+      setLoadReductionApply(reductionValidation);
+
+      if (!reductionValidation?.Load_Reduction) {
+
+        showModal(
+          `You are not eligible for Load Reduction.
+
+           As per company policy, you can apply for Load Reduction only after completion of one year from the previous Load Reduction.`,
+
+          () => {
+            // Reset all related fields
+            setValue('type_of_change', '');
+            setValue('lc_type', '');
+            setValue('new_supply_voltage', '');
+            setValue('new_contact_demand', '');
+            setValue('contract_demand_difference', '');
+
+            // Reset local states
+            setSubTypeOfChange([]);
+            setSupplyVoltage([]);
+            clearErrors();
+          }
+        );
+
+        return;
+      }
+
+      // Existing functionality
       if (htConsumers?.existing_supply_voltage === "33 KV") {
         setSubTypeOfChange(TypeOfValue.reductionOptions);
       } else {
@@ -1186,7 +1206,6 @@ function ApplicantReg() {
           )
         );
       }
-
     } else {
       setSubTypeOfChange([]);
     }
@@ -1400,8 +1419,8 @@ function ApplicantReg() {
       dispatch(setLoading(true));
       setIsSendingOtp(true); // ✅ Disable Save button when OTP is being sent
       setIsDisabled(true);
-      const rawMobile = htConsumers?.mobile || "";
-      // const rawMobile = String(9754548330)
+      // const rawMobile = htConsumers?.mobile || "";
+      const rawMobile = String(9754548330)
       const mobileNo = String(rawMobile);
       const otpResp = await sendOtpNew(mobileNo);
 
@@ -1460,8 +1479,8 @@ function ApplicantReg() {
   // };
   const handleVerifyOtp = async () => {
     const otpValue = getValues("otp");
-    const mobileNo = htConsumers?.mobile;
-    // const mobileNo = 9754548330;
+    // const mobileNo = htConsumers?.mobile;
+    const mobileNo = 9754548330;
 
     try {
       setBtnDisabled(true);
@@ -1828,7 +1847,7 @@ function ApplicantReg() {
                         disabled={isDisabled}
                       />
 
-                        <InputTag
+                      <InputTag
                         LName="Upload GST Document"
                         {...register('gst_doc')}
                         type="file"

@@ -18,7 +18,7 @@ const Sidebar = () => {
     dispatch(setOfficerData(JSON.parse(savedOfficer)));
   }
 }, [dispatch, officerData]);
-
+const role = officerData?.employee_detail?.role;
 useEffect(() => {
   const savedUser = localStorage.getItem("login_user");
 
@@ -41,16 +41,6 @@ useEffect(() => {
   };
 
 
-//   const handleLogout = () => {
-//   Cookies.remove('accessToken', { path: '/' });
-//   Cookies.remove('refresh_token', { path: '/' });
-
-//   localStorage.removeItem("officer_data");
-
-//   dispatch(logout()); // ✅ ONLY THIS
-
-//   navigate('/department-login', { replace: true });
-// };
 
 const handleLogout = () => {
 
@@ -83,7 +73,7 @@ const handleLogout = () => {
 
   }
 };
-
+console.log(role,'role in sidebar')
   return (
     <>
       <aside
@@ -139,6 +129,19 @@ const handleLogout = () => {
                   {isSidebarOpen && <span className='text-md'>Download PDF</span>}
                 </Link>
               </li>
+
+              {(role  === 30 ||  role === 3 )&& (
+                  <li className='block'>
+                <Link to={"/dashboard/cancel_applications"} className={`flex items-center p-2 border-b border-gray-100 space-x-2 hover:bg-white hover:text-black ${!isSidebarOpen ? 'justify-center' : ''}`}>
+                  <span>
+                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                  </span>
+                  {isSidebarOpen && <span className='text-md'>Cancel Applications</span>}
+                </Link>
+              </li>
+              )}
 
           </ul>
         </nav>
