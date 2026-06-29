@@ -47,6 +47,8 @@ import DownloadAllPdf from "./component/Dashboard/SearchApplicantDetailsPDF";
 // import Reports from "./component/Dashboard/Reports";
 import ApplicationView from './component/Dashboard/UserDashboard/ApplicationView';
 import LoadWorkCompletionChargingPermission from './component/Dashboard/UserDashboard/LoadWorkCompletionChargingPermission'
+import CancelApplications from './component/Dashboard/CancelApplications';
+import LoadChangeCancelledApplication from './component/Dashboard/LoadChangeCancelledApplication';
 
 
 function App() {
@@ -114,7 +116,7 @@ function App() {
             <Route path="/dashboard/pending_for_commissioning_permission/:id" element={<LoadCommissioningPermission />} />
             <Route path="/dashboard/pending_for_commissioning/:id" element={<LoadCommissioning />} />
             <Route path="/dashboard/connection_served/:id" element={<LoadConnectionServed />} />
-
+             <Route path="/dashboard/cancelled/:id" element={<LoadChangeCancelledApplication />} />
             <Route path="/dashboard/success_respones" element={<SuccessRespones />} />
             <Route path="/dashboard/respones/:id" element={<SuccessRespones />} />
             {/* <Route path="/dashboard/download_pdf" element={<SearchApplicantDetailsPDF />} /> */}
@@ -122,6 +124,8 @@ function App() {
             {/* <Route path="/dashboard/reports" element={<Reports/>} /> */}
 
             <Route path="/dashboard/download" element={< Download />} />
+            <Route path="/dashboard/cancel_applications" element={< CancelApplications/>} />
+
           </Route>
           <Route path="/user-dashboard" element={<DashboardLayout />}>
             <Route index element={<ApplicantStatus />} />
