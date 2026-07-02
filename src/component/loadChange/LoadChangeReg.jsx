@@ -1174,9 +1174,7 @@ function ApplicantReg() {
       if (!reductionValidation?.Load_Reduction) {
 
         showModal(
-          `You are not eligible for Load Reduction.
-
-           As per company policy, you can apply for Load Reduction only after completion of one year from the previous Load Reduction.`,
+          `The connection is not eligible for load reduction as per MPERC Regulations. For further details, please contact the Nodal Officer of the concerned Circle.`,
 
           () => {
             // Reset all related fields
@@ -1419,8 +1417,8 @@ function ApplicantReg() {
       dispatch(setLoading(true));
       setIsSendingOtp(true); // ✅ Disable Save button when OTP is being sent
       setIsDisabled(true);
-      // const rawMobile = htConsumers?.mobile || "";
-      const rawMobile = String(9754548330)
+      const rawMobile = htConsumers?.mobile || "";
+      // const rawMobile = String(9754548330)
       const mobileNo = String(rawMobile);
       const otpResp = await sendOtpNew(mobileNo);
 
@@ -1479,8 +1477,8 @@ function ApplicantReg() {
   // };
   const handleVerifyOtp = async () => {
     const otpValue = getValues("otp");
-    // const mobileNo = htConsumers?.mobile;
-    const mobileNo = 9754548330;
+    const mobileNo = htConsumers?.mobile;
+    // const mobileNo = 9754548330;
 
     try {
       setBtnDisabled(true);

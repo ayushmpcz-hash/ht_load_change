@@ -179,6 +179,9 @@ export default function PaddingApplication() {
                   <th className="px-3 py-3 text-md font-medium text-left text-white uppercase tracking-wider whitespace-nowrap">
                     App No
                   </th>
+                   <th className="px-3 py-3 text-md font-medium text-left text-white uppercase tracking-wider whitespace-nowrap">
+                    Consumer No
+                  </th>
                   <th className="px-3 py-3 text-md font-medium text-left text-white uppercase tracking-wider whitespace-nowrap">
                     Firm Name
                   </th>
@@ -235,6 +238,12 @@ export default function PaddingApplication() {
                               </Tooltip>
                             </td>
 
+                              <td className="px-3 py-3 align-middle">                        
+                                <div className="text-sm text-gray-900 truncate max-w-[150px]">
+                                  {items.consumer_id}
+                                </div>                             
+                            </td>
+
                             <td className="px-3 py-3 align-middle">
                               <Tooltip text={items.consumer_name || ''}>
                                 <div className="text-sm text-gray-900 truncate max-w-[150px]">
@@ -242,6 +251,7 @@ export default function PaddingApplication() {
                                 </div>
                               </Tooltip>
                             </td>
+                          
 
                             {/* Payment Date cell - Only render if column is visible */}
                             {showPaymentColumn && (

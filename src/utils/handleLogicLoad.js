@@ -298,12 +298,13 @@ const checkLoadReductionDate = (htConsumers) => {
   const lastReductionDate = new Date(htConsumers?.last_reduction_date);
   const currentDate = new Date();
   const totalYearConnDate = (currentDate - connectionDate) / (1000 * 60 * 60 * 24 * 365.25);
+  // console.log(totalYearConnDate, "totalYearConnDate")
   const totalYearLastReduction = (currentDate - lastReductionDate) / (1000 * 60 * 60 * 24 * 365.25);
   let CountOfConnYear = totalYearConnDate.toFixed(1);
   let CountOfLastReduction = totalYearLastReduction.toFixed(1);
   let existing_contract_demand = Number(htConsumers.existing_contract_demand) / 2
-  console.log(CountOfConnYear, "CountOfConnYear")
-  console.log(CountOfLastReduction, "CountOfLastReduction")
+  // console.log(CountOfConnYear, "CountOfConnYear")
+  // console.log(CountOfLastReduction, "CountOfLastReduction")
 
 
   if (Number(CountOfConnYear) < 2 && !htConsumers?.last_reduction_date) {

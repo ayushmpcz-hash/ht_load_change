@@ -313,28 +313,28 @@ const CancelApplications = () => {
                 </div> */}
                 <div className="flex gap-4 items-end flex-wrap">
 
-  <div className="w-full sm:w-[20%]">
-    <InputTag
-      LName="Application Number"
-      placeholder="Enter Application Number"
-      value={applicationNumber}
-      onChange={(e) => setApplicationNumber(e.target.value)}
-      errorMsg={searchError}
-    />
-  </div>
+                    <div className="w-full sm:w-[20%]">
+                      <InputTag
+                        LName="Application Number"
+                        placeholder="Enter Application Number"
+                        value={applicationNumber}
+                        onChange={(e) => setApplicationNumber(e.target.value)}
+                        errorMsg={searchError}
+                      />
+                    </div>
 
-  <div>
-    <button
-      type="button"
-      onClick={handleSearchApplication}
-      disabled={isLoading}
-      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 min-w-[120px]"
-    >
-      {isLoading ? "Searching..." : "Search"}
-    </button>
-  </div>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={handleSearchApplication}
+                        disabled={isLoading}
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 min-w-[120px]"
+                      >
+                        {isLoading ? "Searching..." : "Search"}
+                      </button>
+                    </div>
 
-</div>
+                  </div>
               </div>
             </div>
           </div>
@@ -376,6 +376,18 @@ const CancelApplications = () => {
                   GM Action for Cancel Application
                 </h2>
               </div>
+             {
+              applicationData?.bank_response && (applicationData?.type_of_change === 'Load_Enhancement' || applicationData?.type_of_change === 'Load_Reduction') && (
+                 <div className="w-4/5 mx-auto mt-4">
+                  <div className="rounded-md border border-blue-200 bg-blue-50 px-6 py-4">
+                  <h4 className="text-sm font-medium text-gray-800 leading-6">
+                  <span className="font-bold text-red-600">Note:</span>{" "}
+                  Any refund due against the cancelled application shall be processed manually through the proper channel as per the applicable rules and procedures.
+                </h4>
+              </div>
+            </div>
+              )
+             }
               <div className="card-body px-4 pb-4">
                 <div className="">
                   <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8">
