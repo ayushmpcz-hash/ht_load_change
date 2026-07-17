@@ -263,10 +263,10 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors, o
   function DocumentTrBloack({ Lable, docLink }) {
     return (
       <tr>
-        <th colSpan={2} className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+        <th colSpan={2} className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
           {Lable}
         </th>
-        <th className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+        <th className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
           <Link to={`https://htsanyojan.mpcz.in:8089${docLink}`} target="_blank" rel="noopener noreferrer"
             className="rounded-lg mt-2 px-3 py-2 text-center text-green-100 bg-indigo-500 hover:bg-fuchsia-500 duration-300">
             {docLink ? 'View PDF File' : 'No File View'}
@@ -299,10 +299,10 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors, o
     };
     return (
       <tr>
-        <th colSpan={2} className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+        <th colSpan={2} className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
           {Lable}
         </th>
-        <th className="font-medium text-gray-900 whitespace-nowrap dark:text-white">
+        <th className="font-medium text-gray-900 whitespace-nowrap">
           <div className="text-center">
             {docLink ? (
               <Link to={`https://htsanyojan.mpcz.in:8089${docLink}`} target="_blank" rel="noopener noreferrer"
@@ -528,6 +528,9 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors, o
                 <TableTrBloack Lable={'Existing Supply Voltage'} Value={htConsumers?.existing_supply_voltage} />
                 <TableTrBloack Lable={'Existing Contract Demand'} Value={htConsumers?.existing_contract_demand} />
               </tr>
+              <tr>
+                <TableTrBloack Lable={'Solar Installation Capacity'} Value={htConsumers?.solar_installation_capacity || 'N/A'} />
+              </tr>
 
               {/* Meter & ME */}
               <tr style={{ backgroundColor: '#f9f9f9ff' }}>
@@ -566,13 +569,12 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors, o
               </tr>
 
               <tr>
-                <TableTrBloack Lable={'Solar Installation Capacity'} Value={htConsumers?.solar_installation_capacity || 'N/A'} />
+                
                 <TableTrBloack Lable={'Dial Factor'} Value={htConsumers?.dial_factor} />
+                 <TableTrBloack Lable={'MF (Multiply)'} Value={htConsumers?.mf || 'N/A'} />
               </tr>
 
-              <tr>
-                <TableTrBloack Lable={'MF (Multiply)'} Value={htConsumers?.mf || 'N/A'} />
-              </tr>
+
 
               {/* Bill Details */}
               <tr style={{ backgroundColor: '#f9f9f9ff' }}>
@@ -802,8 +804,23 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors, o
               {required.includes('is_me_meter_required') && (
                 <>
                   <tr style={{ backgroundColor: '#f9f9f9ff' }}>
-                    <th colSpan={4} style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>
-                      <h2>ERP Details Of NDF (ME Meter Estimate)..</h2>
+                    <th
+                      colSpan={4}
+                      style={{
+                        border: "1px solid #ccc",
+                        padding: "8px",
+                        textAlign: "center",
+                      }}
+                    >
+                      <h2>
+                        ERP Details Of{" "}
+                        {htConsumers?.survey?.ndf_scheme_name === "DEPOSITE"
+                          ? "Estimate For Deposit"
+                          : htConsumers?.survey?.ndf_scheme_name === "SCCW"
+                            ? "SCCW"
+                            : "NDF"}{" "}
+                        (ME Meter Estimate)
+                      </h2>
                     </th>
                   </tr>
 
@@ -826,9 +843,14 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors, o
                   </tr>
                   <tr>
                     <TableTrBloack Lable={"ME METER Status"} Value={htConsumers?.survey?.ndf_status} />
-                    <TableTrBloack Lable={"ME METER Total Amount"} Value={htConsumers?.survey?.ndf_total_amt} />
+                    <TableTrBloack Lable={"ME METER Supervision Cost"} Value={htConsumers?.survey?.ndf_supervision_cost} />
                   </tr>
                   <tr>
+                    <TableTrBloack Lable={"ME METER Supervision SGST"} Value={htConsumers?.survey?.ndf_supervision_sgst} />
+                    <TableTrBloack Lable={"ME METER Supervision CGST"} Value={htConsumers?.survey?.ndf_supervision_cgst} />
+                  </tr>
+                  <tr>
+                    <TableTrBloack Lable={"ME METER Total Amount"} Value={htConsumers?.survey?.ndf_total_amt} />
                     <TableTrBloack Lable={"ME METER Circle Name"} Value={htConsumers?.survey?.ndf_circle_name} />
                     {/* <TableTrBloack Lable={"ME METER Circle Name"} Value={htConsumers?.survey?.ndf_circle_name} /> */}
                   </tr>

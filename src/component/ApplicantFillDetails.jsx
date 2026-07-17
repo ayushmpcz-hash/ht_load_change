@@ -142,6 +142,15 @@ export default function ApplicantBasicDetails({ htConsumers ,register ,errors}) 
               errorMsg={errors.existing_contract_demand?.message}
             />
           )}
+
+           <InputTag
+            LName="Solar Installation Capacity"
+            type="number"
+            {...register('solar_installation_capacity')}
+           readOnly={true}
+            errorMsg={errors.solar_installation_capacity?.message}
+             placeholder={htConsumers.solar_installation_capacity || "0"}
+          />
             {/* {htConsumers?.connection_type === 'Permanent' && (
             <InputTag
               LName="Existing Contract Demand"
@@ -247,15 +256,6 @@ export default function ApplicantBasicDetails({ htConsumers ,register ,errors}) 
             {...register('me_pt_ratio')}
            readOnly={true}
             errorMsg={errors.me_pt_ratio?.message}
-          />
-
-          <InputTag
-            LName="Solar Installation Capacity"
-            type="number"
-            {...register('solar_installation_capacity')}
-           readOnly={true}
-            errorMsg={errors.solar_installation_capacity?.message}
-             placeholder={htConsumers.solar_installation_capacity || "0"}
           />
 
           <InputTag

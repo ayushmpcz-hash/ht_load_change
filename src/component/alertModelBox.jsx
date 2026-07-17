@@ -42,11 +42,11 @@ export default function AlertModalBox({
   return (
     <Modal show={open} size="md" onClose={handleClose} popup>
       <ModalHeader />
-      <ModalBody className="bg-white dark:bg-gray-800 rounded-lg">
+      <ModalBody className="bg-white  rounded-lg">
         <div className="text-center">
           <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-white dark:text-gray-200" />
 
-          <h3 className="text-lg font-medium text-gray-800 dark:text-white">
+          <h3 className="text-lg font-medium text-gray-800">
             {message}
           </h3>
 

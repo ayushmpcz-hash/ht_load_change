@@ -293,83 +293,243 @@ const contractDemandRange = (voltage, value) => {
 
 
 
+// const checkLoadReductionDate = (htConsumers) => {
+//   const connectionDate = new Date(htConsumers?.connection_date);
+//   const lastReductionDate = new Date(htConsumers?.last_reduction_date);
+//   const currentDate = new Date();
+//   const totalYearConnDate = (currentDate - connectionDate) / (1000 * 60 * 60 * 24 * 365.25);
+//   // console.log(totalYearConnDate, "totalYearConnDate")
+//   const totalYearLastReduction = (currentDate - lastReductionDate) / (1000 * 60 * 60 * 24 * 365.25);
+//   let CountOfConnYear = totalYearConnDate.toFixed(1);
+//   let CountOfLastReduction = totalYearLastReduction.toFixed(1);
+//   let existing_contract_demand = Number(htConsumers.existing_contract_demand) / 2
+//   // console.log(CountOfConnYear, "CountOfConnYear")
+//   // console.log(CountOfLastReduction, "CountOfLastReduction")
+
+
+//   if (Number(CountOfConnYear) < 2 && !htConsumers?.last_reduction_date) {
+//     return {
+//       "dividedContractDemand": existing_contract_demand,
+//       "lastReductionDate": null,
+//       "divided": true,
+//       "Load_Reduction": true
+
+//     }
+
+//   } else if (Number(CountOfConnYear) > 2 && !htConsumers?.last_reduction_date) {
+//     return {
+//       "dividedContractDemand": existing_contract_demand,
+//       "lastReductionDate": null,
+//       "divided": false,
+//       "Load_Reduction": true
+
+//     }
+
+//   }
+//   else if (htConsumers?.last_reduction_date && Number(totalYearLastReduction) > 1) {
+//     return {
+//       "dividedContractDemand": existing_contract_demand,
+//       "lastReductionDate": null,
+//       "divided": false,
+//       "Load_Reduction": true
+
+//     }
+//   } else if (Number(CountOfConnYear) > 2 && Number(totalYearLastReduction) > 1 && htConsumers?.last_reduction_date) {
+//     return {
+//       "dividedContractDemand": existing_contract_demand,
+//       "lastReductionDate": null,
+//       "divided": false,
+//       "Load_Reduction": true
+
+//     }
+
+//   } else {
+//     return {
+//       "dividedContractDemand": existing_contract_demand,
+//       "lastReductionDate": null,
+//       "divided": false,
+//       "Load_Reduction": false
+
+//     }
+
+//   }
+// };
 const checkLoadReductionDate = (htConsumers) => {
-  const connectionDate = new Date(htConsumers?.connection_date);
-  const lastReductionDate = new Date(htConsumers?.last_reduction_date);
-  const currentDate = new Date();
-  const totalYearConnDate = (currentDate - connectionDate) / (1000 * 60 * 60 * 24 * 365.25);
-  // console.log(totalYearConnDate, "totalYearConnDate")
-  const totalYearLastReduction = (currentDate - lastReductionDate) / (1000 * 60 * 60 * 24 * 365.25);
-  let CountOfConnYear = totalYearConnDate.toFixed(1);
-  let CountOfLastReduction = totalYearLastReduction.toFixed(1);
-  let existing_contract_demand = Number(htConsumers.existing_contract_demand) / 2
-  // console.log(CountOfConnYear, "CountOfConnYear")
-  // console.log(CountOfLastReduction, "CountOfLastReduction")
 
+  const connectionDate =
+    htConsumers.connection_date ||
+    htConsumers.conectionDate;
 
-  if (Number(CountOfConnYear) < 2 && !htConsumers?.last_reduction_date) {
+  const lastReductionDate =
+    htConsumers.last_reduction_date ||
+    htConsumers.lastReducedCdDate;
+
+  if (!connectionDate) {
     return {
-      "dividedContractDemand": existing_contract_demand,
-      "lastReductionDate": null,
-      "divided": true,
-      "Load_Reduction": true
-
-    }
-
-  } else if (Number(CountOfConnYear) > 2 && !htConsumers?.last_reduction_date) {
-    return {
-      "dividedContractDemand": existing_contract_demand,
-      "lastReductionDate": null,
-      "divided": false,
-      "Load_Reduction": true
-
-    }
-
+      dividedContractDemand: 0,
+      lastReductionDate: null,
+      divided: false,
+      Load_Reduction: false
+    };
   }
-  else if (htConsumers?.last_reduction_date && Number(totalYearLastReduction) > 1) {
-    return {
-      "dividedContractDemand": existing_contract_demand,
-      "lastReductionDate": null,
-      "divided": false,
-      "Load_Reduction": true
+  console.log(lastReductionDate, "lastReductionDate")
+  console.log(connectionDate, "connectionDate")
+  const today = new Date();
 
+  const connectionYears =
+    (today - new Date(connectionDate)) /
+    (1000 * 60 * 60 * 24 * 365.25);
+
+  const lastReductionYears =
+    lastReductionDate
+      ? (today - new Date(lastReductionDate)) /
+      (1000 * 60 * 60 * 24 * 365.25)
+      : null;
+
+  const halfDemand =
+    Number(htConsumers.existing_contract_demand) / 2;
+
+  // ----------------------------
+  // CASE 1
+  // Connection < 2 Years
+  // ----------------------------
+
+  if (connectionYears < 2) {
+
+    // Already reduced once
+    if (lastReductionDate) {
+      return {
+        dividedContractDemand: halfDemand,
+        lastReductionDate,
+        divided: false,
+        Load_Reduction: false
+      };
     }
-  } else if (Number(CountOfConnYear) > 2 && Number(totalYearLastReduction) > 1 && htConsumers?.last_reduction_date) {
+
+    // First reduction allowed
     return {
-      "dividedContractDemand": existing_contract_demand,
-      "lastReductionDate": null,
-      "divided": false,
-      "Load_Reduction": true
-
-    }
-
-  } else {
-    return {
-      "dividedContractDemand": existing_contract_demand,
-      "lastReductionDate": null,
-      "divided": false,
-      "Load_Reduction": false
-
-    }
-
+      dividedContractDemand: halfDemand,
+      lastReductionDate: null,
+      divided: true,
+      Load_Reduction: true
+    };
   }
+
+  // ----------------------------
+  // CASE 2
+  // Connection >=2 Years
+  // ----------------------------
+
+  if (!lastReductionDate) {
+
+    return {
+      dividedContractDemand: halfDemand,
+      lastReductionDate: null,
+      divided: false,
+      Load_Reduction: true
+    };
+  }
+
+  if (lastReductionYears >= 1) {
+
+    return {
+      dividedContractDemand: halfDemand,
+      lastReductionDate,
+      divided: false,
+      Load_Reduction: true
+    };
+  }
+
+  return {
+    dividedContractDemand: halfDemand,
+    lastReductionDate,
+    divided: false,
+    Load_Reduction: false
+  };
+
 };
-const validateContractDemand = (type, value, typesOfChangeValue, htConsumers, totalYearConnectionDate, loadReductionApply) => {
+// const validateContractDemand = (type, value, typesOfChangeValue, htConsumers, totalYearConnectionDate, loadReductionApply) => {
+//   if (type === 'Load_Enhancement') {
+//     console.log(htConsumers.existing_contract_demand, "htConsumers.existing_contract_demand")
+//     if (typesOfChangeValue !== "Only_Voltage_Upgrade" && Number(value) < Number(htConsumers.existing_contract_demand)) {
+//       return `Contract demand cannot be less than Current demand (${htConsumers.existing_contract_demand} KVA)`;
+//     }
+//     else {
+//       return ``;
+//     }
+//   } else if (type === 'Load_Reduction') {
+//     if (loadReductionApply?.Load_Reduction && loadReductionApply?.divided && Number(loadReductionApply?.dividedContractDemand) > Number(value)) {
+//       return "Contract demand divided hamesha value se jyada hona chahiye";
+//     } else if (loadReductionApply.Load_Reduction && Number(value) >= Number(htConsumers.existing_contract_demand)) {
+//       return `Contract demand cannot be greater than current demand (${htConsumers.existing_contract_demand} KVA)`;
+
+//     }
+//   }
+// }
+const validateContractDemand = (
+  type,
+  value,
+  typesOfChangeValue,
+  htConsumers,
+  totalYearConnectionDate,
+  loadReductionApply
+) => {
+
   if (type === 'Load_Enhancement') {
-    console.log(htConsumers.existing_contract_demand, "htConsumers.existing_contract_demand")
-    if (typesOfChangeValue !== "Only_Voltage_Upgrade" && Number(value) < Number(htConsumers.existing_contract_demand)) {
+
+    if (
+      typesOfChangeValue !== "Only_Voltage_Upgrade" &&
+      Number(value) < Number(htConsumers.existing_contract_demand)
+    ) {
       return `Contract demand cannot be less than Current demand (${htConsumers.existing_contract_demand} KVA)`;
     }
-    else {
-      return ``;
-    }
-  } else if (type === 'Load_Reduction') {
-    if (loadReductionApply?.Load_Reduction && loadReductionApply?.divided && Number(loadReductionApply?.dividedContractDemand) > Number(value)) {
-      return "Contract demand divided hamesha value se jyada hona chahiye";
-    } else if (loadReductionApply.Load_Reduction && Number(value) >= Number(htConsumers.existing_contract_demand)) {
-      return `Contract demand cannot be greater than current demand (${htConsumers.existing_contract_demand} KVA)`;
 
-    }
+    return "";
   }
-}
+
+  else if (type === 'Load_Reduction') {
+
+    // ----------------------------
+    // Solar validation
+    // ----------------------------
+
+    const solarCapacity = Number(
+      htConsumers?.solar_installation_capacity || 0
+    );
+
+    if (solarCapacity > 0) {
+
+      const minimumAllowedDemand = Math.ceil(
+        solarCapacity / 0.90
+      );
+
+      if (Number(value) < minimumAllowedDemand) {
+        return `As per the provisions, load reduction is permitted for the selected load as Solar is installed more than the required contract demand.`;
+      }
+    }
+
+    // Existing validations
+
+    if (
+      loadReductionApply?.Load_Reduction &&
+      loadReductionApply?.divided &&
+      Number(loadReductionApply?.dividedContractDemand) > Number(value)
+    ) {
+
+      return `Contract demand should be greater than ${loadReductionApply?.dividedContractDemand} KVA`;
+    }
+
+    if (
+      loadReductionApply?.Load_Reduction &&
+      Number(value) >= Number(htConsumers.existing_contract_demand)
+    ) {
+
+      return `Contract demand cannot be greater than current demand (${htConsumers.existing_contract_demand} KVA)`;
+    }
+
+    return "";
+  }
+
+  return "";
+};
 export { handleSupplyVoltage, contractDemandRange, validateContractDemand, checkLoadReductionDate }
