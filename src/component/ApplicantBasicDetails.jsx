@@ -569,9 +569,9 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors, o
               </tr>
 
               <tr>
-                
+
                 <TableTrBloack Lable={'Dial Factor'} Value={htConsumers?.dial_factor} />
-                 <TableTrBloack Lable={'MF (Multiply)'} Value={htConsumers?.mf || 'N/A'} />
+                <TableTrBloack Lable={'MF (Multiply)'} Value={htConsumers?.mf || 'N/A'} />
               </tr>
 
 
@@ -982,50 +982,120 @@ export default function ApplicantBasicDetails({ htConsumers, register, errors, o
                 </>
               )}
 
-              {htConsumers?.meter_issuing_work_completion && (
+              {required.includes('is_me_meter_required') && htConsumers?.agreement_details && (
                 <>
-                  {/* Heading */}
-                  <tr style={{ backgroundColor: "#f9f9f9" }}>
-                    <th colSpan={4} style={{ border: "1px solid #ccc", padding: "8px", textAlign: "center" }}>
-                      <h2>Meter Issuing & Work Completion</h2>
+                  <tr style={{ backgroundColor: '#f9f9f9ff' }}>
+                    <th colSpan={4} style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>
+                      <h2>Contractor Details</h2>
                     </th>
                   </tr>
 
+                  <tr>
+                    <TableTrBloack
+                      Lable={'Contractor Category'}
+                      Value={htConsumers?.agreement_details?.contractor_category}
+                    />
+                    <TableTrBloack
+                      Lable={'Contractor Name'}
+                      Value={htConsumers?.agreement_details?.contractor_name}
+                    />
+                  </tr>
+
+                  <tr>
+                    <TableTrBloack
+                      Lable={'Contractor Company Name'}
+                      Value={htConsumers?.agreement_details?.contractor_company}
+                    />
+                    <TableTrBloack
+                      Lable={'Contractor Mobile No'}
+                      Value={htConsumers?.agreement_details?.contractor_mobile}
+                    />
+                  </tr>
+
+                  <tr>
+                    <TableTrBloack
+                      Lable={'Authentication ID'}
+                      Value={htConsumers?.agreement_details?.authentication_id}
+                    />
+                    <TableTrBloack
+                      Lable={'Registration Date'}
+                      Value={htConsumers?.agreement_details?.registration_date}
+                    />
+                  </tr>
+                </>
+              )}
+
+
+              {/* Meter Issuing & Work Completion Details */}
+              {htConsumers?.meter_issuing_work_completion && renderStepSummary(
+                htConsumers.meter_issuing_work_completion,
+                {
+                  name: 'Meter Issuing & Work Completion',
+                  statusKey: 'work_completion_response',
+                  acceptKeys: ['accept_remark', 'accept_remark'],
+                  revertKeys: ['revert_reason', 'revert_reason_remark'],
+                  nextKey: null,
+                  nextLabel: 'Next Action'
+                }
+              )}
+
+              {/* Keep the existing meter issuing work completion display but modify it to show only additional details */}
+              {htConsumers?.meter_issuing_work_completion && (
+                <>
+                  {/* The renderStepSummary already handles status and remarks, so we only show additional details here */}
+
                   {/* -------- Meter + ME Side-by-Side -------- */}
+                  <tr style={{ backgroundColor: "#f9f9f9" }}>
+                    <th colSpan={4} style={{ border: "1px solid #ccc", padding: "8px", textAlign: "center" }}>
+                      <h2>Meter & ME Installation Details</h2>
+                    </th>
+                  </tr>
+
                   <PairRow
                     label1="Meter Serial No"
-                    value1={htConsumers?.meter_no}
+                    value1={htConsumers?.meter_issuing_work_completion?.meter_serial_no || htConsumers?.meter_no}
                     label2="ME Serial No"
                     value2={htConsumers?.meter_issuing_work_completion?.me_serial_no}
                   />
 
                   <PairRow
                     label1="Meter Make"
-                    value1={htConsumers?.meter_issuing_work_completion?.meter_make}
+                    value1={htConsumers?.meter_issuing_work_completion?.meter_make || htConsumers?.meter_make}
                     label2="ME Make"
                     value2={htConsumers?.meter_issuing_work_completion?.me_make}
                   />
 
                   <PairRow
                     label1="Meter Model"
-                    value1={htConsumers?.meter_issuing_work_completion?.meter_model}
+                    value1={htConsumers?.meter_issuing_work_completion?.meter_model || 'N/A'}
                     label2="ME Model"
-                    value2={htConsumers?.meter_issuing_work_completion?.me_model}
+                    value2={htConsumers?.meter_issuing_work_completion?.me_model || 'N/A'}
                   />
 
                   <PairRow
                     label1="Meter CT Ratio"
-                    value1={htConsumers?.meter_issuing_work_completion?.meter_ct_ratio}
+                    value1={htConsumers?.meter_issuing_work_completion?.meter_ct_ratio || htConsumers?.meter_ct_ratio}
                     label2="ME CT Ratio"
                     value2={htConsumers?.meter_issuing_work_completion?.me_ct_ratio}
                   />
 
                   <PairRow
                     label1="Meter PT Ratio"
-                    value1={htConsumers?.meter_issuing_work_completion?.meter_pt_ratio}
+                    value1={htConsumers?.meter_issuing_work_completion?.meter_pt_ratio || htConsumers?.meter_pt_ratio}
                     label2="ME PT Ratio"
                     value2={htConsumers?.meter_issuing_work_completion?.me_pt_ratio}
                   />
+
+                  {/* Work Completion Date if available */}
+                  {htConsumers?.meter_issuing_work_completion?.work_completion_date && (
+                    <tr>
+                      <TableTrBloack
+                        Lable={'Work Completion Date'}
+                        Value={formatDateOnly(htConsumers.meter_issuing_work_completion.work_completion_date)}
+                        colSpan={4}
+                      />
+                    </tr>
+                  )}
                 </>
               )}
 

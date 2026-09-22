@@ -1018,7 +1018,7 @@ const total_estimate_amt = extensionAmount + meAmount;
     // 🔴 VALIDATION: Demand note amount must be > 0
     const totalAmount = Number(formData.total_demand_note_amt || 0);
 
-    if (totalAmount <= 0) {
+    if (totalAmount <= 0 && formData.demand_note_response === 'Accepted') {
       alert("Demand note cannot be generated with zero amount");
       return; // ⛔ stop further execution
     }

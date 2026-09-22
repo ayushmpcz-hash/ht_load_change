@@ -2450,14 +2450,14 @@ const LoadSurvey = () => {
                             <div class="card mt-2 mb-2 bg-white rounded shadow-md ">
                               <div className="card-header px-4 py-2 border-b border-gray-300">
                                 <h2 className="text-lg font-bold capitalize ">
-                                  ERP Details Of NDF(Me Meter Estimate)Estimate
+                                  ERP Details Of NDF(ME Meter Estimate)Estimate
                                 </h2>
                               </div>
                               <div className="card-body px-4 pb-4">
                                 <div className="">
                                   <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8">
                                     <InputTag
-                                      LName="ERP No of Me Estimate"
+                                      LName="ERP No of ME Estimate"
                                       placeholder="ME Estimate No."
                                       {...register('ndf_erp_no', {
                                         required: 'Me Estimate is required',

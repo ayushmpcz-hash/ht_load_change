@@ -143,6 +143,37 @@ console.log(role,'role in sidebar')
               </li>
               )}
 
+                {role === 39 && (
+              <li className="block">
+                <Link
+                  to="/dashboard/payment-punch"
+                  className={`flex items-center p-2 border-b border-gray-100 space-x-2 hover:bg-white hover:text-black ${!isSidebarOpen ? 'justify-center' : ''
+                    }`}
+                >
+                  <span>
+                    <svg
+                      className="w-4 h-4 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </span>
+
+                  {isSidebarOpen && (
+                    <span className="text-md">Payment Punch</span>
+                  )}
+                </Link>
+              </li>
+            )}
+
+
           </ul>
         </nav>
 

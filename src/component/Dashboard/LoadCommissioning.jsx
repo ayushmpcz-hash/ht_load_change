@@ -10,7 +10,17 @@
 //   InputTag,
 //   sendOtpNew,
 //   verifyOtpNew,
+//   getNgbToken,
+//   getFinalUsingDataToken,
+//   getPublicData
 // } from '../importComponents.js';
+
+// import {
+//   NGB_PRO_BASE,
+//   HT_NGB_ID,
+//   HT_NGB_PASSWORD
+// } from '../../api/api.js';
+
 // import { responseOption, revertOption } from '../newComponents/commonOption.js';
 // import { HT_LOAD_CHANGE_BASE } from '../../api/api.js';
 // import { handleOfficerFlagCount } from "../../utils/handleOfficerFlagCount.js";
@@ -51,9 +61,233 @@
 //   const [isProcessing, setIsProcessing] = useState(false);
 //   const [isSendOtpLoading, setIsSendOtpLoading] = useState(false);
 
+//   // work completion new states
+//   const [ngbToken, setNgbToken] = useState("");
+//   const [allManufactures, setAllManufactures] = useState([]);
+//   const [allMeterModels, setAllMeterModels] = useState([]);
+//   const [allMeModels, setAllMeModels] = useState([]);
+//   const [allCTRatios, setAllCTRatios] = useState([]);
+//   const [allPTRatios, setAllPTRatios] = useState([]);
+
+//   const meter_make = watch("meter_make");
+//   const me_make = watch("me_make");
+//   const meter_ct_ratio = watch("meter_ct_ratio");
+//   const meter_pt_ratio = watch("meter_pt_ratio");
+
+//   const me_ct_ratio = watch("me_ct_ratio");
+//   const me_pt_ratio = watch("me_pt_ratio");
+
+
 //   const bi_cell_response = watch('bi_cell_response');
 
 //   const dispatch = useDispatch()
+
+//   useEffect(() => {
+
+//     const parseRatio = (val) => {
+
+//       if (!val) return 0;
+
+//       val = val.replace("`", "");
+
+//       if (!val.includes("/")) return 0;
+
+//       const [a, b] = val.split("/").map(Number);
+
+//       if (!b) return 0;
+
+//       return a / b;
+
+//     };
+
+
+//     // ratios live values से लेंगे
+
+//     const meterCT = parseRatio(meter_ct_ratio);
+//     const meterPT = parseRatio(meter_pt_ratio);
+
+//     const meCT = parseRatio(me_ct_ratio);
+//     const mePT = parseRatio(me_pt_ratio);
+
+
+//     // dial factor consumer से fixed रहेगा
+
+//     const dialFactor =
+//       Number(items?.dial_factor || 1);
+
+
+//     if (meterCT && meterPT && meCT && mePT) {
+
+//       const mf =
+//         (meCT * mePT) /
+//         (meterCT * meterPT)
+//         *
+//         dialFactor;
+
+
+//       setValue(
+//         "new_mf",
+//         mf.toFixed(2)
+//       );
+
+//     }
+
+
+//   }, [
+//     meter_ct_ratio,
+//     meter_pt_ratio,
+//     me_ct_ratio,
+//     me_pt_ratio
+//   ]);
+
+
+//   useEffect(() => {
+
+//     (async () => {
+
+//       try {
+
+//         const data = {
+//           userId: HT_NGB_ID,
+//           userPwd: HT_NGB_PASSWORD
+//         };
+
+//         const url = `${NGB_PRO_BASE}/login/verification`;
+
+//         const response = await getNgbToken(data, url);
+
+//         const token = response.headers.get("Authorization");
+
+//         const cleanToken =
+//           token.replace("Bearer ", "");
+
+//         setNgbToken(cleanToken);
+
+
+//         // const manufactures =
+//         //   await getFinalUsingDataToken(
+//         //     `${NGB_PRO_BASE}/masters/getAllManufactures`,
+//         //     cleanToken
+//         //   );
+
+//         // setAllManufactures(manufactures.list);
+
+//         const manufactures = await getPublicData(
+//            `https://services.mpcz.in/HT-NIC/api/htPublicApis/getAllCTManufacturer`
+//         );
+
+//         // setAllManufactures(manufactures?.data || manufactures);
+//         setAllManufactures(manufactures.list);
+
+//         const CTRatios =
+//           await getFinalUsingDataToken(
+//             `${NGB_PRO_BASE}/masters/getAllCTRatios`,
+//             cleanToken
+//           );
+
+//         setAllCTRatios(CTRatios.list);
+
+
+
+//         const PTRatios =
+//           await getFinalUsingDataToken(
+//             `${NGB_PRO_BASE}/masters/getAllPTRatios`,
+//             cleanToken
+//           );
+
+//         setAllPTRatios(PTRatios.list);
+
+
+//       } catch (err) {
+
+//         console.log(err)
+
+//       }
+
+//     })()
+
+//   }, [])
+
+//   useEffect(() => {
+
+//     if (!meter_make || !ngbToken) return;
+
+//     (async () => {
+
+//       const models =
+//         await getFinalUsingDataToken(
+
+//           `${NGB_PRO_BASE}/masters/getAllModelsByMeterManufacturer/${meter_make}`,
+
+//           ngbToken
+
+//         );
+
+//       setAllMeterModels(models.list);
+
+//     })();
+
+//   }, [meter_make, ngbToken]);
+
+//   // useEffect(() => {
+
+//   //   if (!me_make || !ngbToken) return;
+
+//   //   (async () => {
+
+//   //     const models =
+//   //       await getFinalUsingDataToken(
+
+//   //         `${NGB_PRO_BASE}/masters/getAllModelsByMeterManufacturer/${me_make}`,
+
+//   //         ngbToken
+
+//   //       );
+
+//   //     setAllMeModels(models.list);
+
+//   //   })();
+
+//   // }, [me_make, ngbToken]);
+
+//   useEffect(() => {
+//       if (!me_make) return;
+  
+//       (async () => {
+//         try {
+//           const models = await getPublicData(
+//             `https://services.mpcz.in/HT-NIC/api/htPublicApis/getAllCTModelByCTManufacturer/${me_make}`            
+//           );
+  
+//           console.log(models, 'me models public');
+  
+//           setAllMeModels(models?.list || []);
+//         } catch (err) {
+//           console.error('Error fetching ME models:', err.message || err);
+//         }
+//       })();
+//     }, [me_make]);
+
+
+
+//   useEffect(() => {
+
+//     if (items?.meter_issuing_work_completion) {
+
+//       const wc =
+//         items.meter_issuing_work_completion;
+
+//       Object.keys(wc).forEach(key => {
+
+//         setValue(key, wc[key])
+
+//       })
+
+//     }
+
+//   }, [items]);
+
+
 
 //   //timer
 //   useEffect(() => {
@@ -307,6 +541,12 @@
 //                   <div className="">
 //                     <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-8">
 //                       <input type="hidden" value={items?.id} {...register('application')} />
+//                       <input
+//                         type="hidden"
+//                         name="employee_id"
+//                         {...register('employee_id')}
+//                         value={officerData?.employee_detail.employee_login_id}
+//                       ></input>
 //                       <SelectTag
 //                         LName="Acceptance"
 //                         options={responseOption}
@@ -329,6 +569,62 @@
 //                             })}
 //                             errorMsg={errors.md_reading_date?.message}
 //                             disabled={isDisabled}
+//                           />
+
+//                           <InputTag
+//                             LName="ME Serial No."
+//                             placeholder="Enter Agreement No."
+//                             {...register('me_serial_no', {
+//                               required: 'ME Serial No is required',
+//                             })}
+//                             errorMsg={errors.me_serial_no?.message}
+//                             disabled={isDisabled}
+//                           />
+
+//                           <SelectTag
+//                             LName="ME Make"
+//                             options={allManufactures}
+//                             {...register("me_make")}
+//                             labelKey="ctManufacturerName"
+//                             valueKey="ctManufacturerId"
+//                           />
+
+//                           <SelectTag
+//                             LName="ME Model"
+//                             options={allMeModels}
+//                             {...register("me_model")}
+//                             labelKey="ctModelName"
+//                             valueKey="ctModelName"
+//                           />
+
+//                           <SelectTag
+//                             LName="ME CT Ratio"
+//                             options={allCTRatios}
+//                             {...register("me_ct_ratio")}
+//                             labelKey="charVal"
+//                             valueKey="charVal"
+//                           />
+
+//                           <SelectTag
+//                             LName="ME PT Ratio"
+//                             options={allPTRatios}
+//                             {...register("me_pt_ratio")}
+//                             labelKey="charVal"
+//                             valueKey="charVal"
+//                           />
+
+//                           <InputTag
+//                             LName="Dial Factor"
+//                             {...register("dial_factor")}
+//                             disabled={true}
+//                           />
+
+//                           {/* new work completion fields added  */}
+//                           <InputTag
+//                             LName="New MF"
+//                             placeholder="Auto Calculated"
+//                             {...register("new_mf")}
+//                             disabled={true}
 //                           />
 
 //                           <InputTag
@@ -358,6 +654,7 @@
 //                             disabled={isDisabled}
 //                             placeholder={' Enter Import Meter Reading KWH'}
 //                           />
+
 //                           <InputTag
 //                             LName=" Import TOD1"
 //                             {...register('import_meter_reading_tod1', {
@@ -367,6 +664,7 @@
 //                             disabled={isDisabled}
 //                             placeholder={' Enter Import Meter Reading TOD1'}
 //                           />
+
 //                           <InputTag
 //                             LName=" Import  TOD2"
 //                             {...register('import_meter_reading_tod2', {
@@ -394,6 +692,40 @@
 //                             disabled={isDisabled}
 //                             placeholder={' Enter Import Meter Reading TOD4'}
 //                           />
+
+//                           {/* new work completion fields added  */}
+//                           {/* <SelectTag
+//                             LName="Meter Make"
+//                             options={allManufactures}
+//                             {...register("meter_make")}
+//                             labelKey="meterManufacturerName"
+//                             valueKey="meterMakeDetailId"
+//                           />
+
+//                           <SelectTag
+//                             LName="Meter Model"
+//                             options={allMeterModels}
+//                             {...register("meter_model")}
+//                             labelKey="meterModelName"
+//                             valueKey="meterModelName"
+//                           />
+
+//                           <SelectTag
+//                             LName="Meter CT Ratio"
+//                             options={allCTRatios}
+//                             {...register("meter_ct_ratio")}
+//                             labelKey="charVal"
+//                             valueKey="charVal"
+//                           />
+
+//                           <SelectTag
+//                             LName="Meter PT Ratio"
+//                             options={allPTRatios}
+//                             {...register("meter_pt_ratio")}
+//                             labelKey="charVal"
+//                             valueKey="charVal"
+//                           /> */}
+
 //                           {items?.meter_type === 'HT Net Meter' && (
 //                             <>
 //                               <InputTag
@@ -460,17 +792,30 @@
 //                                 placeholder={' Enter Export Meter Reading TOD4'}
 //                               />
 
-//                               <InputTag
+//                               {/* <InputTag
 //                                 LName="Commissioning pdf"
 //                                 type="file"
+//                                 acceptPdfOnly={true}
 //                                 {...register("agreement_doc", {
 //                                   required: "Agreement Letter is required",
 //                                 })}
 //                                 errorMsg={errors.agreement_doc?.message}
 //                                 disabled={isDisabled}
-//                               />
+//                               /> */}
 //                             </>
 //                           )}
+
+//                           {/* -------- COMMISSIONING FILES -------- */}
+//                           <InputTag
+//                             LName="Commissioning Report Upload"
+//                             type="file"
+//                             acceptPdfOnly={true}
+//                             {...register("commissioning_report_upload", {
+//                               required: "Commissioning report is required",
+//                             })}
+//                             errorMsg={errors.commissioning_report?.message}
+//                             disabled={isDisabled}
+//                           />
 //                         </>
 //                       )}
 
@@ -500,6 +845,7 @@
 //                           <InputTag
 //                             LName="Upload Revert Docs"
 //                             type="file"
+//                             acceptPdfOnly={true}
 //                             {...register('upload_revert_docs', {
 //                               required: 'Revert Docs are required',
 //                             })}
@@ -572,8 +918,8 @@
 //                               type="submit"
 //                               disabled={isSendOtpLoading || isBtnDisabled}
 //                               className={`px-4 py-2 rounded text-white ${isSendOtpLoading || isBtnDisabled
-//                                   ? "bg-gray-400 cursor-not-allowed"
-//                                   : "bg-green-500 hover:bg-purple-800"
+//                                 ? "bg-gray-400 cursor-not-allowed"
+//                                 : "bg-green-500 hover:bg-purple-800"
 //                                 }`}
 //                             >
 //                               {isSendOtpLoading
@@ -602,8 +948,8 @@
 //                               onClick={handleVerifyOtp}
 //                               disabled={isBtnDisabled || isOtpExpired}
 //                               className={`px-4 py-2 rounded text-white ${isBtnDisabled || isOtpExpired
-//                                   ? "bg-gray-400 cursor-not-allowed"
-//                                   : "bg-green-600 hover:bg-purple-800"
+//                                 ? "bg-gray-400 cursor-not-allowed"
+//                                 : "bg-green-600 hover:bg-purple-800"
 //                                 }`}
 //                             >
 //                               {isBtnDisabled ? "Verifying..." : "Verify OTP"}
@@ -644,6 +990,9 @@
 // };
 // export default LoadCommissioning;
 
+
+
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
@@ -673,6 +1022,12 @@ import { handleOfficerFlagCount } from "../../utils/handleOfficerFlagCount.js";
 import { handleTokenExpiry } from '../../utils/handleTokenExpiry';
 import { setOfficerData } from "../../redux/slices/userSlice.js";
 
+// Dial Factor dropdown options
+const dialFactorOptions = [
+  { label: "1", value: "1" },
+  { label: "1000", value: "1000" },
+];
+
 const LoadCommissioning = () => {
   const officerData = useSelector(state => state.user.officerData);
   const location = useLocation();
@@ -688,7 +1043,10 @@ const LoadCommissioning = () => {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    defaultValues: items || {},
+    defaultValues: {
+      ...(items || {}),
+      dial_factor: items?.dial_factor ?? "1",
+    },
   });
   console.log(officerData, 'officerData');
   console.log(items, 'items');
@@ -723,6 +1081,8 @@ const LoadCommissioning = () => {
   const me_ct_ratio = watch("me_ct_ratio");
   const me_pt_ratio = watch("me_pt_ratio");
 
+  // ⭐ Dial Factor watch (dropdown)
+  const dial_factor = watch("dial_factor");
 
   const bi_cell_response = watch('bi_cell_response');
 
@@ -756,10 +1116,9 @@ const LoadCommissioning = () => {
     const mePT = parseRatio(me_pt_ratio);
 
 
-    // dial factor consumer से fixed रहेगा
+    // dial factor ab dropdown (user selected) से लेंगे, default 1
 
-    const dialFactor =
-      Number(items?.dial_factor || 1);
+    const dialFactor = Number(dial_factor || 1);
 
 
     if (meterCT && meterPT && meCT && mePT) {
@@ -783,7 +1142,8 @@ const LoadCommissioning = () => {
     meter_ct_ratio,
     meter_pt_ratio,
     me_ct_ratio,
-    me_pt_ratio
+    me_pt_ratio,
+    dial_factor
   ]);
 
 
@@ -1088,76 +1448,138 @@ const LoadCommissioning = () => {
     }
   };
 
-
-  // 🔹 Final Submit API Call
   // const handleFinalSubmit = async () => {
   //   try {
-  //     const formValue = formDataValue;
+  //     const formValue = getValues();   // ⭐ stale data fix
   //     const formData = new FormData();
 
-  //     Object.keys(formValue).forEach(key => {
-  //       if (formValue[key] instanceof FileList && formValue[key].length > 0) {
-  //         formData.append(key, formValue[key][0]);
-  //       } else {
-  //         formData.append(key, formValue[key]);
+  //     Object.entries(formValue).forEach(([key, value]) => {
+  //       if (value instanceof FileList && value.length > 0) {
+  //         formData.append(key, value[0]);
+  //         return;
+  //       }
+  //       if (value !== undefined && value !== null && value !== "") {
+  //         formData.append(key, value);
   //       }
   //     });
 
-  //     const { data } = await axios.post(`${HT_LOAD_CHANGE_BASE}/bicell-response/`, formData, {
-  //       headers: { Authorization: `Bearer ${token}` },
+  //     const { data } = await axios.post(
+  //       `${HT_LOAD_CHANGE_BASE}/bicell-response/`,
+  //       formData,
+  //       { headers: { Authorization: `Bearer ${token}` } }
+  //     );
+
+  //     alert("Commissioning Successfully ✅");
+
+  //     navigate(`/dashboard/respones/${data.data.application}`, {
+  //       state: data.data,
   //     });
 
-  //     alert('Commissioning Successfully ✅');
-  //     navigate(`/dashboard/respones/${data.data.application}`, { state: data });
   //     const updatedFlags = await handleOfficerFlagCount();
   //     dispatch(setOfficerData(updatedFlags));
   //   } catch (error) {
   //     if (handleTokenExpiry(error, navigate)) return;
-  //     console.error('API Error:', error);
-  //     alert('Something went wrong ❌');
+
+  //     console.error("API Error:", error);
+  //     alert("Something went wrong ❌");
   //   } finally {
   //     setBtnIsDisabled(false);
+  //     setIsProcessing(false);   // ⭐ stop processing
   //   }
   // };
+
   const handleFinalSubmit = async () => {
-    try {
-      const formValue = getValues();   // ⭐ stale data fix
-      const formData = new FormData();
+  try {
+    const formValue = getValues();
+    const formData = new FormData();
 
-      Object.entries(formValue).forEach(([key, value]) => {
-        if (value instanceof FileList && value.length > 0) {
+    Object.entries(formValue).forEach(([key, value]) => {
+
+      // ==============================
+      // FILE INPUT
+      // ==============================
+      if (value instanceof FileList) {
+        if (value.length > 0) {
           formData.append(key, value[0]);
-          return;
         }
-        if (value !== undefined && value !== null && value !== "") {
-          formData.append(key, value);
-        }
-      });
 
-      const { data } = await axios.post(
-        `${HT_LOAD_CHANGE_BASE}/bicell-response/`,
-        formData,
-        { headers: { Authorization: `Bearer ${token}` } }
+        // Empty FileList ko ignore karo
+        return;
+      }
+
+      // ==============================
+      // EXISTING FILE PATH
+      // ==============================
+      if (
+        key === "upload_revert_docs" &&
+        typeof value === "string"
+      ) {
+        // Existing backend file path hai.
+        // Isko dobara upload nahi karna.
+        return;
+      }
+
+      // ==============================
+      // NORMAL VALUES
+      // ==============================
+      if (
+        value !== undefined &&
+        value !== null &&
+        value !== ""
+      ) {
+        formData.append(key, value);
+      }
+    });
+
+    console.log("========== FORMDATA ==========");
+
+    for (const [key, value] of formData.entries()) {
+      console.log(
+        key,
+        value,
+        value instanceof File
+          ? `FILE: ${value.name}`
+          : `TYPE: ${typeof value}`
       );
-
-      alert("Commissioning Successfully ✅");
-
-      navigate(`/dashboard/respones/${data.data.application}`, {
-        state: data.data,
-      });
-
-      const updatedFlags = await handleOfficerFlagCount();
-      dispatch(setOfficerData(updatedFlags));
-    } catch (error) {
-      if (handleTokenExpiry(error, navigate)) return;
-
-      console.error("API Error:", error);
-      alert("Something went wrong ❌");
-    } finally {
-      setBtnIsDisabled(false);
-      setIsProcessing(false);   // ⭐ stop processing
     }
-  };
+
+    const { data } = await axios.post(
+      `${HT_LOAD_CHANGE_BASE}/bicell-response/`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    alert("Commissioning Successfully ✅");
+
+    navigate(`/dashboard/respones/${data.data.application}`, {
+      state: data.data,
+    });
+
+    const updatedFlags = await handleOfficerFlagCount();
+    dispatch(setOfficerData(updatedFlags));
+
+  } catch (error) {
+
+    if (handleTokenExpiry(error, navigate)) return;
+
+    console.error("API Error:", error);
+    console.error("Backend response:", error?.response?.data);
+
+    alert(
+      error?.response?.data?.errors?.upload_revert_docs?.[0] ||
+      error?.response?.data?.message ||
+      "Something went wrong ❌"
+    );
+
+  } finally {
+    setBtnIsDisabled(false);
+    setIsProcessing(false);
+  }
+};
 
   return (
     <>
@@ -1259,10 +1681,13 @@ const LoadCommissioning = () => {
                             valueKey="charVal"
                           />
 
-                          <InputTag
+                          {/* ⭐ Dial Factor - now a dropdown with options 1 and 1000, default 1 */}
+                          <SelectTag
                             LName="Dial Factor"
+                            options={dialFactorOptions}
                             {...register("dial_factor")}
-                            disabled={true}
+                            labelKey="label"
+                            valueKey="value"
                           />
 
                           {/* new work completion fields added  */}

@@ -49,7 +49,7 @@ import ApplicationView from './component/Dashboard/UserDashboard/ApplicationView
 import LoadWorkCompletionChargingPermission from './component/Dashboard/UserDashboard/LoadWorkCompletionChargingPermission'
 import CancelApplications from './component/Dashboard/CancelApplications';
 import LoadChangeCancelledApplication from './component/Dashboard/LoadChangeCancelledApplication';
-
+import PaymentPunch from './component/Dashboard/PaymentPunch';
 
 function App() {
   console.log(import.meta.env.MODE, 'App js MODE')
@@ -125,6 +125,7 @@ function App() {
 
             <Route path="/dashboard/download" element={< Download />} />
             <Route path="/dashboard/cancel_applications" element={< CancelApplications/>} />
+            <Route path="/dashboard/payment-punch" element={<PaymentPunch />} />
 
           </Route>
           <Route path="/user-dashboard" element={<DashboardLayout />}>
