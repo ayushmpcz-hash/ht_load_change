@@ -31,7 +31,7 @@ const paymentSourceOptions = [
     { label: "Direct Transfer in NSC Office", value: "Direct Transfer in NSC Office" },
     { label: "Direct Transfer in DSP Office", value: "Direct Transfer in DSP Office" },
     { label: "Transfer in Circle Account", value: "Transfer in Circle Account" },
-    { label: "Energy Amount For VAN", value: "Energy Amount For VAN" },
+    { label: "VAN of Energy Bill", value: "VAN of Energy Bill" },
 ];
 
 const PaymentPunch = () => {

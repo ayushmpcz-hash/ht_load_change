@@ -904,8 +904,8 @@ const DownloadAllPdf = () => {
     statuses: []
   });
 
-  // const DOCUMENT_BASE_URL = "https://htsanyojan.mpcz.in:8089";
-   const DOCUMENT_BASE_URL = "https://htsanyojanuat.mpcz.in:8088";
+  const DOCUMENT_BASE_URL = "https://htsanyojan.mpcz.in:8089";
+  //  const DOCUMENT_BASE_URL = "https://htsanyojanuat.mpcz.in:8088";
   const token = Cookies.get("accessToken");
 
   // ⭐ Ordered stage summary with per-status applications for tooltip
