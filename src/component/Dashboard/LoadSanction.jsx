@@ -554,7 +554,7 @@ console.log(items,'items')
                     ${isDisabled || isSendOtpLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-700 hover:bg-blue-900"}`}
                                   disabled={isSendOtpLoading || isDisabled}
                                 >
-                                  {isDisabled || isSendOtpLoading ? "Please wait..." : "Forward to EDCRA"}
+                                  {isDisabled || isSendOtpLoading ? "Please wait..." : "Forward to CGM Region for EDCRA Approval"}
                                 </button>
                               )
                             ) : (

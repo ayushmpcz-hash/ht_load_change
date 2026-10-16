@@ -1815,7 +1815,7 @@ const LoadSurvey = () => {
       if (!isApplicationNoPresent) {
         setError(erpField, {
           type: 'manual',
-          message: `Application number ${currentApplicationNo} not found in Long name. Please verify and try again.`,
+          message: `Application number ${currentApplicationNo} not found in Long name of ERP Estimate. Please verify and try again.`,
         });
 
         if (type === 'ME') setIsMeErpFetched(false);

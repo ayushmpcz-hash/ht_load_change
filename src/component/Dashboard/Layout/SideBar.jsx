@@ -143,7 +143,7 @@ console.log(role,'role in sidebar')
               </li>
               )}
 
-                {role === 39 && (
+                {role === 39 || role === 9 && (
               <li className="block">
                 <Link
                   to="/dashboard/payment-punch"
